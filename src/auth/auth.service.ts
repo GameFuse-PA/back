@@ -11,6 +11,7 @@ import { User, UserDocument } from 'src/schemas/user.schema';
 import { UsersService } from 'src/users/users.service';
 import { LoginDto } from './dto/login.dto';
 import { RegisterDto } from './dto/register.dto';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class AuthService {
@@ -22,10 +23,11 @@ export class AuthService {
   ) {}
 
   async signIn(loginDto: LoginDto) {
-    const user = await this.usersService.findOneByEmail(loginDto.email);
+    const user = await this.usersService.findOneByEmail(loginDto.email, true);
 
-    if (user && user.password === loginDto.password) {
+    if (user && (await bcrypt.compare(loginDto.password, user.password))) {
       const payload = { username: user.username, sub: user._id };
+      user.password = undefined;
 
       return {
         user,
@@ -42,7 +44,6 @@ export class AuthService {
     const existEmail = await this.usersService.findOneByEmail(
       registerDto.email,
     );
-
     if (existEmail) {
       throw new ConflictException('Un utilisateur avec cet email existe déjà');
     }
@@ -50,13 +51,23 @@ export class AuthService {
     const existUsername = await this.usersService.findOneByUsername(
       registerDto.username,
     );
-
     if (existUsername) {
       throw new ConflictException('Un utilisateur avec ce pseudo existe déjà');
     }
 
+    const salt = await bcrypt.genSalt();
+    registerDto.password = await bcrypt.hash(registerDto.password, salt);
     const newUser = new this.userModel(registerDto);
+    const user = await newUser.save();
 
-    return newUser.save();
+    const payload = { username: user.username, sub: user._id };
+    user.password = undefined;
+
+    return {
+      user,
+      access_token: this.jwtService.sign(payload),
+      token_type: 'Bearer',
+      expires_in: this.appConfigService.jwtExpiration,
+    };
   }
 }
