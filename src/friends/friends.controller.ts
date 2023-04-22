@@ -10,7 +10,6 @@ export class FriendsController {
         private jwtService: JwtService,
     ) {}
 
-    @HttpCode(200)
     @Get('getFriends')
     getFriends(@Request() req) {
         return this.friendsService.getFriends(req.user.userId);
