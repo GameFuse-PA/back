@@ -28,6 +28,7 @@ export class AuthService {
       const payload = { username: user.username, sub: user._id };
 
       return {
+        user,
         access_token: this.jwtService.sign(payload),
         token_type: 'Bearer',
         expires_in: this.appConfigService.jwtExpiration,
@@ -51,7 +52,7 @@ export class AuthService {
     );
 
     if (existUsername) {
-      throw new ConflictException('Un utilisateur avec ce nom existe déjà');
+      throw new ConflictException('Un utilisateur avec ce pseudo existe déjà');
     }
 
     const newUser = new this.userModel(registerDto);
