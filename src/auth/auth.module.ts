@@ -12,11 +12,11 @@ import { AppConfigService } from 'src/configuration/app.config.service';
       inject: [AppConfigService],
       useFactory: (appConfigService: AppConfigService) => ({
         secret: appConfigService.jwtSecret,
-        signOptions: { expiresIn: appConfigService.jwtExpiration }
-      })
-    })
+        signOptions: { expiresIn: appConfigService.jwtExpiration },
+      }),
+    }),
   ],
   controllers: [AuthController],
-  providers: [AuthService]
+  providers: [AuthService],
 })
 export class AuthModule {}
