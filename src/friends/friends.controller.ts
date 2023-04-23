@@ -3,9 +3,8 @@ import {
     Body,
     Controller,
     Delete,
-    Get,
     HttpCode,
-    Post,
+    Param,
     Request,
     UseGuards,
 } from '@nestjs/common';
@@ -21,20 +20,18 @@ export class FriendsController {
     ) {}
 
     @UseGuards(AuthGuard)
-    @Get('getFriends')
     getFriends(@Request() req) {
         return this.friendsService.getFriends(req.userId);
     }
 
     @HttpCode(201)
-    @Post('addFriend')
-    addFriend(@Body() friend: FriendsDto): Promise<any> {
+    addFriend(@Body() friend: FriendsDto) {
         return this.friendsService.addFriend(friend);
     }
 
     @UseGuards(AuthGuard)
-    @Delete('deleteFriend')
-    deleteFriend(@Request() req): Promise<boolean> {
-        return this.friendsService.deleteFriend(req.userId, req.body.id);
+    @Delete(':id')
+    deleteFriend(@Request() req, @Param() id): Promise<boolean> {
+        return this.friendsService.deleteFriend(req.userId, id);
     }
 }

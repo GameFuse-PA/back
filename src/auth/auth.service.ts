@@ -79,8 +79,20 @@ export class AuthService {
         };
     }
 
+    async sendResetPasswordEmail(resetPasswordDto: ResetPasswordDto) {
+        const user = await this.usersService.findOneByEmail(
+            resetPasswordDto.email,
+        );
+        if (!user) {
+            throw new UnauthorizedException('Identifiants incorrects');
+        }
+        return 'voici le lien pour réinitialiser votre mot de passe: https://test';
+    }
+
     async resetPassword(resetPasswordDto: ResetPasswordDto) {
-        const user = await this.usersService.findOneByEmail(resetPasswordDto.email);
+        const user = await this.usersService.findOneByEmail(
+            resetPasswordDto.email,
+        );
         if (!user) {
             throw new UnauthorizedException('Identifiants incorrects');
         }

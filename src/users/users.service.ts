@@ -26,8 +26,7 @@ export class UsersService {
     async findOneById(id: string): Promise<UserDocument> {
         return this.userModel.findById(id).exec();
     }
-    async updateOneById(id: string, user: User): Promise<boolean> {
-        const userUpdated = await this.userModel.updateOne({ id }, user).exec();
-        return userUpdated.modifiedCount === 1;
+    async updateOneById(id: string, user: User) {
+        return this.userModel.findByIdAndUpdate(id, user).exec();
     }
 }

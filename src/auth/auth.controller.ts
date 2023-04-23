@@ -37,6 +37,9 @@ export class AuthController {
     }
     @Post('resetPassword')
     resetPassword(@Body() resetPasswordDto: ResetPasswordDto) {
+        if (!resetPasswordDto.password) {
+            return this.authService.sendResetPasswordEmail(resetPasswordDto);
+        }
         return this.authService.resetPassword(resetPasswordDto);
     }
 }
