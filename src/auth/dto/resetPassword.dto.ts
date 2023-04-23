@@ -1,9 +1,7 @@
 import { IsEmail, MinLength, IsNotEmpty } from 'class-validator';
 
-export class RegisterDto {
-    @IsNotEmpty({ message: 'Pseudo requis' })
-    username: string;
-
+export class ResetPasswordDto {
+    @IsNotEmpty({ message: 'Email requis' })
     @IsEmail({}, { message: 'Email invalide' })
     email: string;
 

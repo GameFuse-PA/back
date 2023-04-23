@@ -1,5 +1,5 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { FriendsDto } from './Friends.dto';
+import { FriendsDto } from './dto/Friends.dto';
 import { InjectModel } from '@nestjs/mongoose';
 import { FriendDocument, Friends } from '../schemas/friends.schema';
 import { Model } from 'mongoose';
@@ -13,7 +13,7 @@ export class FriendsService {
     ) {}
 
     async getFriends(idUser: string) {
-        const user = await this.usersServices.findOneByid(idUser);
+        const user = await this.usersServices.findOneById(idUser);
         if (!user) {
             throw new NotFoundException("L'utilisateur n'existe pas");
         }
