@@ -79,13 +79,13 @@ export class AuthService {
         };
     }
 
-    async resetPassword(values: ResetPasswordDto) {
-        const user = await this.usersService.findOneByEmail(values.email);
+    async resetPassword(resetPasswordDto: ResetPasswordDto) {
+        const user = await this.usersService.findOneByEmail(resetPasswordDto.email);
         if (!user) {
             throw new UnauthorizedException('Identifiants incorrects');
         }
         const salt = await bcrypt.genSalt();
-        let password = values.password;
+        let password = resetPasswordDto.password;
         password = await bcrypt.hash(password, salt);
         user.password = password;
         await user.save();
