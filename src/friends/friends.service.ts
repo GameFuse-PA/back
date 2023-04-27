@@ -2,7 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { FriendsDto } from './dto/Friends.dto';
 import { InjectModel } from '@nestjs/mongoose';
 import { FriendDocument, Friends } from '../schemas/friends.schema';
-import { Model } from 'mongoose';
+import { Model, Types } from 'mongoose';
 import { UsersService } from '../users/users.service';
 
 @Injectable()
@@ -17,14 +17,28 @@ export class FriendsService {
         if (!user) {
             throw new NotFoundException("L'utilisateur n'existe pas");
         }
-        return this.friendsModel.find({ idUser: idUser });
+        return this.friendsModel
+            .find({ idUser: idUser })
+            .populate('idFriend')
+            .exec();
     }
 
-    async addFriend(friend: FriendsDto) {
-        if (!friend) {
+    async addFriend(id: string, friend: FriendsDto) {
+        if (!friend.idFriend) {
             throw new Error("Erreur avec l'ami entré");
         }
-        const newFriend = new this.friendsModel(friend);
+        const userFriend = await this.friendsModel.findById(id);
+        if (userFriend && userFriend.idFriend.length > 0) {
+            userFriend.idFriend.push(
+                friend.idFriend as unknown as Types.ObjectId,
+            );
+            return userFriend.save();
+        }
+        const model: FriendsDto = {
+            idFriend: friend.idFriend,
+            idUser: id,
+        };
+        const newFriend = new this.friendsModel(model);
         return newFriend.save();
     }
 

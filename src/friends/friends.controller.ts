@@ -5,10 +5,10 @@ import {
     Delete,
     HttpCode,
     Param,
+    Post,
     Request,
     UseGuards,
 } from '@nestjs/common';
-import { FriendsDto } from './dto/Friends.dto';
 import { JwtService } from '@nestjs/jwt';
 import { AuthGuard } from '../guards/auth.guard';
 
@@ -24,9 +24,10 @@ export class FriendsController {
         return this.friendsService.getFriends(req.userId);
     }
 
+    @UseGuards(AuthGuard)
     @HttpCode(201)
-    addFriend(@Body() friend: FriendsDto) {
-        return this.friendsService.addFriend(friend);
+    addFriend(@Request() req, @Body() id) {
+        return this.friendsService.addFriend(req.userId, id);
     }
 
     @UseGuards(AuthGuard)
