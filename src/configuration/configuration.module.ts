@@ -4,9 +4,9 @@ import { AppConfigService } from './app.config.service';
 
 @Global()
 @Module({
-  imports: [ConfigModule.forRoot()],
-  controllers: [],
-  providers: [AppConfigService],
-  exports: [AppConfigService],
+    imports: [ConfigModule.forRoot()],
+    controllers: [],
+    providers: [AppConfigService],
+    exports: [AppConfigService],
 })
 export class ConfigurationModule {}
