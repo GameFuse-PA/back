@@ -7,7 +7,6 @@ import { ConfigurationModule } from './configuration/configuration.module';
 import { SchemasModule } from './schemas/schemas.module';
 import { DatabaseModule } from './database/database.module';
 import { FriendsModule } from './friends/friends.module';
-import { ProfilModule } from './profil/profil.module';
 
 @Module({
     imports: [
@@ -17,7 +16,6 @@ import { ProfilModule } from './profil/profil.module';
         SchemasModule,
         DatabaseModule,
         FriendsModule,
-        ProfilModule,
     ],
     controllers: [AppController],
     providers: [AppService],
