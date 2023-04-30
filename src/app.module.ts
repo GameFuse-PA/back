@@ -6,6 +6,7 @@ import { UsersModule } from './users/users.module';
 import { ConfigurationModule } from './configuration/configuration.module';
 import { SchemasModule } from './schemas/schemas.module';
 import { DatabaseModule } from './database/database.module';
+import { MailModule } from './mail/mail.module';
 
 @Module({
     imports: [
@@ -14,6 +15,7 @@ import { DatabaseModule } from './database/database.module';
         ConfigurationModule,
         SchemasModule,
         DatabaseModule,
+        MailModule,
     ],
     controllers: [AppController],
     providers: [AppService],

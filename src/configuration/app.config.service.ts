@@ -16,4 +16,16 @@ export class AppConfigService {
     get mongoUri(): string {
         return this.configService.get<string>('MONGO_URI');
     }
+
+    get mailjetApiKey(): string {
+        return this.configService.get<string>('MAILJET_API_KEY');
+    }
+
+    get mailjetApiSecret(): string {
+        return this.configService.get<string>('MAILJET_API_SECRET');
+    }
+
+    get mailjetEmail(): string {
+        return this.configService.get<string>('MAILJET_EMAIL_FROM');
+    }
 }

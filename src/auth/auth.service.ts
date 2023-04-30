@@ -13,6 +13,8 @@ import { LoginDto } from './dto/login.dto';
 import { RegisterDto } from './dto/register.dto';
 import * as bcrypt from 'bcrypt';
 import { ResetPasswordDto } from './dto/resetPassword.dto';
+import { NotificationsConfigService } from '../configuration/notifications.config.service';
+import { NewPasswordDto } from './dto/newPassword.dto';
 
 @Injectable()
 export class AuthService {
@@ -20,6 +22,7 @@ export class AuthService {
         private usersService: UsersService,
         private jwtService: JwtService,
         private appConfigService: AppConfigService,
+        private notificationsService: NotificationsConfigService,
         @InjectModel(User.name) private userModel: Model<UserDocument>,
     ) {}
 
@@ -86,21 +89,39 @@ export class AuthService {
         if (!user) {
             throw new UnauthorizedException('Identifiants incorrects');
         }
-        return 'voici le lien pour réinitialiser votre mot de passe: https://test';
+        const payload = { email: user.email, sub: user._id };
+
+        const subject = 'Réinitialisation de votre email';
+        const token = this.jwtService.sign(payload);
+        const text = `<h1>Bonjour</h1>
+         <p>Vous avez demandé récemment un changement de mot de passe voici le lien vous permettant de le réinitialiser</p>
+         <a href="http://localhost:4200/newPassword?token=${token}">http://localhost:4200/newPassword?token=${token}</a>`;
+
+        user.newPasswordToken = token;
+        await user.save();
+        return await this.notificationsService.sendEmail(
+            resetPasswordDto.email,
+            subject,
+            text,
+        );
     }
 
-    async resetPassword(resetPasswordDto: ResetPasswordDto) {
-        const user = await this.usersService.findOneByEmail(
-            resetPasswordDto.email,
-        );
-        if (!user) {
-            throw new UnauthorizedException('Identifiants incorrects');
+    async resetPassword(userId: string, newPasswordDto: NewPasswordDto) {
+        const user = await this.usersService.findOneById(userId);
+        if (!user || !user.newPasswordToken) {
+            throw new UnauthorizedException(
+                "Le token a expiré ou vous n'êtes plus autorisé à accéder à cette partie",
+            );
         }
         const salt = await bcrypt.genSalt();
-        let password = resetPasswordDto.password;
+        let password = newPasswordDto.password;
         password = await bcrypt.hash(password, salt);
         user.password = password;
+        user.newPasswordToken = undefined;
         await user.save();
-        return user;
+        return {
+            message:
+                "Mot de passe bien modifié, vous pouvez l'utilisez pour votre prochaine connexion",
+        };
     }
 }
