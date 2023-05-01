@@ -26,7 +26,8 @@ export class LiveChatController
 
     @SubscribeMessage('join-room')
     handleJoinRoom(client: Socket, payload: any) {
-        const { roomId, userId } = payload;
+        const roomId = payload[0];
+        const userId = payload[1];
         client.join(roomId);
         client.broadcast.to(roomId).emit('user-connected', userId);
 
