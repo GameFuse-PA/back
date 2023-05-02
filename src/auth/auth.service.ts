@@ -106,11 +106,20 @@ export class AuthService {
         );
     }
 
-    async resetPassword(userId: string, newPasswordDto: NewPasswordDto) {
+    async resetPassword(
+        userId: string,
+        token: string,
+        newPasswordDto: NewPasswordDto,
+    ) {
         const user = await this.usersService.findOneById(userId);
         if (!user || !user.newPasswordToken) {
             throw new UnauthorizedException(
                 "Le token a expiré ou vous n'êtes plus autorisé à accéder à cette partie",
+            );
+        }
+        if (user.newPasswordToken !== token) {
+            throw new UnauthorizedException(
+                'Le token fourni est expiré ou invalide',
             );
         }
         const salt = await bcrypt.genSalt();
