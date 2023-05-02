@@ -15,6 +15,7 @@ import * as bcrypt from 'bcrypt';
 import { ResetPasswordDto } from './dto/resetPassword.dto';
 import { NotificationsConfigService } from '../configuration/notifications.config.service';
 import { NewPasswordDto } from './dto/newPassword.dto';
+import { MailConfigService } from '../configuration/mail.config.service';
 
 @Injectable()
 export class AuthService {
@@ -23,6 +24,7 @@ export class AuthService {
         private jwtService: JwtService,
         private appConfigService: AppConfigService,
         private notificationsService: NotificationsConfigService,
+        private mailerService: MailConfigService,
         @InjectModel(User.name) private userModel: Model<UserDocument>,
     ) {}
 
@@ -90,19 +92,17 @@ export class AuthService {
             throw new UnauthorizedException('Identifiants incorrects');
         }
         const payload = { email: user.email, sub: user._id };
-
-        const subject = 'Réinitialisation de votre email';
         const token = this.jwtService.sign(payload);
-        const text = `<h1>Bonjour</h1>
-         <p>Vous avez demandé récemment un changement de mot de passe voici le lien vous permettant de le réinitialiser</p>
-         <a href="http://localhost:4200/newPassword?token=${token}">http://localhost:4200/newPassword?token=${token}</a>`;
+
+        const mailResetPassword =
+            this.mailerService.getResetPasswordMail(token);
 
         user.newPasswordToken = token;
         await user.save();
         return await this.notificationsService.sendEmail(
             resetPasswordDto.email,
-            subject,
-            text,
+            mailResetPassword.subject,
+            mailResetPassword.body,
         );
     }
 
