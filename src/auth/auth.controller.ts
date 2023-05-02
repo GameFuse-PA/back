@@ -37,12 +37,12 @@ export class AuthController {
     me(@Request() req) {
         return this.usersService.findOneById(req.userId);
     }
-    @Post('sendResetPassword')
+    @Post('forgot-password')
     sendResetPassword(@Body() resetPasswordDto: ResetPasswordDto) {
         return this.authService.sendResetPasswordEmail(resetPasswordDto);
     }
 
-    @Put('resetPassword')
+    @Put('password')
     @UseGuards(AuthGuard)
     resetPassword(@Request() req, @Body() newPasswordDto: NewPasswordDto) {
         return this.authService.resetPassword(req.userId, newPasswordDto);
