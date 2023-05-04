@@ -13,6 +13,12 @@ export class User {
 
     @Prop({ required: true, select: false })
     password: string;
+
+    @Prop({
+        type: { location: { type: String }, key: { type: String } },
+        required: false,
+    })
+    avatar: { location: string; key: string };
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);
