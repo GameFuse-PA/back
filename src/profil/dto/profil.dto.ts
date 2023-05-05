@@ -7,12 +7,13 @@ export class ProfilDto {
     @IsEmail({}, { message: 'Email invalide' })
     email: string;
 
-    @IsDate({ message: 'Date invalide' })
     birthDate: Date;
 
     @MinLength(2, { message: 'Le prénom doit avoir minimum 2 caractères' })
-    firstName: string;
+    firstname: string;
 
-    @MinLength(2, { message: 'Le prénom doit avoir minimum 2 caractères' })
-    lastName: string;
+    @MinLength(2, {
+        message: 'Le nom de famille doit avoir minimum 2 caractères',
+    })
+    lastname: string;
 }

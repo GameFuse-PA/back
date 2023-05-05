@@ -8,6 +8,7 @@ import {
     UploadedFile,
     Body,
     Get,
+    Param,
 } from '@nestjs/common';
 import { AuthGuard } from '../guards/auth.guard';
 import { ProfilService } from './profile.service';
@@ -19,9 +20,9 @@ export class ProfilController {
     constructor(private profileService: ProfilService) {}
 
     @UseGuards(AuthGuard)
-    @Get()
-    async getProfile(@Request() req) {
-        return this.profileService.getProfil(req.userId);
+    @Get(':id')
+    async getProfile(@Param('id') id: string) {
+        return this.profileService.getProfil(id);
     }
 
     @UseGuards(AuthGuard)
