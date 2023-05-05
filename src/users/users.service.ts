@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { User, UserDocument } from 'src/schemas/user.schema';
+import { ProfilDto } from '../profil/dto/profil.dto';
 
 @Injectable()
 export class UsersService {
@@ -26,7 +27,7 @@ export class UsersService {
     async findOneById(id: string): Promise<UserDocument> {
         return this.userModel.findById(id).exec();
     }
-    async updateOneById(id: string, user: User) {
+    async updateOneById(id: string, user: ProfilDto) {
         return this.userModel.findByIdAndUpdate(id, user).exec();
     }
 }

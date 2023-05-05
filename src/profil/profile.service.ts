@@ -2,12 +2,14 @@ import {
     Injectable,
     InternalServerErrorException,
     NotFoundException,
+    UnauthorizedException,
 } from '@nestjs/common';
 import { UsersService } from '../users/users.service';
 import { User, UserDocument } from '../schemas/user.schema';
 import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import { S3ConfigService } from '../amazon/s3.config.service';
+import { ProfilDto } from './dto/profil.dto';
 
 @Injectable()
 export class ProfilService {
@@ -17,20 +19,29 @@ export class ProfilService {
         @InjectModel(User.name) private userModel: Model<UserDocument>,
     ) {}
 
-    async updateProfil(id: string, user: User) {
-        const userExist = await this.usersServices.findOneById(id);
-        if (!userExist) {
+    async getProfil(id: string) {
+        const user = await this.usersServices.findOneById(id);
+        if (!user) {
             throw new NotFoundException("L'utilisateur n'existe pas");
         }
-        return this.usersServices.updateOneById(id, user);
+        user.password = undefined;
+        return user;
     }
 
-    async updateProfilePicture(id: string) {
+    async updateProfil(id: string, user: ProfilDto) {
         const userExist = await this.usersServices.findOneById(id);
         if (!userExist) {
             throw new NotFoundException("L'utilisateur n'existe pas");
         }
-        return '';
+        const userEmailExist = await this.usersServices.findOneByEmail(
+            user.email,
+        );
+        if (userEmailExist && userEmailExist._id.toString() != id) {
+            throw new UnauthorizedException(
+                'Un utilisateur avec cet email existe déjà',
+            );
+        }
+        return this.usersServices.updateOneById(id, user);
     }
 
     async uploadPhoto(userId: any, file: Express.Multer.File) {

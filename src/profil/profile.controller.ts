@@ -7,18 +7,26 @@ import {
     UseInterceptors,
     UploadedFile,
     Body,
+    Get,
 } from '@nestjs/common';
 import { AuthGuard } from '../guards/auth.guard';
 import { ProfilService } from './profile.service';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { User } from '../schemas/user.schema';
+import { ProfilDto } from './dto/profil.dto';
 
 @Controller('me')
 export class ProfilController {
     constructor(private profileService: ProfilService) {}
+
+    @UseGuards(AuthGuard)
+    @Get()
+    async getProfile(@Request() req) {
+        return this.profileService.getProfil(req.userId);
+    }
+
     @UseGuards(AuthGuard)
     @Put()
-    async updateProfile(@Request() req, @Body() body: User) {
+    async updateProfile(@Request() req, @Body() body: ProfilDto) {
         return this.profileService.updateProfil(req.userId, body);
     }
 
