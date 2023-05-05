@@ -6,6 +6,10 @@ import {
     WebSocketServer,
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
+import { UseGuards } from '@nestjs/common';
+import { AuthGuard } from '../guards/auth.guard';
+import { LiveChatService } from './liveChat.service';
+import { MessageDTO } from './MessageDTO';
 
 @WebSocketGateway({
     cors: { origin: '*', methods: ['GET', 'POST'] },
@@ -16,6 +20,8 @@ export class LiveChatController
 {
     @WebSocketServer()
     server: Server;
+
+    constructor(private liveChatService: LiveChatService) {}
     handleConnection(client: Socket) {
         console.log('Client connected:', client.id);
     }
@@ -24,6 +30,7 @@ export class LiveChatController
         console.log('Client disconnected:', client.id);
     }
 
+    @UseGuards(AuthGuard)
     @SubscribeMessage('join-room')
     handleJoinRoom(client: Socket, payload: any) {
         const roomId = payload[0];
@@ -37,6 +44,13 @@ export class LiveChatController
 
         client.on('chat', (content) => {
             client.broadcast.to(roomId).emit('new-message', content);
+            const message: MessageDTO = {
+                content: content,
+                senderId: userId,
+                date: Date.now(),
+                conversationId: roomId,
+            };
+            this.liveChatService.postMessage(message);
         });
     }
 }

@@ -13,6 +13,9 @@ export class User {
 
     @Prop({ required: true, select: false })
     password: string;
+
+    @Prop({ required: true, select: false })
+    peerIds: string[];
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);
