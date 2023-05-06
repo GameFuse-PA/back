@@ -8,6 +8,7 @@ import { SchemasModule } from './schemas/schemas.module';
 import { DatabaseModule } from './database/database.module';
 import { ProfilModule } from './profil/profil.module';
 import { AmazonModule } from './amazon/amazon.module';
+import { MailModule } from './mail/mail.module';
 
 @Module({
     imports: [
@@ -18,6 +19,7 @@ import { AmazonModule } from './amazon/amazon.module';
         DatabaseModule,
         ProfilModule,
         AmazonModule,
+        MailModule,
     ],
     controllers: [AppController],
     providers: [AppService],

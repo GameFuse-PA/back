@@ -32,4 +32,16 @@ export class AppConfigService {
     get awsBucketName(): string {
         return this.configService.get<string>('AWS_BUCKET_NAME');
     }
+
+    get mailjetApiKey(): string {
+        return this.configService.get<string>('MAILJET_API_KEY');
+    }
+
+    get mailjetApiSecret(): string {
+        return this.configService.get<string>('MAILJET_API_SECRET');
+    }
+
+    get mailjetEmail(): string {
+        return this.configService.get<string>('MAILJET_EMAIL_FROM');
+    }
 }
