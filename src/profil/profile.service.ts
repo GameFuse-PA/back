@@ -10,12 +10,14 @@ import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import { S3ConfigService } from '../amazon/s3.config.service';
 import { ProfilDto } from './dto/profil.dto';
+import { AppConfigService } from '../configuration/app.config.service';
 
 @Injectable()
 export class ProfilService {
     constructor(
         private usersServices: UsersService,
         private s3Services: S3ConfigService,
+        private appConfig: AppConfigService,
         @InjectModel(User.name) private userModel: Model<UserDocument>,
     ) {}
 
@@ -52,12 +54,24 @@ export class ProfilService {
         try {
             const saveAvatar = await this.s3Services.uploadFile(
                 file.buffer,
-                file.originalname,
+                `profil-pic/${user.id}-${file.originalname}`,
             );
-            user.avatar.location = saveAvatar.ETag;
-            user.avatar.key = saveAvatar.ChecksumSHA256;
-            await user.save();
+
+            const urlPic = `https://${this.appConfig.awsBucketName}.s3.${this.appConfig.awsRegion}.amazonaws.com/profil-pic/${user.id}-${file.originalname}`;
+
+            await user.updateOne(
+                {
+                    $set: {
+                        avatar: {
+                            location: urlPic,
+                            key: saveAvatar.ETag,
+                        },
+                    },
+                },
+                { omitUndefined: true },
+            );
             return {
+                pic: urlPic,
                 message: 'Image de profil mise à jour avec succès',
             };
         } catch (e) {

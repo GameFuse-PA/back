@@ -32,6 +32,11 @@ export class AuthService {
         if (user && (await bcrypt.compare(loginDto.password, user.password))) {
             const payload = { username: user.username, sub: user._id };
             user.password = undefined;
+            if (user.avatar) {
+                if (user.avatar.key) {
+                    user.avatar.key = undefined;
+                }
+            }
 
             return {
                 user,

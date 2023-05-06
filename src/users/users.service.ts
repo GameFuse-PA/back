@@ -28,6 +28,8 @@ export class UsersService {
         return this.userModel.findById(id).exec();
     }
     async updateOneById(id: string, user: ProfilDto) {
-        return this.userModel.findByIdAndUpdate(id, user).exec();
+        return this.userModel
+            .findByIdAndUpdate(id, user, { omitUndefined: true })
+            .exec();
     }
 }
