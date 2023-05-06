@@ -1,4 +1,4 @@
-import { IsDate, IsEmail, MinLength } from 'class-validator';
+import { IsEmail, MinLength } from 'class-validator';
 
 export class ProfilDto {
     @MinLength(2, { message: 'Le pseudo doit avoir minimum 2 caractères' })
