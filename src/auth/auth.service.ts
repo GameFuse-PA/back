@@ -115,14 +115,21 @@ export class AuthService {
         userId: string,
         token: string,
         newPasswordDto: NewPasswordDto,
+        fromProfil: string | undefined,
     ) {
         const user = await this.usersService.findOneById(userId);
-        if (!user || !user.newPasswordToken) {
+        if (
+            !user ||
+            (!user.newPasswordToken && fromProfil.toLowerCase() !== 'true')
+        ) {
             throw new UnauthorizedException(
                 "Le token a expiré ou vous n'êtes plus autorisé à accéder à cette partie",
             );
         }
-        if (user.newPasswordToken !== token) {
+        if (
+            user.newPasswordToken !== token &&
+            fromProfil.toLowerCase() !== 'true'
+        ) {
             throw new UnauthorizedException(
                 'Le token fourni est expiré ou invalide',
             );

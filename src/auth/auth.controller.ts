@@ -3,7 +3,7 @@ import {
     Controller,
     Get,
     Post,
-    Put,
+    Put, Query,
     Request,
     UseGuards,
 } from '@nestjs/common';
@@ -44,12 +44,17 @@ export class AuthController {
 
     @Put('password')
     @UseGuards(AuthGuard)
-    resetPassword(@Request() req, @Body() newPasswordDto: NewPasswordDto) {
+    resetPassword(
+        @Request() req,
+        @Query('fromProfil') fromProfil,
+        @Body() newPasswordDto: NewPasswordDto,
+    ) {
         const token = req.headers.authorization.split(' ')[1];
         return this.authService.resetPassword(
             req.userId,
             token,
             newPasswordDto,
+            fromProfil,
         );
     }
 }
