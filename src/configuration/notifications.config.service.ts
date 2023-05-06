@@ -15,6 +15,7 @@ export class NotificationsConfigService {
                 {
                     From: {
                         Email: this.appConfiguration.mailjetEmail,
+                        Name: 'Support Gamefuse',
                     },
                     To: [
                         {
