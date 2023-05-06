@@ -5,11 +5,12 @@ import {
     WebSocketGateway,
     WebSocketServer,
 } from '@nestjs/websockets';
+
+import { UseGuards, Request } from '@nestjs/common';
 import { Server, Socket } from 'socket.io';
-import { UseGuards } from '@nestjs/common';
-import { AuthGuard } from '../guards/auth.guard';
 import { LiveChatService } from './liveChat.service';
 import { MessageDTO } from './MessageDTO';
+import { WebSocketAuthGuard } from '../guards/WebSocketAuthGuard';
 
 @WebSocketGateway({
     cors: { origin: '*', methods: ['GET', 'POST'] },
@@ -30,9 +31,10 @@ export class LiveChatController
         console.log('Client disconnected:', client.id);
     }
 
-    @UseGuards(AuthGuard)
+    @UseGuards(WebSocketAuthGuard)
     @SubscribeMessage('join-room')
-    handleJoinRoom(client: Socket, payload: any) {
+    handleJoinRoom(client: Socket, payload: any, @Request() req) {
+        console.log(req.userId);
         const roomId = payload[0];
         const userId = payload[1];
         client.join(roomId);
@@ -47,7 +49,7 @@ export class LiveChatController
             const message: MessageDTO = {
                 content: content,
                 senderId: userId,
-                date: Date.now(),
+                date: new Date(),
                 conversationId: roomId,
             };
             this.liveChatService.postMessage(message);

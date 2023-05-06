@@ -7,6 +7,7 @@ import { ConfigurationModule } from './configuration/configuration.module';
 import { SchemasModule } from './schemas/schemas.module';
 import { DatabaseModule } from './database/database.module';
 import { LiveChatModule } from './liveChat/liveChat.module';
+import { JwtModule } from '@nestjs/jwt';
 
 @Module({
     imports: [
@@ -16,6 +17,7 @@ import { LiveChatModule } from './liveChat/liveChat.module';
         SchemasModule,
         DatabaseModule,
         LiveChatModule,
+        JwtModule,
     ],
     controllers: [AppController],
     providers: [AppService],
