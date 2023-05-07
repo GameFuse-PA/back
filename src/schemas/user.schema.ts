@@ -1,9 +1,10 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { HydratedDocument } from 'mongoose';
+import { HydratedDocument, Schema as MongooseSchema } from 'mongoose';
+import { File } from './file.schema';
 
 export type UserDocument = HydratedDocument<User>;
 
-@Schema({ versionKey: false })
+@Schema({ versionKey: false, timestamps: true })
 export class User {
     @Prop({ required: false })
     firstname: string;
@@ -24,10 +25,10 @@ export class User {
     newPasswordToken: string;
 
     @Prop({
-        type: { location: { type: String }, key: { type: String } },
-        required: false,
+        type: MongooseSchema.Types.ObjectId,
+        ref: 'File',
     })
-    avatar: { location: string; key: string };
+    avatar: File;
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);

@@ -3,7 +3,7 @@ import { PutObjectCommand, S3Client } from '@aws-sdk/client-s3';
 import { AppConfigService } from '../configuration/app.config.service';
 
 @Injectable()
-export class S3ConfigService {
+export class FileService {
     private s3: S3Client;
 
     constructor(private appConfigService: AppConfigService) {
@@ -26,7 +26,7 @@ export class S3ConfigService {
             const command = new PutObjectCommand(params);
             return await this.s3.send(command);
         } catch (e) {
-            throw new Error(`Could not upload file. Error: ${e}`);
+            throw new Error(`Erreur lors de l'upload du fichier. Error: ${e}`);
         }
     }
 }

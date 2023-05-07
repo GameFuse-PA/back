@@ -3,7 +3,8 @@ import {
     Controller,
     Get,
     Post,
-    Put, Query,
+    Put,
+    Query,
     Request,
     UseGuards,
 } from '@nestjs/common';
@@ -54,7 +55,6 @@ export class AuthController {
             req.userId,
             token,
             newPasswordDto,
-            fromProfil,
         );
     }
 }

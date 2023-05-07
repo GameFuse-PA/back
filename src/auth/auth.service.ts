@@ -37,11 +37,6 @@ export class AuthService {
         if (user && (await bcrypt.compare(loginDto.password, user.password))) {
             const payload = { username: user.username, sub: user._id };
             user.password = undefined;
-            if (user.avatar) {
-                if (user.avatar.key) {
-                    user.avatar.key = undefined;
-                }
-            }
 
             return {
                 user,
@@ -115,21 +110,14 @@ export class AuthService {
         userId: string,
         token: string,
         newPasswordDto: NewPasswordDto,
-        fromProfil: string | undefined,
     ) {
         const user = await this.usersService.findOneById(userId);
-        if (
-            !user ||
-            (!user.newPasswordToken && fromProfil.toLowerCase() !== 'true')
-        ) {
+        if (!user || !user.newPasswordToken) {
             throw new UnauthorizedException(
                 "Le token a expiré ou vous n'êtes plus autorisé à accéder à cette partie",
             );
         }
-        if (
-            user.newPasswordToken !== token &&
-            fromProfil.toLowerCase() !== 'true'
-        ) {
+        if (user.newPasswordToken !== token) {
             throw new UnauthorizedException(
                 'Le token fourni est expiré ou invalide',
             );
@@ -142,7 +130,7 @@ export class AuthService {
         await user.save();
         return {
             message:
-                "Mot de passe bien modifié, vous pouvez l'utilisez pour votre prochaine connexion",
+                "Mot de passe bien modifié, vous pouvez l'utiliser pour votre prochaine connexion",
         };
     }
 }

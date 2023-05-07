@@ -5,20 +5,22 @@ import {
     UnauthorizedException,
 } from '@nestjs/common';
 import { UsersService } from '../users/users.service';
-import { User, UserDocument } from '../schemas/user.schema';
+import { File, FileDocument } from '../schemas/file.schema';
 import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
-import { S3ConfigService } from '../amazon/s3.config.service';
+import { FileService } from '../amazon/file.service';
 import { ProfilDto } from './dto/profil.dto';
 import { AppConfigService } from '../configuration/app.config.service';
+import { PasswordDto } from './dto/password.dto';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class ProfilService {
     constructor(
         private usersServices: UsersService,
-        private s3Services: S3ConfigService,
+        private fileServices: FileService,
         private appConfig: AppConfigService,
-        @InjectModel(User.name) private userModel: Model<UserDocument>,
+        @InjectModel(File.name) private fileModel: Model<FileDocument>,
     ) {}
 
     async getProfil(id: string) {
@@ -43,7 +45,29 @@ export class ProfilService {
                 'Un utilisateur avec cet email existe déjà',
             );
         }
-        return this.usersServices.updateOneById(id, user);
+
+        const updatedUser = await this.usersServices.updateOneById(id, user);
+        updatedUser.password = undefined;
+        return {
+            message: 'Profil mis à jour avec succès',
+            user: updatedUser,
+        };
+    }
+
+    async updatePassword(id: string, user: PasswordDto) {
+        const userExist = await this.usersServices.findOneById(id);
+        if (!userExist) {
+            throw new NotFoundException("L'utilisateur n'existe pas");
+        }
+        const salt = await bcrypt.genSalt();
+        let password = user.password;
+        password = await bcrypt.hash(password, salt);
+        userExist.password = password;
+        await userExist.save();
+        return {
+            message:
+                "Mot de passe bien modifié, vous pouvez l'utiliser pour votre prochaine connexion",
+        };
     }
 
     async uploadPhoto(userId: any, file: Express.Multer.File) {
@@ -52,24 +76,21 @@ export class ProfilService {
             throw new NotFoundException("L'utilisateur n'existe pas");
         }
         try {
-            const saveAvatar = await this.s3Services.uploadFile(
+            const saveAvatar = await this.fileServices.uploadFile(
                 file.buffer,
                 `profil-pic/${user.id}-${file.originalname}`,
             );
 
             const urlPic = `https://${this.appConfig.awsBucketName}.s3.${this.appConfig.awsRegion}.amazonaws.com/profil-pic/${user.id}-${file.originalname}`;
+            const newFileModel = new this.fileModel({
+                location: urlPic,
+                key: saveAvatar.ETag,
+            });
 
-            await user.updateOne(
-                {
-                    $set: {
-                        avatar: {
-                            location: urlPic,
-                            key: saveAvatar.ETag,
-                        },
-                    },
-                },
-                { omitUndefined: true },
-            );
+            user.avatar = await newFileModel.save();
+
+            await user.save();
+
             return {
                 pic: urlPic,
                 message: 'Image de profil mise à jour avec succès',

@@ -3,10 +3,10 @@ import { ProfilController } from './profile.controller';
 import { UsersModule } from '../users/users.module';
 import { ProfilService } from './profile.service';
 import { JwtModule } from '@nestjs/jwt';
-import { AmazonModule } from '../amazon/amazon.module';
+import { FileModule } from '../amazon/file.module';
 
 @Module({
-    imports: [UsersModule, JwtModule, AmazonModule],
+    imports: [UsersModule, JwtModule, FileModule],
     controllers: [ProfilController],
     providers: [ProfilService],
 })

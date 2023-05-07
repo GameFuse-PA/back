@@ -7,7 +7,7 @@ import { ConfigurationModule } from './configuration/configuration.module';
 import { SchemasModule } from './schemas/schemas.module';
 import { DatabaseModule } from './database/database.module';
 import { ProfilModule } from './profil/profil.module';
-import { AmazonModule } from './amazon/amazon.module';
+import { FileModule } from './amazon/file.module';
 import { MailModule } from './mail/mail.module';
 
 @Module({
@@ -18,7 +18,7 @@ import { MailModule } from './mail/mail.module';
         SchemasModule,
         DatabaseModule,
         ProfilModule,
-        AmazonModule,
+        FileModule,
         MailModule,
     ],
     controllers: [AppController],
