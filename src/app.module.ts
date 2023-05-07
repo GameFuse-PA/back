@@ -7,6 +7,7 @@ import { ConfigurationModule } from './configuration/configuration.module';
 import { SchemasModule } from './schemas/schemas.module';
 import { DatabaseModule } from './database/database.module';
 import { MailModule } from './mail/mail.module';
+import { GamesModule } from './games/games.module';
 
 @Module({
     imports: [
@@ -16,6 +17,7 @@ import { MailModule } from './mail/mail.module';
         SchemasModule,
         DatabaseModule,
         MailModule,
+        GamesModule,
     ],
     controllers: [AppController],
     providers: [AppService],
