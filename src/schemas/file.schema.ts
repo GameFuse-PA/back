@@ -10,6 +10,12 @@ export class File {
 
     @Prop({ required: true })
     key: string;
+
+    @Prop({ required: true })
+    name: string;
+
+    @Prop({ required: true })
+    type: string;
 }
 
 export const FileSchema = SchemaFactory.createForClass(File);
