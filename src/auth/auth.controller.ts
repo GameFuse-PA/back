@@ -45,11 +45,7 @@ export class AuthController {
 
     @Put('password')
     @UseGuards(AuthGuard)
-    resetPassword(
-        @Request() req,
-        @Query('fromProfil') fromProfil,
-        @Body() newPasswordDto: NewPasswordDto,
-    ) {
+    resetPassword(@Request() req, @Body() newPasswordDto: NewPasswordDto) {
         const token = req.headers.authorization.split(' ')[1];
         return this.authService.resetPassword(
             req.userId,

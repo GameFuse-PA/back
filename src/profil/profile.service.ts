@@ -102,10 +102,13 @@ export class ProfilService {
             const newFileModel = new this.fileModel({
                 location: urlPic,
                 key: saveAvatar.ETag,
-                name: `${user.username.toLowerCase()}-${
-                    file.originalname.split('.')[0]
-                }`,
-                type: file.originalname.split('.')[1].toUpperCase(),
+                name: `${user.username.toLowerCase()}-${file.originalname
+                    .split('.')
+                    .slice(0, -1)
+                    .join('-')}`,
+                type: file.originalname
+                    .split('.')
+                    [file.originalname.split('.').length - 1].toUpperCase(),
             });
 
             user.avatar = await newFileModel.save();
