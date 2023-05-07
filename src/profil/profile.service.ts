@@ -32,13 +32,13 @@ export class ProfilService {
         return user;
     }
 
-    async updateProfil(id: string, user: ProfilDto) {
-        const userExist = await this.usersServices.findOneById(id);
-        if (!userExist) {
+    async updateProfil(id: string, profil: ProfilDto) {
+        const user = await this.usersServices.findOneById(id);
+        if (!user) {
             throw new NotFoundException("L'utilisateur n'existe pas");
         }
         const userEmailExist = await this.usersServices.findOneByEmail(
-            user.email,
+            profil.email,
         );
         if (userEmailExist && userEmailExist._id.toString() != id) {
             throw new UnauthorizedException(
@@ -46,8 +46,25 @@ export class ProfilService {
             );
         }
 
-        const updatedUser = await this.usersServices.updateOneById(id, user);
+        if (profil.email !== undefined) {
+            user.email = profil.email;
+        }
+
+        if (profil.username !== undefined) {
+            user.username = profil.username;
+        }
+
+        if (profil.firstname !== undefined) {
+            user.firstname = profil.firstname;
+        }
+
+        if (profil.lastname !== undefined) {
+            user.lastname = profil.lastname;
+        }
+
+        const updatedUser = await user.save();
         updatedUser.password = undefined;
+        await updatedUser.populate('avatar');
         return {
             message: 'Profil mis à jour avec succès',
             user: updatedUser,
