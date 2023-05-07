@@ -33,8 +33,9 @@ export class LiveChatController
 
     @UseGuards(WebSocketAuthGuard)
     @SubscribeMessage('join-room')
-    handleJoinRoom(client: Socket, payload: any, @Request() req) {
-        console.log(req.userId);
+    handleJoinRoom(client: Socket, payload: any) {
+        console.log('nono debut de handleJoinRoom');
+        console.log(payload);
         const roomId = payload[0];
         const userId = payload[1];
         client.join(roomId);
