@@ -130,7 +130,7 @@ export class AuthService {
         await user.save();
         return {
             message:
-                "Mot de passe bien modifié, vous pouvez l'utilisez pour votre prochaine connexion",
+                "Mot de passe bien modifié, vous pouvez l'utiliser pour votre prochaine connexion",
         };
     }
 }

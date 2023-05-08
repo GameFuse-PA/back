@@ -6,6 +6,8 @@ import { UsersModule } from './users/users.module';
 import { ConfigurationModule } from './configuration/configuration.module';
 import { SchemasModule } from './schemas/schemas.module';
 import { DatabaseModule } from './database/database.module';
+import { ProfilModule } from './profil/profil.module';
+import { FileModule } from './amazon/file.module';
 import { MailModule } from './mail/mail.module';
 import { GamesModule } from './games/games.module';
 
@@ -16,6 +18,8 @@ import { GamesModule } from './games/games.module';
         ConfigurationModule,
         SchemasModule,
         DatabaseModule,
+        ProfilModule,
+        FileModule,
         MailModule,
         GamesModule,
     ],
