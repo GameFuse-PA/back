@@ -1,7 +1,7 @@
 import { CanActivate, Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { AppConfigService } from '../configuration/app.config.service';
-import { UserFromFrontDTO } from '../UserFromFrontDTO';
+import { UserFromFrontDTO } from '../liveChat/Models/UserFromFrontDTO';
 
 @Injectable()
 export class WebSocketAuthGuard implements CanActivate {

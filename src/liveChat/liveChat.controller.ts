@@ -6,19 +6,20 @@ import {
     WebSocketServer,
 } from '@nestjs/websockets';
 
-import { UseGuards, Request } from '@nestjs/common';
+import {UseGuards, Request, Controller, Post, Body, Param, Get} from '@nestjs/common';
 import { Server, Socket } from 'socket.io';
 import { LiveChatService } from './liveChat.service';
 import { MessageForDb } from './Models/MessageForDb';
 import { WebSocketAuthGuard } from '../guards/WebSocketAuthGuard';
-import { UserFromFrontDTO } from '../UserFromFrontDTO';
 import { UsersService } from '../users/users.service';
 import { ChatFormatter } from './ChatFormatter';
+import {UserFromFrontDTO} from "../UserFromFrontDTO";
 
 @WebSocketGateway({
     cors: { origin: '*', methods: ['GET', 'POST'] },
     path: '/socket',
 })
+//@Controller()
 export class LiveChatController
     implements OnGatewayConnection, OnGatewayDisconnect
 {
@@ -29,6 +30,13 @@ export class LiveChatController
         private liveChatService: LiveChatService,
         private usersService: UsersService,
     ) {}
+
+    /*@Get('/createRoom/:roomId')
+    async createRoom(@Param('roomId') roomId: string) {
+        console.log("createRoom begenning");
+        return await this.liveChatService.createRoom(roomId);
+    }*/
+
     handleConnection(client: Socket) {
         console.log('Client connected:', client.id);
     }
@@ -62,7 +70,7 @@ export class LiveChatController
                 date: new Date(),
                 conversationId: user.roomId,
             };
-            this.liveChatService.postMessage(messageForDb);
+            this.liveChatService.postMessage(messageForDb, user.roomId);
         });
     }
 }
