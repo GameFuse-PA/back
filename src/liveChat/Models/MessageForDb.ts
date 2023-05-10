@@ -1,4 +1,4 @@
-export interface MessageDTO {
+export interface MessageForDb {
     content: string;
     senderId: string;
     date: Date;

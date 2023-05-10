@@ -9,9 +9,11 @@ import {
 import { UseGuards, Request } from '@nestjs/common';
 import { Server, Socket } from 'socket.io';
 import { LiveChatService } from './liveChat.service';
-import { MessageDTO } from './MessageDTO';
+import { MessageForDb } from './Models/MessageForDb';
 import { WebSocketAuthGuard } from '../guards/WebSocketAuthGuard';
 import { UserFromFrontDTO } from '../UserFromFrontDTO';
+import { UsersService } from '../users/users.service';
+import { ChatFormatter } from './ChatFormatter';
 
 @WebSocketGateway({
     cors: { origin: '*', methods: ['GET', 'POST'] },
@@ -23,7 +25,10 @@ export class LiveChatController
     @WebSocketServer()
     server: Server;
 
-    constructor(private liveChatService: LiveChatService) {}
+    constructor(
+        private liveChatService: LiveChatService,
+        private usersService: UsersService,
+    ) {}
     handleConnection(client: Socket) {
         console.log('Client connected:', client.id);
     }
@@ -45,14 +50,19 @@ export class LiveChatController
         });
 
         client.on('chat', (content) => {
-            client.broadcast.to(user.roomId).emit('new-message', content);
-            const message: MessageDTO = {
+            const chatToFront = ChatFormatter.makeChatForFront(
+                content,
+                user.id,
+                this.usersService
+            );
+            client.broadcast.to(user.roomId).emit('new-message', chatToFront);
+            const messageForDb: MessageForDb = {
                 content: content,
-                senderId: user.peerId,
+                senderId: user.id,
                 date: new Date(),
                 conversationId: user.roomId,
             };
-            this.liveChatService.postMessage(message);
+            this.liveChatService.postMessage(messageForDb);
         });
     }
 }

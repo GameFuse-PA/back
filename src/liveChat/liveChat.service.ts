@@ -1,9 +1,9 @@
 import { Injectable } from '@nestjs/common';
-import { MessageDTO } from './MessageDTO';
+import { MessageForDb } from './Models/MessageForDb';
 
 @Injectable()
 export class LiveChatService {
-    async postMessage(content: MessageDTO) {
+    async postMessage(content: MessageForDb) {
         //post du message dans la conv
     }
 }
