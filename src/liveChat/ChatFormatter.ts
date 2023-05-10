@@ -7,6 +7,7 @@ export class ChatFormatter {
         userId: string,
         usersService: UsersService,
     ) {
+        console.log("coucou in chatformatter avant")
         const now = new Date();
         const time = now.getTime();
         const user = await usersService.findOneById(userId);
@@ -17,6 +18,7 @@ export class ChatFormatter {
             userName: user.username,
             //userPhoto: user.avatar,
         };
+        console.log("coucou avant de return chat", chat)
         return chat;
     }
 }

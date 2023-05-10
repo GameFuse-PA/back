@@ -49,8 +49,8 @@ export class LiveChatController
                 .emit('user-disconnected', user.peerId);
         });
 
-        client.on('chat', (content) => {
-            const chatToFront = ChatFormatter.makeChatForFront(
+        client.on('chat', async (content) => {
+            const chatToFront = await ChatFormatter.makeChatForFront(
                 content,
                 user.id,
                 this.usersService
