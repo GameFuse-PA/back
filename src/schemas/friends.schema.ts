@@ -11,6 +11,7 @@ export class Friends {
     @Prop({
         required: true,
         type: [{ type: MongooseSchema.Types.ObjectId, ref: 'User' }],
+        default: [],
     })
     idFriend: Types.ObjectId[];
 }
