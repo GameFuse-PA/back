@@ -7,11 +7,11 @@ import {Conversation, ConversationDocument, ConversationSchema} from "../schemas
 
 @Injectable()
 export class LiveChatService {
-    /*constructor(@InjectModel(Message.name) private messageModel: Model<MessageDocument>,
+    constructor(@InjectModel(Message.name) private messageModel: Model<MessageDocument>,
                 @InjectModel(Conversation.name) private conversationModel: Model<ConversationDocument>) {
-    }*/
+    }
     async postMessage(messageForDb: MessageForDb, roomId: string) {
-        /*const newMessage = new this.messageModel(messageForDb);
+        const newMessage = new this.messageModel(messageForDb);
         const message = await newMessage.save();
         const conversation = await this.conversationModel.findOne({ _id: roomId });
         if (!conversation) {
@@ -32,6 +32,6 @@ export class LiveChatService {
         console.log("newConversation", newConversation)
         let conversation = await newConversation.save();
         console.log("conversation from db creation", conversation)
-        return conversation._id;*/
+        return conversation._id;
     }
 }

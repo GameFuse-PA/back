@@ -31,11 +31,11 @@ export class LiveChatController
         private usersService: UsersService,
     ) {}
 
-    /*@Get('/createRoom/:roomId')
+    @Get('/createRoom/:roomId')
     async createRoom(@Param('roomId') roomId: string) {
         console.log("createRoom begenning");
         return await this.liveChatService.createRoom(roomId);
-    }*/
+    }
 
     handleConnection(client: Socket) {
         console.log('Client connected:', client.id);
