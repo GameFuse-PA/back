@@ -6,7 +6,7 @@ export type FriendDocument = HydratedDocument<Friends>;
 @Schema({ versionKey: false })
 export class Friends {
     @Prop({ required: true })
-    idUSer: string;
+    idUser: string;
 
     @Prop({
         required: true,

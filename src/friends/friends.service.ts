@@ -18,7 +18,7 @@ export class FriendsService {
             throw new NotFoundException("L'utilisateur n'existe pas");
         }
         return this.friendsModel
-            .find({ idUser: idUser })
+            .findOne({ idUser: idUser })
             .populate('idFriend')
             .exec();
     }
@@ -43,10 +43,17 @@ export class FriendsService {
     }
 
     async deleteFriend(idUser: string, id: string) {
-        const deleted = await this.friendsModel.deleteOne({
-            $and: [{ idUser: idUser }, { idFriend: id }],
-        });
+        const deleted = await this.friendsModel.updateOne(
+            {
+                _id: idUser,
+            },
+            {
+                $pullAll: {
+                    idFriend: id,
+                },
+            },
+        );
 
-        return deleted.deletedCount === 1;
+        return deleted.modifiedCount === 1;
     }
 }
