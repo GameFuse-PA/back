@@ -3,6 +3,8 @@ import {
     Controller,
     Get,
     Post,
+    Put,
+    Query,
     Request,
     UseGuards,
 } from '@nestjs/common';
@@ -11,6 +13,8 @@ import { LoginDto } from './dto/login.dto';
 import { RegisterDto } from './dto/register.dto';
 import { AuthGuard } from '../guards/auth.guard';
 import { UsersService } from '../users/users.service';
+import { ResetPasswordDto } from './dto/resetPassword.dto';
+import { NewPasswordDto } from './dto/newPassword.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -33,5 +37,20 @@ export class AuthController {
     @Get('me')
     me(@Request() req) {
         return this.usersService.findOneById(req.userId);
+    }
+    @Post('forgot-password')
+    sendResetPassword(@Body() resetPasswordDto: ResetPasswordDto) {
+        return this.authService.sendResetPasswordEmail(resetPasswordDto);
+    }
+
+    @Put('password')
+    @UseGuards(AuthGuard)
+    resetPassword(@Request() req, @Body() newPasswordDto: NewPasswordDto) {
+        const token = req.headers.authorization.split(' ')[1];
+        return this.authService.resetPassword(
+            req.userId,
+            token,
+            newPasswordDto,
+        );
     }
 }

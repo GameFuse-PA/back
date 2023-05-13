@@ -1,0 +1,6 @@
+{
+  "forgotPassword": {
+    "subject": "Réinitialisation de votre mot de passe",
+    "html": "<h1>Bonjour</h1>\n<p>Vous avez demandé récemment un changement de mot de passe voici le lien vous permettant de le réinitialiser</p>\n<a href=\"http://localhost:4200/newPassword?token={{token}}\">http://localhost:4200/newPassword?token={{token}}</a>"
+  }
+}
