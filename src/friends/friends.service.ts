@@ -47,18 +47,17 @@ export class FriendsService {
     }
 
     async deleteFriend(idUser: string, idFriend: string) {
-        const deleted = await this.friendsModel.updateOne(
-            {
-                idUser: idUser,
-            },
-            {
-                $pull: {
-                    idFriend: idFriend,
-                },
-            },
-        );
-
-        if (deleted.modifiedCount === 1) {
+        const user = await this.friendsModel.findOne({ idUser: idUser });
+        if (user && user.idFriend) {
+            const newArrayUser = [];
+            for (const userElement of user.idFriend) {
+                if (userElement.toString() === idFriend) {
+                    continue;
+                }
+                newArrayUser.push(userElement);
+            }
+            user.idFriend = newArrayUser;
+            await user.save();
             return {
                 message: 'Ami supprimé',
             };
