@@ -24,7 +24,7 @@ export class FriendsController {
 
     @UseGuards(AuthGuard)
     @Delete(':id')
-    deleteFriend(@Request() req, @Param() id): Promise<boolean> {
+    deleteFriend(@Request() req, @Param('id') id: string) {
         return this.friendsService.deleteFriend(req.userId, id);
     }
 }

@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+    Injectable,
+    InternalServerErrorException,
+    NotFoundException,
+} from '@nestjs/common';
 import { FriendsDto } from './dto/Friends.dto';
 import { InjectModel } from '@nestjs/mongoose';
 import { FriendDocument, Friends } from '../schemas/friends.schema';
@@ -27,8 +31,8 @@ export class FriendsService {
         if (!friend.idFriend) {
             throw new Error("Erreur avec l'ami entré");
         }
-        const userFriend = await this.friendsModel.findById(id);
-        if (userFriend && userFriend.idFriend.length > 0) {
+        const userFriend = await this.friendsModel.findOne({ idUser: id });
+        if (userFriend && userFriend.idFriend.length >= 0) {
             userFriend.idFriend.push(
                 friend.idFriend as unknown as Types.ObjectId,
             );
@@ -42,18 +46,25 @@ export class FriendsService {
         return newFriend.save();
     }
 
-    async deleteFriend(idUser: string, id: string) {
+    async deleteFriend(idUser: string, idFriend: string) {
         const deleted = await this.friendsModel.updateOne(
             {
-                _id: idUser,
+                idUser: idUser,
             },
             {
-                $pullAll: {
-                    idFriend: id,
+                $pull: {
+                    idFriend: idFriend,
                 },
             },
         );
 
-        return deleted.modifiedCount === 1;
+        if (deleted.modifiedCount === 1) {
+            return {
+                message: 'Ami supprimé',
+            };
+        }
+        throw new InternalServerErrorException(
+            "Erreur lors de la suppression de l'ami",
+        );
     }
 }
