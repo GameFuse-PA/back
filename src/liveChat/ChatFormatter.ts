@@ -2,8 +2,6 @@ import { UsersService } from '../users/users.service';
 import { MessageForFront } from './Models/MessageForFront';
 
 export class ChatFormatter {
-    private static usersService: UsersService;
-
     static async makeChatForFront(content: string, userName: string) {
         const now = new Date();
         const time = now.getTime();
