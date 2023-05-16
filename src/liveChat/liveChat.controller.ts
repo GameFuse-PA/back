@@ -19,7 +19,7 @@ import {UserFromFrontDTO} from "../UserFromFrontDTO";
     cors: { origin: '*', methods: ['GET', 'POST'] },
     path: '/socket',
 })
-//@Controller()
+@Controller()
 export class LiveChatController
     implements OnGatewayConnection, OnGatewayDisconnect
 {
@@ -31,12 +31,6 @@ export class LiveChatController
         private usersService: UsersService,
     ) {}
 
-    @Get('/createRoom/:roomId')
-    async createRoom(@Param('roomId') roomId: string) {
-        console.log("createRoom begenning");
-        return await this.liveChatService.createRoom(roomId);
-    }
-
     handleConnection(client: Socket) {
         console.log('Client connected:', client.id);
     }
@@ -46,7 +40,7 @@ export class LiveChatController
     }
 
     @UseGuards(WebSocketAuthGuard)
-    @SubscribeMessage('join-room')
+    @SubscribeMessage('roomAccessRequest')
     handleJoinRoom(client: Socket, user: UserFromFrontDTO) {
         client.join(user.roomId);
         client.broadcast.to(user.roomId).emit('user-connected', user.peerId);

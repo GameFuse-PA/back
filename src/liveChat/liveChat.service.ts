@@ -23,15 +23,4 @@ export class LiveChatService {
 
         await this.conversationModel.updateOne({ _id: roomId }, updateQuery);
     }
-
-    async createRoom(roomId: string){
-        console.log("on cree la room")
-        const newConversation = new this.conversationModel({
-            _id: roomId,
-        });
-        console.log("newConversation", newConversation)
-        let conversation = await newConversation.save();
-        console.log("conversation from db creation", conversation)
-        return conversation._id;
-    }
 }
