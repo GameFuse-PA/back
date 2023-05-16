@@ -2,35 +2,39 @@ import {
     Body,
     Controller,
     Post,
-    UploadedFile,
+    UploadedFiles,
+    UseGuards,
     UseInterceptors,
 } from '@nestjs/common';
 import { GamesService } from './games.service';
+import { FileFieldsInterceptor } from '@nestjs/platform-express';
+import { AuthGuard } from '../guards/auth.guard';
 import { AddGameDto } from './dto/addGame.dto';
-import { FileInterceptor } from '@nestjs/platform-express';
 
 @Controller('games')
 export class GamesController {
     constructor(private gamesService: GamesService) {}
 
     @Post()
+    @UseGuards(AuthGuard)
     @UseInterceptors(
-        FileInterceptor('logo', {
-            dest: './uploads/img',
-        }),
-        FileInterceptor('banner', {
-            dest: './uploads/img',
-        }),
-        FileInterceptor('file', {
-            dest: './uploads/file',
-        }),
+        FileFieldsInterceptor([
+            { name: 'banner', maxCount: 1 },
+            { name: 'program', maxCount: 1 },
+        ]),
     )
     addGame(
-        @Body() addGameDto: AddGameDto,
-        @UploadedFile() logo: Express.Multer.File,
-        @UploadedFile() banner: Express.Multer.File,
-        @UploadedFile() file: Express.Multer.File,
+        @UploadedFiles()
+        files: {
+            banner: Express.Multer.File[];
+            program: Express.Multer.File[];
+        },
+        @Body() addGameDto: any,
     ) {
-        return 'Game added';
+        return this.gamesService.addGame(
+            addGameDto,
+            files.banner[0],
+            files.program[0],
+        );
     }
 }
