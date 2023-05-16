@@ -1,26 +1,23 @@
-import {Injectable, NotFoundException} from '@nestjs/common';
-import { MessageForDb } from './Models/MessageForDb';
-import {InjectModel} from "@nestjs/mongoose";
-import {Model} from "mongoose";
-import {Message, MessageDocument} from "../schemas/message.schema";
-import {Conversation, ConversationDocument, ConversationSchema} from "../schemas/conversation.schema";
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { Socket } from 'socket.io';
+import { UserFromFrontDTO } from '../UserFromFrontDTO';
+import { ChatFormatter } from './ChatFormatter';
+import { UsersService } from '../users/users.service';
 
 @Injectable()
 export class LiveChatService {
-    constructor(@InjectModel(Message.name) private messageModel: Model<MessageDocument>,
-                @InjectModel(Conversation.name) private conversationModel: Model<ConversationDocument>) {
-    }
-    async postMessage(messageForDb: MessageForDb, roomId: string) {
-        const newMessage = new this.messageModel(messageForDb);
-        const message = await newMessage.save();
-        const conversation = await this.conversationModel.findOne({ _id: roomId });
-        if (!conversation) {
-            throw new NotFoundException(`Conversation with ID ${roomId} not found`);
-        }
-        const updateQuery = {
-            $push: { messages: message._id }
-        };
+    constructor(private usersService: UsersService) {}
 
-        await this.conversationModel.updateOne({ _id: roomId }, updateQuery);
+    public disconnect(client: Socket, user: UserFromFrontDTO) {
+        client.broadcast.to(user.roomId).emit('user-disconnected', user.peerId);
+    }
+
+    public async chat(client: Socket, user: UserFromFrontDTO, content: string) {
+        const userDocument = await this.usersService.findOneById(user.id);
+        const chatToFront = await ChatFormatter.makeChatForFront(
+            content,
+            userDocument.username,
+        );
+        client.broadcast.to(user.roomId).emit('new-message', chatToFront);
     }
 }

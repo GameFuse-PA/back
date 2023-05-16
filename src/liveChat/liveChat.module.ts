@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common';
-import { LiveChatController } from './liveChat.controller';
+import { LiveChatGateWay } from './liveChatGateWay';
 import { LiveChatService } from './liveChat.service';
 import { JwtService } from '@nestjs/jwt';
 import { UsersService } from '../users/users.service';
@@ -7,6 +7,6 @@ import { UsersService } from '../users/users.service';
 @Module({
     imports: [],
     controllers: [],
-    providers: [LiveChatController, UsersService, LiveChatService, JwtService],
+    providers: [LiveChatGateWay, UsersService, LiveChatService, JwtService],
 })
 export class LiveChatModule {}

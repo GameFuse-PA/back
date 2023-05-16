@@ -1,15 +1,15 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { LiveChatController } from './liveChat.controller';
+import { LiveChatGateWay } from './liveChatGateWay';
 
 describe('AuthController', () => {
-    let controller: LiveChatController;
+    let controller: LiveChatGateWay;
 
     beforeEach(async () => {
         const module: TestingModule = await Test.createTestingModule({
-            controllers: [LiveChatController],
+            controllers: [LiveChatGateWay],
         }).compile();
 
-        controller = module.get<LiveChatController>(LiveChatController);
+        controller = module.get<LiveChatGateWay>(LiveChatGateWay);
     });
 
     it('should be defined', () => {
