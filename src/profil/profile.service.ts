@@ -5,12 +5,8 @@ import {
     UnauthorizedException,
 } from '@nestjs/common';
 import { UsersService } from '../users/users.service';
-import { File, FileDocument } from '../schemas/file.schema';
-import { Model } from 'mongoose';
-import { InjectModel } from '@nestjs/mongoose';
 import { FileService } from '../amazon/file.service';
 import { ProfilDto } from './dto/profil.dto';
-import { AppConfigService } from '../configuration/app.config.service';
 import { PasswordDto } from './dto/password.dto';
 import * as bcrypt from 'bcrypt';
 
@@ -19,8 +15,6 @@ export class ProfilService {
     constructor(
         private usersServices: UsersService,
         private fileServices: FileService,
-        private appConfig: AppConfigService,
-        @InjectModel(File.name) private fileModel: Model<FileDocument>,
     ) {}
 
     async getProfil(id: string) {
@@ -93,30 +87,18 @@ export class ProfilService {
             throw new NotFoundException("L'utilisateur n'existe pas");
         }
         try {
-            const saveAvatar = await this.fileServices.uploadFile(
+            const avatar = await this.fileServices.uploadFile(
                 file.buffer,
-                `profil-pic/${user.id}-${file.originalname}`,
+                `${user.id}-${file.originalname}`,
+                `profil-pic`,
+                file.mimetype,
             );
 
-            const urlPic = `https://${this.appConfig.awsBucketName}.s3.${this.appConfig.awsRegion}.amazonaws.com/profil-pic/${user.id}-${file.originalname}`;
-            const newFileModel = new this.fileModel({
-                location: urlPic,
-                key: saveAvatar.ETag,
-                name: `${user.username.toLowerCase()}-${file.originalname
-                    .split('.')
-                    .slice(0, -1)
-                    .join('-')}`,
-                type: file.originalname
-                    .split('.')
-                    [file.originalname.split('.').length - 1].toUpperCase(),
-            });
-
-            user.avatar = await newFileModel.save();
-
+            user.avatar = avatar;
             await user.save();
 
             return {
-                pic: urlPic,
+                pic: avatar.location,
                 message: 'Image de profil mise à jour avec succès',
             };
         } catch (e) {
