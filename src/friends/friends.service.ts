@@ -23,23 +23,23 @@ export class FriendsService {
         }
         return this.friendsModel
             .findOne({ idUser: idUser })
-            .populate('idFriend')
+            .populate('idFriends')
             .exec();
     }
 
     async addFriend(id: string, friend: FriendsDto) {
-        if (!friend.idFriend) {
+        if (!friend.idFriends) {
             throw new Error("Erreur avec l'ami entré");
         }
         const userFriend = await this.friendsModel.findOne({ idUser: id });
-        if (userFriend && userFriend.idFriend.length >= 0) {
-            userFriend.idFriend.push(
-                friend.idFriend as unknown as Types.ObjectId,
+        if (userFriend && userFriend.idFriends.length >= 0) {
+            userFriend.idFriends.push(
+                friend.idFriends as unknown as Types.ObjectId,
             );
             return userFriend.save();
         }
         const model: FriendsDto = {
-            idFriend: friend.idFriend,
+            idFriends: friend.idFriends,
             idUser: id,
         };
         const newFriend = new this.friendsModel(model);
@@ -48,15 +48,15 @@ export class FriendsService {
 
     async deleteFriend(idUser: string, idFriend: string) {
         const user = await this.friendsModel.findOne({ idUser: idUser });
-        if (user && user.idFriend) {
+        if (user && user.idFriends) {
             const newArrayUser = [];
-            for (const userElement of user.idFriend) {
+            for (const userElement of user.idFriends) {
                 if (userElement.toString() === idFriend) {
                     continue;
                 }
                 newArrayUser.push(userElement);
             }
-            user.idFriend = newArrayUser;
+            user.idFriends = newArrayUser;
             await user.save();
             return {
                 message: 'Ami supprimé',

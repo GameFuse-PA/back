@@ -30,7 +30,7 @@ export class ProfilController {
     }
 
     @UseGuards(AuthGuard)
-    @Get('MyFriends')
+    @Get('friends')
     getFriends(@Request() req) {
         return this.friendsService.getFriends(req.userId);
     }

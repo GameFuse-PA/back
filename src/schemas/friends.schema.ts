@@ -13,7 +13,7 @@ export class Friends {
         type: [{ type: MongooseSchema.Types.ObjectId, ref: 'User' }],
         default: [],
     })
-    idFriend: Types.ObjectId[];
+    idFriends: Types.ObjectId[];
 }
 
 export const FriendsSchema = SchemaFactory.createForClass(Friends);

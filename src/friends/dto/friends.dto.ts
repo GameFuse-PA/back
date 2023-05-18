@@ -5,5 +5,5 @@ export class FriendsDto {
     idUser: string;
 
     @IsNotEmpty({ message: "Info de l'ami requis" })
-    idFriend: string;
+    idFriends: string;
 }
