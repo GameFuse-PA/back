@@ -9,6 +9,7 @@ import { DatabaseModule } from './database/database.module';
 import { ProfilModule } from './profil/profil.module';
 import { FileModule } from './amazon/file.module';
 import { MailModule } from './mail/mail.module';
+import { FriendsModule } from './friends/friends.module';
 
 @Module({
     imports: [
@@ -20,6 +21,7 @@ import { MailModule } from './mail/mail.module';
         ProfilModule,
         FileModule,
         MailModule,
+        FriendsModule,
     ],
     controllers: [AppController],
     providers: [AppService],
