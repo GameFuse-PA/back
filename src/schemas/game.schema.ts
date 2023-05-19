@@ -22,7 +22,7 @@ export class Game {
         type: MongooseSchema.Types.ObjectId,
         ref: 'File',
     })
-    file: File;
+    program: File;
 }
 
 export const GameSchema = SchemaFactory.createForClass(Game);

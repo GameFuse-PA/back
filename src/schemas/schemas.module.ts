@@ -2,7 +2,8 @@ import { Global, Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { User, UserSchema } from './user.schema';
 import { File, FileSchema } from './file.schema';
-import {Friends, FriendsSchema} from "./friends.schema";
+import { Friends, FriendsSchema } from './friends.schema';
+import { Game, GameSchema } from './game.schema';
 
 @Global()
 @Module({

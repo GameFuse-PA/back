@@ -1,4 +1,5 @@
 import {
+    BadRequestException,
     Body,
     Controller,
     Post,
@@ -29,8 +30,14 @@ export class GamesController {
             banner: Express.Multer.File[];
             program: Express.Multer.File[];
         },
-        @Body() addGameDto: any,
+        @Body() addGameDto: AddGameDto,
     ) {
+        if (!files.banner) {
+            throw new BadRequestException('Bannière requise');
+        }
+        if (!files.program) {
+            throw new BadRequestException('Fichier du jeu requis');
+        }
         return this.gamesService.addGame(
             addGameDto,
             files.banner[0],

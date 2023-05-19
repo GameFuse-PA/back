@@ -17,20 +17,27 @@ export class GamesService {
         banner: Express.Multer.File,
         program: Express.Multer.File,
     ) {
-        const bannerUrl = await this.fileService.uploadFile(
+        const bannerFile = await this.fileService.uploadFile(
             banner.buffer,
-            `game-banner/${Date.now()}-${banner.originalname}`,
+            `${Date.now()}-${banner.originalname}`,
+            `game-banner`,
+            banner.mimetype,
         );
-        const programUrl = await this.fileService.uploadFile(
+
+        const programFile = await this.fileService.uploadFile(
             program.buffer,
-            `game-program/${Date.now()}-${program.originalname}`,
+            `${Date.now()}-${program.originalname}`,
+            `game-program`,
+            program.mimetype,
         );
+
         const newGame = new this.gameModel({
             name: game.name,
             description: game.description,
-            banner: bannerUrl,
-            program: programUrl,
+            banner: bannerFile,
+            program: programFile,
         });
+
         return await newGame.save();
     }
 }
