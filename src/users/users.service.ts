@@ -31,4 +31,8 @@ export class UsersService {
     async updateOneById(id: string, user: ProfilDto) {
         return this.userModel.findByIdAndUpdate(id, user).exec();
     }
+
+    async findAll(): Promise<UserDocument[]> {
+        return this.userModel.find().exec();
+    }
 }

@@ -10,6 +10,7 @@ import { ProfilModule } from './profil/profil.module';
 import { FileModule } from './amazon/file.module';
 import { MailModule } from './mail/mail.module';
 import { GamesModule } from './games/games.module';
+import { FriendsModule } from './friends/friends.module';
 
 @Module({
     imports: [
@@ -21,6 +22,7 @@ import { GamesModule } from './games/games.module';
         ProfilModule,
         FileModule,
         MailModule,
+        FriendsModule,
         GamesModule,
     ],
     controllers: [AppController],
