@@ -5,9 +5,10 @@ import { ProfilService } from './profile.service';
 import { JwtModule } from '@nestjs/jwt';
 import { FileModule } from '../amazon/file.module';
 import { FriendsModule } from '../friends/friends.module';
+import { GamesModule } from '../games/games.module';
 
 @Module({
-    imports: [UsersModule, JwtModule, FileModule, FriendsModule],
+    imports: [UsersModule, JwtModule, FileModule, FriendsModule, GamesModule],
     controllers: [ProfilController],
     providers: [ProfilService],
 })
