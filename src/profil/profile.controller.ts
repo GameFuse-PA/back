@@ -14,15 +14,25 @@ import { ProfilService } from './profile.service';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ProfilDto } from './dto/profil.dto';
 import { PasswordDto } from './dto/password.dto';
+import { FriendsService } from '../friends/friends.service';
 
 @Controller('me')
 export class ProfilController {
-    constructor(private profileService: ProfilService) {}
+    constructor(
+        private profileService: ProfilService,
+        private friendsService: FriendsService,
+    ) {}
 
     @UseGuards(AuthGuard)
     @Get()
     async getProfile(@Request() req) {
         return this.profileService.getProfil(req.userId);
+    }
+
+    @UseGuards(AuthGuard)
+    @Get('friends')
+    getFriends(@Request() req) {
+        return this.friendsService.getFriends(req.userId);
     }
 
     @UseGuards(AuthGuard)

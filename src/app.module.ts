@@ -11,6 +11,8 @@ import { FileModule } from './amazon/file.module';
 import { MailModule } from './mail/mail.module';
 import { LiveChatModule } from './liveChat/liveChat.module';
 import { JwtModule } from '@nestjs/jwt';
+import { GamesModule } from './games/games.module';
+import { FriendsModule } from './friends/friends.module';
 
 @Module({
     imports: [
@@ -23,7 +25,9 @@ import { JwtModule } from '@nestjs/jwt';
         FileModule,
         MailModule,
         LiveChatModule,
-        JwtModule,//TODO:  à garder ?
+        JwtModule,
+        FriendsModule,
+        GamesModule,
     ],
     controllers: [AppController],
     providers: [AppService],
