@@ -1,4 +1,3 @@
-import { UsersService } from '../users/users.service';
 import { MessageForFront } from './Models/MessageForFront';
 
 export class ChatFormatter {

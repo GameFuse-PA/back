@@ -8,7 +8,7 @@ import { UserFromFrontDTO } from './Models/UserFromFrontDTO';
 export class LiveChatService {
     constructor(private usersService: UsersService) {}
 
-    public connect(client: Socket, user: UserFromFrontDTO){
+    public connect(client: Socket, user: UserFromFrontDTO) {
         client.join(user.roomId);
         client.broadcast.to(user.roomId).emit('user-connected', user.peerId);
     }
