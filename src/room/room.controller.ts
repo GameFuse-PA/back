@@ -6,6 +6,7 @@ import {
 } from '@nestjs/common';
 import { AuthGuard } from '../guards/auth.guard';
 import { RoomService } from './room.service';
+import {v4 as uuidv4} from 'uuid';
 
 @Controller('room')
 export class RoomController {
@@ -16,8 +17,7 @@ export class RoomController {
     @UseGuards(AuthGuard)
     @Get('roomCreation')
     getFriends(@Request() req) {
-        console.log("coucou in back")
-        //ID generation + save
-        return "couou"
+        let id = uuidv4();
+        return id;
     }
 }
