@@ -13,10 +13,10 @@ import { AuthGuard } from '../guards/auth.guard';
 @Controller('users')
 export class UsersController {
     constructor(private userService: UsersService) {}
-    @Get('search')
+    @Get()
     @UseGuards(AuthGuard)
     async searchUser(@Request() req, @Query() searchUser: SearchUserDto) {
-        return this.userService.searchUser(searchUser.value, req.userId);
+        return this.userService.searchUser(searchUser.search, req.userId);
     }
 
     @Get(':id')
