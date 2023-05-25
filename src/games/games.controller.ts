@@ -3,6 +3,7 @@ import {
     Body,
     Controller,
     Post,
+    Request,
     UploadedFiles,
     UseGuards,
     UseInterceptors,
@@ -31,6 +32,7 @@ export class GamesController {
             program: Express.Multer.File[];
         },
         @Body() addGameDto: AddGameDto,
+        @Request() req,
     ) {
         if (!files.banner) {
             throw new BadRequestException('Bannière requise');
@@ -42,6 +44,7 @@ export class GamesController {
             addGameDto,
             files.banner[0],
             files.program[0],
+            req.userId,
         );
     }
 }
