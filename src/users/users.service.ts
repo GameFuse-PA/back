@@ -35,4 +35,31 @@ export class UsersService {
     async findAll(): Promise<UserDocument[]> {
         return this.userModel.find().exec();
     }
+
+    async searchUser(value: string, userId: string): Promise<UserDocument[]> {
+        return this.userModel
+            .find({
+                $or: [
+                    {
+                        $and: [
+                            { username: { $regex: value, $options: 'i' } },
+                            { _id: { $ne: userId } },
+                        ],
+                    },
+                    {
+                        $and: [
+                            { firstname: { $regex: value, $options: 'i' } },
+                            { _id: { $ne: userId } },
+                        ],
+                    },
+                    {
+                        $and: [
+                            { email: { $regex: value, $options: 'i' } },
+                            { _id: { $ne: userId } },
+                        ],
+                    },
+                ],
+            })
+            .exec();
+    }
 }
