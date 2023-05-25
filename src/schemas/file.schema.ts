@@ -8,7 +8,7 @@ export class File {
     @Prop({ required: true })
     location: string;
 
-    @Prop({ required: true })
+    @Prop({ required: true, select: false })
     key: string;
 
     @Prop({ required: true })
