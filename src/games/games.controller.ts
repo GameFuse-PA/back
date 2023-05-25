@@ -2,6 +2,10 @@ import {
     BadRequestException,
     Body,
     Controller,
+    Delete,
+    ForbiddenException,
+    NotFoundException,
+    Param,
     Post,
     Request,
     UploadedFiles,
@@ -12,6 +16,7 @@ import { GamesService } from './games.service';
 import { FileFieldsInterceptor } from '@nestjs/platform-express';
 import { AuthGuard } from '../guards/auth.guard';
 import { AddGameDto } from './dto/addGame.dto';
+import { GameDocument } from '../schemas/game.schema';
 
 @Controller('games')
 export class GamesController {
@@ -46,5 +51,21 @@ export class GamesController {
             files.program[0],
             req.userId,
         );
+    }
+
+    @Delete(':id')
+    @UseGuards(AuthGuard)
+    async deleteGame(@Request() req, @Param('id') gameId: string) {
+        const game = await this.gamesService.getGame(gameId);
+
+        if (!game) {
+            throw new NotFoundException('Jeu introuvable');
+        }
+
+        if (game.createdBy._id.toString() !== req.userId) {
+            throw new ForbiddenException('Vous ne pouvez pas supprimer ce jeu');
+        }
+
+        return this.gamesService.deleteGame(gameId);
     }
 }
