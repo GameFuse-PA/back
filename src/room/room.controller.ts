@@ -1,23 +1,14 @@
-import {
-    Controller,
-    UseGuards,
-    Request,
-    Get,
-} from '@nestjs/common';
+import { Controller, UseGuards, Request, Post } from '@nestjs/common';
 import { AuthGuard } from '../guards/auth.guard';
 import { RoomService } from './room.service';
-import {v4 as uuidv4} from 'uuid';
 
-@Controller('room')
+@Controller('rooms')
 export class RoomController {
-    constructor(
-        private roomService: RoomService,
-    ) {}
+    constructor(private roomService: RoomService) {}
 
     @UseGuards(AuthGuard)
-    @Get('roomCreation')
+    @Post()
     getFriends(@Request() req) {
-        let id = uuidv4();
-        return id;
+        return this.roomService.createRoom(req.userId);
     }
 }
