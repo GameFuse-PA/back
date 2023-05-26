@@ -24,14 +24,14 @@ export class GamesService {
 
         const bannerFile = await this.fileService.uploadFile(
             banner.buffer,
-            `${Date.now()}.${banner.mimetype.split('/')[1]}}`,
+            `${Date.now()}.${banner.mimetype.split('/')[1]}`,
             `game-banner`,
             banner.mimetype,
         );
 
         const programFile = await this.fileService.uploadFile(
             program.buffer,
-            `${Date.now()}.${banner.mimetype.split('/')[1]}}`,
+            `${Date.now()}.${banner.mimetype.split('/')[1]}`,
             `game-program`,
             program.mimetype,
         );
@@ -54,5 +54,28 @@ export class GamesService {
             .populate('program')
             .populate('createdBy')
             .exec();
+    }
+
+    async getGame(gameId: string) {
+        return await this.gameModel
+            .findById(gameId)
+            .populate('banner')
+            .populate('program')
+            .populate('createdBy')
+            .exec();
+    }
+
+    async deleteGame(gameId: string) {
+        const game = await this.gameModel.findById(gameId).exec();
+
+        if (game) {
+            await this.fileService.deleteFile(game.banner._id, `game-banner`);
+            await this.fileService.deleteFile(game.program._id, `game-program`);
+            await game.deleteOne();
+
+            return true;
+        }
+
+        return false;
     }
 }

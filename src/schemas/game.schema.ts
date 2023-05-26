@@ -1,4 +1,4 @@
-import { HydratedDocument, Schema as MongooseSchema } from 'mongoose';
+import { HydratedDocument, Schema as MongooseSchema, Document } from 'mongoose';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { File } from './file.schema';
 import { User } from './user.schema';
@@ -6,7 +6,7 @@ import { User } from './user.schema';
 export type GameDocument = HydratedDocument<Game>;
 
 @Schema({ versionKey: false, timestamps: true })
-export class Game {
+export class Game extends Document {
     @Prop({ required: true })
     name: string;
 
