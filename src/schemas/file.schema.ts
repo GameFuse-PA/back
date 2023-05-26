@@ -1,10 +1,10 @@
-import { HydratedDocument } from 'mongoose';
+import { HydratedDocument, Document } from 'mongoose';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 
 export type FileDocument = HydratedDocument<File>;
 
 @Schema({ versionKey: false, timestamps: true })
-export class File {
+export class File extends Document {
     @Prop({ required: true })
     location: string;
 

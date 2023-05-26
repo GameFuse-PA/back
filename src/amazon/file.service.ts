@@ -1,5 +1,9 @@
 import { Injectable } from '@nestjs/common';
-import { PutObjectCommand, S3Client } from '@aws-sdk/client-s3';
+import {
+    DeleteObjectCommand,
+    PutObjectCommand,
+    S3Client,
+} from '@aws-sdk/client-s3';
 import { AppConfigService } from '../configuration/app.config.service';
 import { InjectModel } from '@nestjs/mongoose';
 import { File, FileDocument } from '../schemas/file.schema';
@@ -50,6 +54,25 @@ export class FileService {
             return await file.save();
         } catch (e) {
             throw new Error(`Erreur lors de l'upload du fichier. Error: ${e}`);
+        }
+    }
+
+    async deleteFile(fileId: string, path: string) {
+        try {
+            const file = await this.fileModel.findById(fileId);
+
+            const params = {
+                Bucket: this.appConfigService.awsBucketName,
+                Key: `${path}/${file.name}`,
+            };
+            const command = new DeleteObjectCommand(params);
+            await this.s3.send(command);
+
+            return await this.fileModel.findByIdAndDelete(fileId);
+        } catch (e) {
+            throw new Error(
+                `Erreur lors de la suppression du fichier. Error: ${e}`,
+            );
         }
     }
 }
