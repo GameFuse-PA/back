@@ -8,7 +8,7 @@ export class RoomController {
 
     @UseGuards(AuthGuard)
     @Post()
-    getFriends(@Request() req) {
-        return this.roomService.createRoom(req.userId);
+    roomCreation(@Request() req) {
+        return this.roomService.joinRoom(req.userId);
     }
 }

@@ -36,9 +36,7 @@
     "mustache": "^4.2.0",
     "nest-mailjet": "^0.3.0",
     "reflect-metadata": "^0.1.13",
-    "rxjs": "^7.2.0",
-    "socket.io-client": "^4.0.2",
-    "uuid": "^9.0.0"
+    "rxjs": "^7.2.0"
   },
   "devDependencies": {
     "@nestjs/cli": "^9.0.0",

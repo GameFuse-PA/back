@@ -9,13 +9,10 @@ export class RoomService {
         @InjectModel(Room.name) private roomModel: Model<RoomDocument>,
     ) {}
 
-    async createRoom(userId: string) {
-        const newUser = new this.roomModel({
+    async joinRoom(userId: string) {
+        const newRoom = new this.roomModel({
             idUsers: userId,
         });
-        const user = await newUser.save();
-        console.log('user saved in base');
-        console.log(user);
-        return user;
+        return await newRoom.save();
     }
 }
