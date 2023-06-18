@@ -93,7 +93,9 @@ export class FileService {
 
             const stream = s3File.Body as any;
 
-            return stream.pipe(unzipper.Extract({ path: outputDirectory }));
+            await stream.pipe(unzipper.Extract({ path: outputDirectory }));
+
+            return outputDirectory;
         } catch (e) {
             throw new Error(
                 `Erreur lors de la décompression du fichier. Error: ${e}`,
