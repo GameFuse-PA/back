@@ -3,13 +3,16 @@ import { exec } from 'child_process';
 
 @Injectable()
 export class RunnerPythonService {
-    async exec(filePath: string) {
-        exec(`python ${filePath}`, (err, stdout, stderr) => {
-            if (err) {
-                console.log(err);
-                return;
-            }
-            console.log(stdout);
+    async run(filePath: string) {
+        const res = exec(`python ${filePath}`);
+
+        return new Promise((resolve, reject) => {
+            res.stdout.on('data', (data) => {
+                resolve(data);
+            });
+            res.stderr.on('data', (data) => {
+                reject(data);
+            });
         });
     }
 }

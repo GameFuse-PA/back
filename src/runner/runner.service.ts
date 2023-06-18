@@ -15,6 +15,6 @@ export class RunnerService {
         const game = await this.gameService.getGame(gameId);
         const path = await this.fileService.unzipFile(game.program._id);
 
-        await this.runnerPythonService.exec(path + '/test.py');
+        return await this.runnerPythonService.run(path + '/test.py');
     }
 }

@@ -8,6 +8,9 @@ export class RunnerController {
     @Get(':id/start')
     async start(@Param('id') gameId: string) {
         console.log('start');
-        return this.runnerService.start(gameId);
+
+        return {
+            status: await this.runnerService.start(gameId),
+        };
     }
 }
