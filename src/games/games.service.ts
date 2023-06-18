@@ -65,6 +65,15 @@ export class GamesService {
             .exec();
     }
 
+    async getGames(name: string) {
+        return await this.gameModel
+            .find({ name: { $regex: name, $options: 'i' } })
+            .populate('banner')
+            .populate('program')
+            .populate('createdBy')
+            .exec();
+    }
+
     async deleteGame(gameId: string) {
         const game = await this.gameModel.findById(gameId).exec();
 

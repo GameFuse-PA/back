@@ -4,10 +4,12 @@ import {
     Controller,
     Delete,
     ForbiddenException,
+    Get,
     NotFoundException,
     Param,
     Post,
     Put,
+    Query,
     Request,
     UploadedFiles,
     UseGuards,
@@ -105,5 +107,10 @@ export class GamesController {
             files.banner ? files.banner[0] : null,
             files.program ? files.program[0] : null,
         );
+    }
+
+    @Get()
+    async getGames(@Query('search') search: string) {
+        return this.gamesService.getGames(search);
     }
 }
