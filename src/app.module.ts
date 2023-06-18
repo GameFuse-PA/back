@@ -13,6 +13,7 @@ import { LiveChatModule } from './liveChat/liveChat.module';
 import { JwtModule } from '@nestjs/jwt';
 import { GamesModule } from './games/games.module';
 import { FriendsModule } from './friends/friends.module';
+import { RunnerModule } from './runner/runner.module';
 
 @Module({
     imports: [
@@ -28,6 +29,7 @@ import { FriendsModule } from './friends/friends.module';
         JwtModule,
         FriendsModule,
         GamesModule,
+        RunnerModule,
     ],
     controllers: [AppController],
     providers: [AppService],

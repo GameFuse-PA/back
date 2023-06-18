@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import {
     DeleteObjectCommand,
+    GetObjectCommand,
     PutObjectCommand,
     S3Client,
 } from '@aws-sdk/client-s3';
@@ -8,6 +9,7 @@ import { AppConfigService } from '../configuration/app.config.service';
 import { InjectModel } from '@nestjs/mongoose';
 import { File, FileDocument } from '../schemas/file.schema';
 import { Model } from 'mongoose';
+import * as unzipper from 'unzipper';
 
 @Injectable()
 export class FileService {
@@ -72,6 +74,29 @@ export class FileService {
         } catch (e) {
             throw new Error(
                 `Erreur lors de la suppression du fichier. Error: ${e}`,
+            );
+        }
+    }
+
+    async unzipFile(fileId: string) {
+        try {
+            const file = await this.fileModel.findById(fileId);
+
+            const params = {
+                Bucket: this.appConfigService.awsBucketName,
+                Key: `game-program/${file.name}`,
+            };
+
+            const outputDirectory = `game-program/${file.name.split('.')[0]}`;
+
+            const s3File = await this.s3.send(new GetObjectCommand(params));
+
+            const stream = s3File.Body as any;
+
+            return stream.pipe(unzipper.Extract({ path: outputDirectory }));
+        } catch (e) {
+            throw new Error(
+                `Erreur lors de la décompression du fichier. Error: ${e}`,
             );
         }
     }
