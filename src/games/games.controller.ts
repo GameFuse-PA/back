@@ -7,6 +7,7 @@ import {
     NotFoundException,
     Param,
     Post,
+    Put,
     Request,
     UploadedFiles,
     UseGuards,
@@ -17,6 +18,7 @@ import { FileFieldsInterceptor } from '@nestjs/platform-express';
 import { AuthGuard } from '../guards/auth.guard';
 import { AddGameDto } from './dto/addGame.dto';
 import { GameDocument } from '../schemas/game.schema';
+import { UpdateGameDto } from './dto/updateGame.dto';
 
 @Controller('games')
 export class GamesController {
@@ -67,5 +69,41 @@ export class GamesController {
         }
 
         return this.gamesService.deleteGame(gameId);
+    }
+
+    @Put(':id')
+    @UseGuards(AuthGuard)
+    @UseInterceptors(
+        FileFieldsInterceptor([
+            { name: 'banner', maxCount: 1 },
+            { name: 'program', maxCount: 1 },
+        ]),
+    )
+    async updateGame(
+        @UploadedFiles()
+        files: {
+            banner: Express.Multer.File[];
+            program: Express.Multer.File[];
+        },
+        @Body() addGameDto: UpdateGameDto,
+        @Request() req,
+        @Param('id') gameId: string,
+    ) {
+        const game = await this.gamesService.getGame(gameId);
+
+        if (!game) {
+            throw new NotFoundException('Jeu introuvable');
+        }
+
+        if (game.createdBy._id.toString() !== req.userId) {
+            throw new ForbiddenException('Vous ne pouvez pas modifier ce jeu');
+        }
+
+        return this.gamesService.updateGame(
+            gameId,
+            addGameDto,
+            files.banner ? files.banner[0] : null,
+            files.program ? files.program[0] : null,
+        );
     }
 }
