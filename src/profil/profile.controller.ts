@@ -16,7 +16,7 @@ import { ProfilDto } from './dto/profil.dto';
 import { PasswordDto } from './dto/password.dto';
 import { FriendsService } from '../friends/friends.service';
 import { GamesService } from '../games/games.service';
-import { PartiesService } from '../parties/parties.service';
+import { GameSessionService } from '../game-session/game-session.service';
 
 @Controller('me')
 export class ProfilController {
@@ -24,7 +24,7 @@ export class ProfilController {
         private profileService: ProfilService,
         private friendsService: FriendsService,
         private gamesService: GamesService,
-        private partiesService: PartiesService,
+        private partiesService: GameSessionService,
     ) {}
 
     @UseGuards(AuthGuard)

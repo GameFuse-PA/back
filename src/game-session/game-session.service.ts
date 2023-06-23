@@ -4,7 +4,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 
 @Injectable()
-export class PartiesService {
+export class GameSessionService {
     constructor(
         @InjectModel(Parties.name)
         private readonly partyModel: Model<PartiesDocument>,
