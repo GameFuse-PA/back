@@ -5,9 +5,6 @@ export class GameSessionDto {
     name: string;
 
     @IsOptional()
-    description: string;
-
-    @IsOptional()
     createdBy: string;
 
     @IsNotEmpty({
