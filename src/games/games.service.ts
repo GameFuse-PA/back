@@ -5,6 +5,8 @@ import { Game, GameDocument } from '../schemas/game.schema';
 import { Model } from 'mongoose';
 import { AddGameDto } from './dto/addGame.dto';
 import { UsersService } from '../users/users.service';
+import { EntryArgumentDto } from './dto/entryArgument.dto';
+import { validate } from 'class-validator';
 
 @Injectable()
 export class GamesService {
@@ -18,7 +20,9 @@ export class GamesService {
         game: AddGameDto,
         banner: Express.Multer.File,
         program: Express.Multer.File,
+        entry: Express.Multer.File,
         userId: string,
+        playersEntry: EntryArgumentDto,
     ) {
         const user = await this.userService.findOneById(userId);
 
@@ -36,12 +40,22 @@ export class GamesService {
             program.mimetype,
         );
 
+        const entryFile = await this.fileService.uploadFile(
+            entry.buffer,
+            `${Date.now()}.${entry.originalname.split('.').pop()}`,
+            `game-entry`,
+            entry.mimetype,
+        );
+
         const newGame = new this.gameModel({
             name: game.name,
             description: game.description,
             banner: bannerFile,
             program: programFile,
+            entry: entryFile,
             createdBy: user,
+            minPlayers: playersEntry.min,
+            maxPlayers: playersEntry.max,
         });
 
         return await newGame.save();
@@ -52,6 +66,7 @@ export class GamesService {
             .find({ createdBy: userId })
             .populate('banner')
             .populate('program')
+            .populate('entry')
             .populate('createdBy')
             .exec();
     }
@@ -61,6 +76,7 @@ export class GamesService {
             .findById(gameId)
             .populate('banner')
             .populate('program')
+            .populate('entry')
             .populate('createdBy')
             .exec();
     }
@@ -70,6 +86,7 @@ export class GamesService {
             .find({ name: { $regex: name, $options: 'i' } })
             .populate('banner')
             .populate('program')
+            .populate('entry')
             .populate('createdBy')
             .exec();
     }
@@ -93,48 +110,91 @@ export class GamesService {
         game: AddGameDto,
         banner: Express.Multer.File,
         program: Express.Multer.File,
+        entry: Express.Multer.File,
+        playersArgument: EntryArgumentDto,
     ) {
         const gameToUpdate = await this.gameModel.findById(gameId).exec();
 
         if (gameToUpdate) {
             if (banner) {
-                await this.fileService.deleteFile(
+                gameToUpdate.banner = await this.UpdateGameFile(
                     gameToUpdate.banner._id,
-                    `game-banner`,
+                    banner,
+                    'banner',
                 );
-
-                const bannerFile = await this.fileService.uploadFile(
-                    banner.buffer,
-                    `${Date.now()}.${banner.mimetype.split('/')[1]}`,
-                    `game-banner`,
-                    banner.mimetype,
-                );
-
-                gameToUpdate.banner = bannerFile;
             }
 
             if (program) {
-                await this.fileService.deleteFile(
+                gameToUpdate.program = await this.UpdateGameFile(
                     gameToUpdate.program._id,
-                    `game-program`,
+                    program,
+                    'program',
                 );
+            }
 
-                const programFile = await this.fileService.uploadFile(
-                    program.buffer,
-                    `${Date.now()}.${program.mimetype.split('/')[1]}`,
-                    `game-program`,
-                    program.mimetype,
+            if (entry) {
+                gameToUpdate.entry = await this.UpdateGameFile(
+                    gameToUpdate.entry._id,
+                    entry,
+                    'entry',
                 );
-
-                gameToUpdate.program = programFile;
             }
 
             gameToUpdate.name = game.name;
             gameToUpdate.description = game.description;
 
+            if (playersArgument) {
+                gameToUpdate.minPlayers = playersArgument.min;
+                gameToUpdate.maxPlayers = playersArgument.max;
+            }
+
             return await gameToUpdate.save();
         }
 
         return null;
+    }
+
+    async UpdateGameFile(
+        fileId: string,
+        newFile: Express.Multer.File,
+        type: string,
+    ) {
+        await this.fileService.deleteFile(fileId, `game-${type}`);
+
+        const gameFile = await this.fileService.uploadFile(
+            newFile.buffer,
+            `${Date.now()}.${newFile.mimetype.split('/')[1]}`,
+            `game-${type}`,
+            newFile.mimetype,
+        );
+
+        return gameFile;
+    }
+
+    async verifyGameEntry(entry: Express.Multer.File) {
+        const json = JSON.parse(entry.buffer.toString());
+
+        const playersArgument = json.arguments.find(
+            (arg) => arg.name === 'players',
+        );
+
+        if (!playersArgument) {
+            return null;
+        }
+
+        let dto = new EntryArgumentDto();
+        dto.min = playersArgument.min;
+        dto.max = playersArgument.max;
+        dto.name = playersArgument.name;
+        dto.description = playersArgument.description;
+        dto.type = playersArgument.type;
+
+        await validate(dto).then((errors) => {
+            if (errors.length > 0) {
+                dto = null;
+            }
+        });
+
+        return dto;
     }
 }

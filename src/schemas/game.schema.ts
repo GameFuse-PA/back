@@ -29,10 +29,23 @@ export class Game extends Document {
 
     @Prop({
         type: MongooseSchema.Types.ObjectId,
+        ref: 'File',
+        required: true,
+    })
+    entry: File;
+
+    @Prop({
+        type: MongooseSchema.Types.ObjectId,
         ref: 'User',
         required: true,
     })
     createdBy: User;
+
+    @Prop({ required: true })
+    maxPlayers: number;
+
+    @Prop({ required: true })
+    minPlayers: number;
 }
 
 export const GameSchema = SchemaFactory.createForClass(Game);
