@@ -5,6 +5,8 @@ import { Game, GameDocument } from '../schemas/game.schema';
 import { Model } from 'mongoose';
 import { AddGameDto } from './dto/addGame.dto';
 import { UsersService } from '../users/users.service';
+import { EntryArgumentDto } from './dto/entryArgument.dto';
+import { validate } from 'class-validator';
 
 @Injectable()
 export class GamesService {
@@ -20,6 +22,7 @@ export class GamesService {
         program: Express.Multer.File,
         entry: Express.Multer.File,
         userId: string,
+        playersEntry: EntryArgumentDto,
     ) {
         const user = await this.userService.findOneById(userId);
 
@@ -51,6 +54,8 @@ export class GamesService {
             program: programFile,
             entry: entryFile,
             createdBy: user,
+            minPlayers: playersEntry.min,
+            maxPlayers: playersEntry.max,
         });
 
         return await newGame.save();
@@ -106,6 +111,7 @@ export class GamesService {
         banner: Express.Multer.File,
         program: Express.Multer.File,
         entry: Express.Multer.File,
+        playersArgument: EntryArgumentDto,
     ) {
         const gameToUpdate = await this.gameModel.findById(gameId).exec();
 
@@ -137,6 +143,11 @@ export class GamesService {
             gameToUpdate.name = game.name;
             gameToUpdate.description = game.description;
 
+            if (playersArgument) {
+                gameToUpdate.minPlayers = playersArgument.min;
+                gameToUpdate.maxPlayers = playersArgument.max;
+            }
+
             return await gameToUpdate.save();
         }
 
@@ -158,5 +169,32 @@ export class GamesService {
         );
 
         return gameFile;
+    }
+
+    async verifyGameEntry(entry: Express.Multer.File) {
+        const json = JSON.parse(entry.buffer.toString());
+
+        const playersArgument = json.arguments.find(
+            (arg) => arg.name === 'players',
+        );
+
+        if (!playersArgument) {
+            return null;
+        }
+
+        let dto = new EntryArgumentDto();
+        dto.min = playersArgument.min;
+        dto.max = playersArgument.max;
+        dto.name = playersArgument.name;
+        dto.description = playersArgument.description;
+        dto.type = playersArgument.type;
+
+        await validate(dto).then((errors) => {
+            if (errors.length > 0) {
+                dto = null;
+            }
+        });
+
+        return dto;
     }
 }

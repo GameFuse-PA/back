@@ -40,6 +40,12 @@ export class Game extends Document {
         required: true,
     })
     createdBy: User;
+
+    @Prop({ required: true })
+    maxPlayers: number;
+
+    @Prop({ required: true })
+    minPlayers: number;
 }
 
 export const GameSchema = SchemaFactory.createForClass(Game);

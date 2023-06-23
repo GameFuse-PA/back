@@ -35,7 +35,7 @@ export class GamesController {
             { name: 'entry', maxCount: 1 },
         ]),
     )
-    addGame(
+    async addGame(
         @UploadedFiles()
         files: {
             banner: Express.Multer.File[];
@@ -51,15 +51,29 @@ export class GamesController {
         if (!files.program) {
             throw new BadRequestException('Fichier du jeu requis');
         }
+
+        let playersEntry = null;
+
         if (!files.entry) {
             throw new BadRequestException("Fichier d'entrée requis");
+        } else {
+            playersEntry = await this.gamesService.verifyGameEntry(
+                files.entry[0],
+            );
+            if (!playersEntry) {
+                throw new BadRequestException(
+                    "Fichier d'entrée invalide (fichier .txt attendu)",
+                );
+            }
         }
+
         return this.gamesService.addGame(
             addGameDto,
             files.banner[0],
             files.program[0],
             files.entry[0],
             req.userId,
+            playersEntry,
         );
     }
 
@@ -109,12 +123,27 @@ export class GamesController {
             throw new ForbiddenException('Vous ne pouvez pas modifier ce jeu');
         }
 
+        let playersEntry = null;
+
+        if (files.entry) {
+            playersEntry = await this.gamesService.verifyGameEntry(
+                files.entry[0],
+            );
+
+            if (!playersEntry) {
+                throw new BadRequestException(
+                    "Le fichier d'entrée n'est pas valide",
+                );
+            }
+        }
+
         return this.gamesService.updateGame(
             gameId,
             addGameDto,
             files.banner ? files.banner[0] : null,
             files.program ? files.program[0] : null,
             files.entry ? files.entry[0] : null,
+            playersEntry ? playersEntry : null,
         );
     }
 
