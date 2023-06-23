@@ -14,7 +14,7 @@ import { JwtModule } from '@nestjs/jwt';
 import { GamesModule } from './games/games.module';
 import { FriendsModule } from './friends/friends.module';
 import { RoomModule } from './room/roomModule';
-import { PartiesModule } from './parties/parties.module';
+import { GameSessionModule } from './game-session/game-session.module';
 
 @Module({
     imports: [
@@ -31,7 +31,7 @@ import { PartiesModule } from './parties/parties.module';
         FriendsModule,
         GamesModule,
         RoomModule,
-        PartiesModule,
+        GameSessionModule,
     ],
     controllers: [AppController],
     providers: [AppService],

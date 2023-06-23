@@ -1,6 +1,6 @@
 import { IsNotEmpty, IsOptional } from 'class-validator';
 
-export class PartyDto {
+export class GameSessionDto {
     @IsNotEmpty({ message: 'Nom requis' })
     name: string;
 

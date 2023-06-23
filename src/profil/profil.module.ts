@@ -6,7 +6,7 @@ import { JwtModule } from '@nestjs/jwt';
 import { FileModule } from '../amazon/file.module';
 import { FriendsModule } from '../friends/friends.module';
 import { GamesModule } from '../games/games.module';
-import { PartiesModule } from '../parties/parties.module';
+import { GameSessionModule } from '../game-session/game-session.module';
 
 @Module({
     imports: [
@@ -15,7 +15,7 @@ import { PartiesModule } from '../parties/parties.module';
         FileModule,
         FriendsModule,
         GamesModule,
-        PartiesModule,
+        GameSessionModule,
     ],
     controllers: [ProfilController],
     providers: [ProfilService],
