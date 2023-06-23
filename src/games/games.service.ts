@@ -24,14 +24,14 @@ export class GamesService {
 
         const bannerFile = await this.fileService.uploadFile(
             banner.buffer,
-            `${Date.now()}.${banner.mimetype.split('/')[1]}`,
+            `${Date.now()}.${banner.originalname.split('.').pop()}`,
             `game-banner`,
             banner.mimetype,
         );
 
         const programFile = await this.fileService.uploadFile(
             program.buffer,
-            `${Date.now()}.${banner.mimetype.split('/')[1]}`,
+            `${Date.now()}.${program.originalname.split('.').pop()}`,
             `game-program`,
             program.mimetype,
         );
@@ -65,6 +65,15 @@ export class GamesService {
             .exec();
     }
 
+    async getGames(name: string) {
+        return await this.gameModel
+            .find({ name: { $regex: name, $options: 'i' } })
+            .populate('banner')
+            .populate('program')
+            .populate('createdBy')
+            .exec();
+    }
+
     async deleteGame(gameId: string) {
         const game = await this.gameModel.findById(gameId).exec();
 
@@ -77,5 +86,55 @@ export class GamesService {
         }
 
         return false;
+    }
+
+    async updateGame(
+        gameId: string,
+        game: AddGameDto,
+        banner: Express.Multer.File,
+        program: Express.Multer.File,
+    ) {
+        const gameToUpdate = await this.gameModel.findById(gameId).exec();
+
+        if (gameToUpdate) {
+            if (banner) {
+                await this.fileService.deleteFile(
+                    gameToUpdate.banner._id,
+                    `game-banner`,
+                );
+
+                const bannerFile = await this.fileService.uploadFile(
+                    banner.buffer,
+                    `${Date.now()}.${banner.mimetype.split('/')[1]}`,
+                    `game-banner`,
+                    banner.mimetype,
+                );
+
+                gameToUpdate.banner = bannerFile;
+            }
+
+            if (program) {
+                await this.fileService.deleteFile(
+                    gameToUpdate.program._id,
+                    `game-program`,
+                );
+
+                const programFile = await this.fileService.uploadFile(
+                    program.buffer,
+                    `${Date.now()}.${program.mimetype.split('/')[1]}`,
+                    `game-program`,
+                    program.mimetype,
+                );
+
+                gameToUpdate.program = programFile;
+            }
+
+            gameToUpdate.name = game.name;
+            gameToUpdate.description = game.description;
+
+            return await gameToUpdate.save();
+        }
+
+        return null;
     }
 }
