@@ -1,4 +1,4 @@
-import { Controller, Get, Param } from '@nestjs/common';
+import { Controller, Get, Param, Post, Req } from '@nestjs/common';
 import { RunnerService } from './runner.service';
 
 @Controller('games')
@@ -7,10 +7,15 @@ export class RunnerController {
 
     @Get(':id/start')
     async start(@Param('id') gameId: string) {
-        console.log('start');
-
         return {
-            status: await this.runnerService.start(gameId),
+            message: await this.runnerService.start(gameId),
+        };
+    }
+
+    @Post(':pid/message')
+    async sendMessage(@Param('pid') pid: number) {
+        return {
+            message: await this.runnerService.sendMessage(pid, 'Test'),
         };
     }
 }
