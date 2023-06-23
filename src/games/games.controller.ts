@@ -49,7 +49,7 @@ export class GamesController {
             throw new BadRequestException('Bannière requise');
         }
         if (!files.program) {
-            throw new BadRequestException('Fichier du jeu requis');
+            throw new BadRequestException('Fichier source requis');
         }
 
         let playersEntry = null;
@@ -61,9 +61,7 @@ export class GamesController {
                 files.entry[0],
             );
             if (!playersEntry) {
-                throw new BadRequestException(
-                    "Fichier d'entrée invalide (fichier .txt attendu)",
-                );
+                throw new BadRequestException("Fichier d'entrée invalide");
             }
         }
 
@@ -131,9 +129,7 @@ export class GamesController {
             );
 
             if (!playersEntry) {
-                throw new BadRequestException(
-                    "Le fichier d'entrée n'est pas valide",
-                );
+                throw new BadRequestException("Fichier d'entrée invalide");
             }
         }
 
