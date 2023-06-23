@@ -5,8 +5,6 @@ import {
     Types,
 } from 'mongoose';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { User } from './user.schema';
-import { Game } from './game.schema';
 
 export type PartiesDocument = HydratedDocument<Parties>;
 
@@ -15,36 +13,39 @@ export class Parties extends Document {
     @Prop({ required: true })
     name: string;
 
-    @Prop({ required: false })
-    description: string;
-
     @Prop({
         required: true,
         type: MongooseSchema.Types.ObjectId,
         ref: 'User',
     })
-    createdBy: User;
+    createdBy: Types.ObjectId;
 
     @Prop({
         required: true,
         type: [{ type: MongooseSchema.Types.ObjectId, ref: 'User' }],
         default: [],
     })
-    members: User[];
+    members: Types.ObjectId[];
 
     @Prop({
         required: true,
         type: MongooseSchema.Types.ObjectId,
         ref: 'Game',
     })
-    game: Game;
+    game: Types.ObjectId;
 
     @Prop({
         required: false,
         type: MongooseSchema.Types.ObjectId,
         ref: 'User',
     })
-    winner: User;
+    winner: Types.ObjectId;
+
+    @Prop({
+        required: true,
+        type: MongooseSchema.Types.Number,
+    })
+    status: number;
 }
 
 export const PartiesSchema = SchemaFactory.createForClass(Parties);
