@@ -46,7 +46,7 @@ export class ProfilController {
     }
 
     @UseGuards(AuthGuard)
-    @Get('parties')
+    @Get('game-sessions')
     getParties(@Request() req) {
         return this.partiesService.getMyParties(req.userId);
     }
