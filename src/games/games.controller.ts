@@ -32,6 +32,7 @@ export class GamesController {
         FileFieldsInterceptor([
             { name: 'banner', maxCount: 1 },
             { name: 'program', maxCount: 1 },
+            { name: 'entry', maxCount: 1 },
         ]),
     )
     addGame(
@@ -39,6 +40,7 @@ export class GamesController {
         files: {
             banner: Express.Multer.File[];
             program: Express.Multer.File[];
+            entry: Express.Multer.File[];
         },
         @Body() addGameDto: AddGameDto,
         @Request() req,
@@ -49,10 +51,14 @@ export class GamesController {
         if (!files.program) {
             throw new BadRequestException('Fichier du jeu requis');
         }
+        if (!files.entry) {
+            throw new BadRequestException("Fichier d'entrée requis");
+        }
         return this.gamesService.addGame(
             addGameDto,
             files.banner[0],
             files.program[0],
+            files.entry[0],
             req.userId,
         );
     }
@@ -79,6 +85,7 @@ export class GamesController {
         FileFieldsInterceptor([
             { name: 'banner', maxCount: 1 },
             { name: 'program', maxCount: 1 },
+            { name: 'entry', maxCount: 1 },
         ]),
     )
     async updateGame(
@@ -86,6 +93,7 @@ export class GamesController {
         files: {
             banner: Express.Multer.File[];
             program: Express.Multer.File[];
+            entry: Express.Multer.File[];
         },
         @Body() addGameDto: UpdateGameDto,
         @Request() req,
@@ -106,6 +114,7 @@ export class GamesController {
             addGameDto,
             files.banner ? files.banner[0] : null,
             files.program ? files.program[0] : null,
+            files.entry ? files.entry[0] : null,
         );
     }
 

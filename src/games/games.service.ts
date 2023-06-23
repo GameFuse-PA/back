@@ -18,6 +18,7 @@ export class GamesService {
         game: AddGameDto,
         banner: Express.Multer.File,
         program: Express.Multer.File,
+        entry: Express.Multer.File,
         userId: string,
     ) {
         const user = await this.userService.findOneById(userId);
@@ -36,11 +37,19 @@ export class GamesService {
             program.mimetype,
         );
 
+        const entryFile = await this.fileService.uploadFile(
+            entry.buffer,
+            `${Date.now()}.${entry.originalname.split('.').pop()}`,
+            `game-entry`,
+            entry.mimetype,
+        );
+
         const newGame = new this.gameModel({
             name: game.name,
             description: game.description,
             banner: bannerFile,
             program: programFile,
+            entry: entryFile,
             createdBy: user,
         });
 
@@ -52,6 +61,7 @@ export class GamesService {
             .find({ createdBy: userId })
             .populate('banner')
             .populate('program')
+            .populate('entry')
             .populate('createdBy')
             .exec();
     }
@@ -61,6 +71,7 @@ export class GamesService {
             .findById(gameId)
             .populate('banner')
             .populate('program')
+            .populate('entry')
             .populate('createdBy')
             .exec();
     }
@@ -70,6 +81,7 @@ export class GamesService {
             .find({ name: { $regex: name, $options: 'i' } })
             .populate('banner')
             .populate('program')
+            .populate('entry')
             .populate('createdBy')
             .exec();
     }
@@ -93,40 +105,33 @@ export class GamesService {
         game: AddGameDto,
         banner: Express.Multer.File,
         program: Express.Multer.File,
+        entry: Express.Multer.File,
     ) {
         const gameToUpdate = await this.gameModel.findById(gameId).exec();
 
         if (gameToUpdate) {
             if (banner) {
-                await this.fileService.deleteFile(
+                gameToUpdate.banner = await this.UpdateGameFile(
                     gameToUpdate.banner._id,
-                    `game-banner`,
+                    banner,
+                    'banner',
                 );
-
-                const bannerFile = await this.fileService.uploadFile(
-                    banner.buffer,
-                    `${Date.now()}.${banner.mimetype.split('/')[1]}`,
-                    `game-banner`,
-                    banner.mimetype,
-                );
-
-                gameToUpdate.banner = bannerFile;
             }
 
             if (program) {
-                await this.fileService.deleteFile(
+                gameToUpdate.program = await this.UpdateGameFile(
                     gameToUpdate.program._id,
-                    `game-program`,
+                    program,
+                    'program',
                 );
+            }
 
-                const programFile = await this.fileService.uploadFile(
-                    program.buffer,
-                    `${Date.now()}.${program.mimetype.split('/')[1]}`,
-                    `game-program`,
-                    program.mimetype,
+            if (entry) {
+                gameToUpdate.entry = await this.UpdateGameFile(
+                    gameToUpdate.entry._id,
+                    entry,
+                    'entry',
                 );
-
-                gameToUpdate.program = programFile;
             }
 
             gameToUpdate.name = game.name;
@@ -136,5 +141,22 @@ export class GamesService {
         }
 
         return null;
+    }
+
+    async UpdateGameFile(
+        fileId: string,
+        newFile: Express.Multer.File,
+        type: string,
+    ) {
+        await this.fileService.deleteFile(fileId, `game-${type}`);
+
+        const gameFile = await this.fileService.uploadFile(
+            newFile.buffer,
+            `${Date.now()}.${newFile.mimetype.split('/')[1]}`,
+            `game-${type}`,
+            newFile.mimetype,
+        );
+
+        return gameFile;
     }
 }
