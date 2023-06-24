@@ -6,10 +6,10 @@ import {
 } from 'mongoose';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 
-export type PartiesDocument = HydratedDocument<Parties>;
+export type GameSessionsDocument = HydratedDocument<GameSessions>;
 
 @Schema({ versionKey: false, timestamps: true })
-export class Parties extends Document {
+export class GameSessions extends Document {
     @Prop({ required: true })
     name: string;
 
@@ -48,4 +48,4 @@ export class Parties extends Document {
     status: number;
 }
 
-export const PartiesSchema = SchemaFactory.createForClass(Parties);
+export const GameSessionsSchema = SchemaFactory.createForClass(GameSessions);

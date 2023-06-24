@@ -1,4 +1,4 @@
 import { Controller } from '@nestjs/common';
 
-@Controller('game-session')
+@Controller('game-sessions')
 export class GameSessionController {}
