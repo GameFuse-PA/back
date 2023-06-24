@@ -32,13 +32,15 @@ export class GamesController {
         FileFieldsInterceptor([
             { name: 'banner', maxCount: 1 },
             { name: 'program', maxCount: 1 },
+            { name: 'entry', maxCount: 1 },
         ]),
     )
-    addGame(
+    async addGame(
         @UploadedFiles()
         files: {
             banner: Express.Multer.File[];
             program: Express.Multer.File[];
+            entry: Express.Multer.File[];
         },
         @Body() addGameDto: AddGameDto,
         @Request() req,
@@ -47,13 +49,29 @@ export class GamesController {
             throw new BadRequestException('Bannière requise');
         }
         if (!files.program) {
-            throw new BadRequestException('Fichier du jeu requis');
+            throw new BadRequestException('Fichier source requis');
         }
+
+        let playersEntry = null;
+
+        if (!files.entry) {
+            throw new BadRequestException("Fichier d'entrée requis");
+        } else {
+            playersEntry = await this.gamesService.verifyGameEntry(
+                files.entry[0],
+            );
+            if (!playersEntry) {
+                throw new BadRequestException("Fichier d'entrée invalide");
+            }
+        }
+
         return this.gamesService.addGame(
             addGameDto,
             files.banner[0],
             files.program[0],
+            files.entry[0],
             req.userId,
+            playersEntry,
         );
     }
 
@@ -79,6 +97,7 @@ export class GamesController {
         FileFieldsInterceptor([
             { name: 'banner', maxCount: 1 },
             { name: 'program', maxCount: 1 },
+            { name: 'entry', maxCount: 1 },
         ]),
     )
     async updateGame(
@@ -86,6 +105,7 @@ export class GamesController {
         files: {
             banner: Express.Multer.File[];
             program: Express.Multer.File[];
+            entry: Express.Multer.File[];
         },
         @Body() addGameDto: UpdateGameDto,
         @Request() req,
@@ -101,11 +121,25 @@ export class GamesController {
             throw new ForbiddenException('Vous ne pouvez pas modifier ce jeu');
         }
 
+        let playersEntry = null;
+
+        if (files.entry) {
+            playersEntry = await this.gamesService.verifyGameEntry(
+                files.entry[0],
+            );
+
+            if (!playersEntry) {
+                throw new BadRequestException("Fichier d'entrée invalide");
+            }
+        }
+
         return this.gamesService.updateGame(
             gameId,
             addGameDto,
             files.banner ? files.banner[0] : null,
             files.program ? files.program[0] : null,
+            files.entry ? files.entry[0] : null,
+            playersEntry ? playersEntry : null,
         );
     }
 

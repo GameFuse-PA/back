@@ -23,7 +23,7 @@ export class ProfilService {
             throw new NotFoundException("L'utilisateur n'existe pas");
         }
         user.password = undefined;
-        return user;
+        return user.populate('avatar');
     }
 
     async updateProfil(id: string, profil: ProfilDto) {
