@@ -17,8 +17,24 @@ export class GameSessionService {
         return await this.gameSessionModel
             .find({ $or: [{ createdBy: id }, { members: id }] })
             .populate('createdBy')
-            .populate('members')
-            .populate('game')
+            .populate({
+                path: 'members',
+                populate: {
+                    path: 'avatar',
+                },
+            })
+            .populate({
+                path: 'game',
+                populate: {
+                    path: 'banner',
+                },
+            })
+            .populate({
+                path: 'game',
+                populate: {
+                    path: 'program',
+                },
+            })
             .populate('winner')
             .exec();
     }
