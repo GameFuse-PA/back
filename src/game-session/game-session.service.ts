@@ -1,28 +1,41 @@
 import { Injectable } from '@nestjs/common';
-import { Parties, PartiesDocument } from '../schemas/parties.schema';
+import {
+    GameSessions,
+    GameSessionsDocument,
+} from '../schemas/game-sessions.schema';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { GameSessionDto } from './dto/game-session.dto';
 
 @Injectable()
 export class GameSessionService {
     constructor(
-        @InjectModel(Parties.name)
-        private readonly gameSessionModel: Model<PartiesDocument>,
+        @InjectModel(GameSessions.name)
+        private readonly gameSessionModel: Model<GameSessionsDocument>,
     ) {}
 
-    async getMyParties(id: string) {
+    async getMyGameSessions(id: string) {
         return await this.gameSessionModel
             .find({ $or: [{ createdBy: id }, { members: id }] })
             .populate('createdBy')
-            .populate('members')
-            .populate('game')
+            .populate({
+                path: 'members',
+                populate: {
+                    path: 'avatar',
+                },
+            })
+            .populate({
+                path: 'game',
+                populate: {
+                    path: 'banner',
+                },
+            })
+            .populate({
+                path: 'game',
+                populate: {
+                    path: 'program',
+                },
+            })
             .populate('winner')
             .exec();
-    }
-
-    async createParty(party: GameSessionDto) {
-        const newParty = new this.gameSessionModel(party);
-        return await newParty.save();
     }
 }

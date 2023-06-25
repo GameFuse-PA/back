@@ -1,7 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { GameSessionController } from './game-session.controller';
 
-describe('PartiesController', () => {
+describe('GameSessionController', () => {
     let controller: GameSessionController;
 
     beforeEach(async () => {

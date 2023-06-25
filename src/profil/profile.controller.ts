@@ -24,7 +24,7 @@ export class ProfilController {
         private profileService: ProfilService,
         private friendsService: FriendsService,
         private gamesService: GamesService,
-        private partiesService: GameSessionService,
+        private gameSessionService: GameSessionService,
     ) {}
 
     @UseGuards(AuthGuard)
@@ -46,9 +46,9 @@ export class ProfilController {
     }
 
     @UseGuards(AuthGuard)
-    @Get('parties')
-    getParties(@Request() req) {
-        return this.partiesService.getMyParties(req.userId);
+    @Get('game-sessions')
+    getGameSessions(@Request() req) {
+        return this.gameSessionService.getMyGameSessions(req.userId);
     }
 
     @UseGuards(AuthGuard)
