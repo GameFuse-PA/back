@@ -5,6 +5,7 @@ import {
     Types,
 } from 'mongoose';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
+import { GameSessionEnum } from '../game-session/enum/game-session.enum';
 
 export type GameSessionsDocument = HydratedDocument<GameSessions>;
 
@@ -43,9 +44,10 @@ export class GameSessions extends Document {
 
     @Prop({
         required: true,
-        type: MongooseSchema.Types.Number,
+        enum: GameSessionEnum,
+        default: GameSessionEnum.In_Progress,
     })
-    status: number;
+    status: GameSessionEnum;
 }
 
 export const GameSessionsSchema = SchemaFactory.createForClass(GameSessions);
