@@ -5,6 +5,7 @@ import {
 } from '../schemas/game-sessions.schema';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
+import { GameSessionDto } from './dto/game-session.dto';
 
 @Injectable()
 export class GameSessionService {
@@ -37,5 +38,10 @@ export class GameSessionService {
             })
             .populate('winner')
             .exec();
+    }
+
+    async createGameSession(party: GameSessionDto) {
+        const newParty = new this.gameSessionModel(party);
+        return await newParty.save();
     }
 }
