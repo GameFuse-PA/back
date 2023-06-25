@@ -5,6 +5,7 @@ import { File, FileSchema } from './file.schema';
 import { Friends, FriendsSchema } from './friends.schema';
 import { Game, GameSchema } from './game.schema';
 import { Room, RoomSchema } from './room.schema';
+import { GameSessions, GameSessionsSchema } from './game-sessions.schema';
 
 @Global()
 @Module({
@@ -16,6 +17,9 @@ import { Room, RoomSchema } from './room.schema';
         ]),
         MongooseModule.forFeature([{ name: Game.name, schema: GameSchema }]),
         MongooseModule.forFeature([{ name: Room.name, schema: RoomSchema }]),
+        MongooseModule.forFeature([
+            { name: GameSessions.name, schema: GameSessionsSchema },
+        ]),
     ],
     exports: [
         MongooseModule.forFeature([{ name: User.name, schema: UserSchema }]),
@@ -25,6 +29,9 @@ import { Room, RoomSchema } from './room.schema';
         ]),
         MongooseModule.forFeature([{ name: Game.name, schema: GameSchema }]),
         MongooseModule.forFeature([{ name: Room.name, schema: RoomSchema }]),
+        MongooseModule.forFeature([
+            { name: GameSessions.name, schema: GameSessionsSchema },
+        ]),
     ],
 })
 export class SchemasModule {}

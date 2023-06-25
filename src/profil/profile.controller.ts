@@ -16,6 +16,7 @@ import { ProfilDto } from './dto/profil.dto';
 import { PasswordDto } from './dto/password.dto';
 import { FriendsService } from '../friends/friends.service';
 import { GamesService } from '../games/games.service';
+import { GameSessionService } from '../game-session/game-session.service';
 
 @Controller('me')
 export class ProfilController {
@@ -23,6 +24,7 @@ export class ProfilController {
         private profileService: ProfilService,
         private friendsService: FriendsService,
         private gamesService: GamesService,
+        private gameSessionService: GameSessionService,
     ) {}
 
     @UseGuards(AuthGuard)
@@ -41,6 +43,12 @@ export class ProfilController {
     @Get('games')
     getGames(@Request() req) {
         return this.gamesService.getUserGames(req.userId);
+    }
+
+    @UseGuards(AuthGuard)
+    @Get('game-sessions')
+    getGameSessions(@Request() req) {
+        return this.gameSessionService.getMyGameSessions(req.userId);
     }
 
     @UseGuards(AuthGuard)
