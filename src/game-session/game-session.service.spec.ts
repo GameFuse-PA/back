@@ -1,7 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { GameSessionService } from './game-session.service';
 
-describe('PartiesService', () => {
+describe('GameSessionService', () => {
     let service: GameSessionService;
 
     beforeEach(async () => {
