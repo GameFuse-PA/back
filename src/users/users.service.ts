@@ -1,13 +1,19 @@
-import { Injectable } from '@nestjs/common';
+import { ConflictException, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { User, UserDocument } from 'src/schemas/user.schema';
 import { ProfilDto } from '../profil/dto/profil.dto';
+import {
+    Invitations,
+    InvitationsDocument,
+} from '../schemas/invitations.schema';
+import { InvitationsDto } from './dto/invitations.dto';
 
 @Injectable()
 export class UsersService {
     constructor(
         @InjectModel(User.name) private userModel: Model<UserDocument>,
+        @InjectModel(Invitations.name) private invitationModel: Model<InvitationsDocument>,
     ) {}
 
     async findOneByEmail(
@@ -61,5 +67,23 @@ export class UsersService {
                 ],
             })
             .exec();
+    }
+
+    sendInvitation(userId: string, user: InvitationsDto) {
+        const invitationExist = this.invitationModel.findOne({
+            $and: [{ sender: userId }, { receiver: user.receiver }],
+        });
+        if (invitationExist) {
+            throw new ConflictException('Une invitation a déjà été envoyée');
+        }
+        const newInvitation = new this.invitationModel({
+            sender: userId,
+            receiver: user.receiver,
+        });
+
+        return {
+            message: 'Invitation envoyée',
+            invitation: newInvitation.save(),
+        };
     }
 }

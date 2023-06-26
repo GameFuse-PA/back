@@ -65,6 +65,17 @@ export class ProfilService {
         };
     }
 
+    async getFriends(id: string) {
+        const user = await this.usersServices.findOneById(id);
+        if (!user) {
+            throw new NotFoundException("L'utilisateur n'existe pas");
+        }
+        const friends = await user.populate('friends');
+        return {
+            friends: friends.friends,
+        };
+    }
+
     async updatePassword(id: string, user: PasswordDto) {
         const userExist = await this.usersServices.findOneById(id);
         if (!userExist) {

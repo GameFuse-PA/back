@@ -5,10 +5,13 @@ import {
     Query,
     UseGuards,
     Request,
+    Post,
+    Body,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { SearchUserDto } from './dto/SearchUserDto';
 import { AuthGuard } from '../guards/auth.guard';
+import { InvitationsDto } from './dto/invitations.dto';
 
 @Controller('users')
 export class UsersController {
@@ -27,5 +30,11 @@ export class UsersController {
     @Get()
     async getAllUsers() {
         return this.userService.findAll();
+    }
+
+    @UseGuards(AuthGuard)
+    @Post('invitations')
+    async sendInvitation(@Request() req, @Body() user: InvitationsDto) {
+        return this.userService.sendInvitation(req.userId, user);
     }
 }

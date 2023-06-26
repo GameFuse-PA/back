@@ -36,7 +36,7 @@ export class ProfilController {
     @UseGuards(AuthGuard)
     @Get('friends')
     getFriends(@Request() req) {
-        return this.friendsService.getFriends(req.userId);
+        return this.profileService.getFriends(req.userId);
     }
 
     @UseGuards(AuthGuard)
