@@ -19,6 +19,14 @@ export class MailConfigService {
         };
     }
 
+    getInvitationMail(username: string, token: string) {
+        const mail = this.mailTemplates.invitations;
+        return {
+            subject: mail.subject,
+            body: this.renderMailBody(mail.html, { username, token }),
+        };
+    }
+
     private renderMailBody(template: string, variables: any): string {
         return mustache.render(template, variables);
     }

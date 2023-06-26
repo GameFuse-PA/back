@@ -1,4 +1,8 @@
-import { ConflictException, Injectable } from '@nestjs/common';
+import {
+    ConflictException,
+    Injectable,
+    NotFoundException,
+} from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { User, UserDocument } from 'src/schemas/user.schema';
@@ -8,12 +12,17 @@ import {
     InvitationsDocument,
 } from '../schemas/invitations.schema';
 import { InvitationsDto } from './dto/invitations.dto';
+import { NotificationsConfigService } from '../configuration/notifications.config.service';
+import { MailConfigService } from '../configuration/mail.config.service';
 
 @Injectable()
 export class UsersService {
     constructor(
         @InjectModel(User.name) private userModel: Model<UserDocument>,
-        @InjectModel(Invitations.name) private invitationModel: Model<InvitationsDocument>,
+        @InjectModel(Invitations.name)
+        private invitationModel: Model<InvitationsDocument>,
+        private notificationsService: NotificationsConfigService,
+        private mailerService: MailConfigService,
     ) {}
 
     async findOneByEmail(
@@ -69,8 +78,15 @@ export class UsersService {
             .exec();
     }
 
-    sendInvitation(userId: string, user: InvitationsDto) {
-        const invitationExist = this.invitationModel.findOne({
+    async sendInvitation(userId: string, user: InvitationsDto) {
+        const userFriend = await this.userModel.findById(user.receiver);
+        const userExist = await this.userModel.findById(userId);
+
+        if (!userFriend || !userExist) {
+            throw new NotFoundException("L'utilisateur n'existe pas");
+        }
+
+        const invitationExist = await this.invitationModel.findOne({
             $and: [{ sender: userId }, { receiver: user.receiver }],
         });
         if (invitationExist) {
@@ -80,10 +96,22 @@ export class UsersService {
             sender: userId,
             receiver: user.receiver,
         });
+        const inviteResponse = await newInvitation.save();
+
+        const mailSendInvit = this.mailerService.getInvitationMail(
+            userExist.username,
+            inviteResponse._id,
+        );
+
+        await this.notificationsService.sendEmail(
+            userFriend.email,
+            mailSendInvit.subject,
+            mailSendInvit.body,
+        );
 
         return {
             message: 'Invitation envoyée',
-            invitation: newInvitation.save(),
+            invitation: inviteResponse,
         };
     }
 }
