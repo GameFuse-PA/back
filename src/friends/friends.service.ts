@@ -8,6 +8,10 @@ import {
     Conversation,
     ConversationDocument,
 } from '../schemas/conversation.schema';
+import {
+    Invitations,
+    InvitationsDocument,
+} from '../schemas/invitations.schema';
 
 @Injectable()
 export class FriendsService {
@@ -15,6 +19,8 @@ export class FriendsService {
         @InjectModel(Friends.name) private friendsModel: Model<FriendDocument>,
         @InjectModel(Conversation.name)
         private conversationModel: Model<ConversationDocument>,
+        @InjectModel(Invitations.name)
+        private invitationModel: Model<InvitationsDocument>,
         private usersServices: UsersService,
     ) {}
 
@@ -42,6 +48,34 @@ export class FriendsService {
         userFriend.friends.push(user._id);
         await user.save();
         await userFriend.save();
+
+        await this.invitationModel
+            .deleteOne({
+                $or: [
+                    {
+                        $and: [
+                            {
+                                sender: userFriend._id,
+                            },
+                            {
+                                receiver: user._id,
+                            },
+                        ],
+                    },
+                    {
+                        $and: [
+                            {
+                                sender: user._id,
+                            },
+                            {
+                                receiver: userFriend._id,
+                            },
+                        ],
+                    },
+                ],
+            })
+            .exec();
+
         const conversation = new this.conversationModel({
             users: [user._id, userFriend._id],
         });

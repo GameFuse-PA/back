@@ -5,10 +5,10 @@ export type InvitationsDocument = HydratedDocument<Invitations>;
 
 @Schema({ versionKey: false, timestamps: true })
 export class Invitations extends Document {
-    @Prop({ required: true })
+    @Prop({ required: true, ref: 'User' })
     sender: string;
 
-    @Prop({ required: true })
+    @Prop({ required: true, ref: 'User' })
     receiver: string;
 }
 

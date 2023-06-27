@@ -16,6 +16,7 @@ import { FriendsModule } from './friends/friends.module';
 import { RoomModule } from './room/roomModule';
 import { GameSessionModule } from './game-session/game-session.module';
 import { ConversationsModule } from './conversations/conversations.module';
+import { InvitationsModule } from './invitations/invitations.module';
 
 @Module({
     imports: [
@@ -34,6 +35,7 @@ import { ConversationsModule } from './conversations/conversations.module';
         RoomModule,
         GameSessionModule,
         ConversationsModule,
+        InvitationsModule,
     ],
     controllers: [AppController],
     providers: [AppService],

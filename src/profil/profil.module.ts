@@ -7,6 +7,7 @@ import { FileModule } from '../amazon/file.module';
 import { FriendsModule } from '../friends/friends.module';
 import { GamesModule } from '../games/games.module';
 import { GameSessionModule } from '../game-session/game-session.module';
+import { InvitationsModule } from '../invitations/invitations.module';
 
 @Module({
     imports: [
@@ -16,6 +17,7 @@ import { GameSessionModule } from '../game-session/game-session.module';
         FriendsModule,
         GamesModule,
         GameSessionModule,
+        InvitationsModule,
     ],
     controllers: [ProfilController],
     providers: [ProfilService],
