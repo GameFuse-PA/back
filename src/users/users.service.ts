@@ -1,6 +1,7 @@
 import {
     ConflictException,
     Injectable,
+    InternalServerErrorException,
     NotFoundException,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
@@ -86,8 +87,29 @@ export class UsersService {
             throw new NotFoundException("L'utilisateur n'existe pas");
         }
 
+        if (userFriend._id.toString() === userExist._id.toString()) {
+            throw new ConflictException(
+                "Vous ne pouvez pas vous ajouter vous même, c'est assez triste en y pensant",
+            );
+        }
+
+        if (userFriend.friends.includes(userExist._id.toString())) {
+            throw new InternalServerErrorException(
+                'La personne vous possède déjà dans ses amis',
+            );
+        }
+
+        if (userExist.friends.includes(userFriend._id.toString())) {
+            throw new InternalServerErrorException(
+                'Vous êtes déjà amis avec cette personne',
+            );
+        }
+
         const invitationExist = await this.invitationModel.findOne({
-            $and: [{ sender: userId }, { receiver: user.receiver }],
+            $or: [
+                { $and: [{ sender: userId }, { receiver: user.receiver }] },
+                { $and: [{ sender: user.receiver }, { receiver: userId }] },
+            ],
         });
         if (invitationExist) {
             throw new ConflictException('Une invitation a déjà été envoyée');
