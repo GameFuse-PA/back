@@ -1,5 +1,4 @@
-import { MessageDto } from '../conversations/dto/message.dto';
-import { Prop, SchemaFactory } from '@nestjs/mongoose';
+import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import {
     Document,
     HydratedDocument,
@@ -9,6 +8,13 @@ import {
 
 export type ConversationDocument = HydratedDocument<Conversation>;
 
+interface Message {
+    text: string;
+    from: string;
+    date: Date;
+}
+
+@Schema({ versionKey: false, timestamps: true })
 export class Conversation extends Document {
     @Prop({
         required: true,
@@ -18,10 +24,10 @@ export class Conversation extends Document {
 
     @Prop({
         required: true,
-        type: [{ type: MessageDto }],
+        type: [{ type: MongooseSchema.Types.Map }],
         default: [],
     })
-    messages: MessageDto[];
+    messages: Message[];
 }
 
 export const ConversationSchema = SchemaFactory.createForClass(Conversation);
