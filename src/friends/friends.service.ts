@@ -1,4 +1,8 @@
-import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import {
+    ConflictException,
+    Injectable,
+    InternalServerErrorException,
+} from '@nestjs/common';
 import { FriendsDto } from './dto/Friends.dto';
 import { InjectModel } from '@nestjs/mongoose';
 import { FriendDocument, Friends } from '../schemas/friends.schema';
@@ -35,6 +39,11 @@ export class FriendsService {
 
         if (!user || !userFriend) {
             throw new Error("Erreur avec l'ami entré");
+        }
+        if (user._id.toString() === userFriend._id.toString()) {
+            throw new ConflictException(
+                'Vous essayez de vous ajouter en ami, je peux être le votre si vous le souhaitez 🙂',
+            );
         }
 
         if (
