@@ -73,6 +73,9 @@ export class ProfilService {
         const friends = await user.populate({
             path: 'friends',
             select: '-friends',
+            populate: {
+                path: 'avatar',
+            },
         });
         return {
             friends: friends.friends,
