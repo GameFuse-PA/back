@@ -14,6 +14,7 @@ import {
 import { InvitationsDto } from './dto/invitations.dto';
 import { NotificationsConfigService } from '../configuration/notifications.config.service';
 import { MailConfigService } from '../configuration/mail.config.service';
+import * as MongooseSchema from 'mongoose';
 
 @Injectable()
 export class UsersService {
@@ -52,7 +53,9 @@ export class UsersService {
     }
 
     async searchUser(value: string, userId: string): Promise<UserDocument[]> {
-        return this.userModel
+        const response = [];
+
+        const usersSearch = await this.userModel
             .find({
                 $or: [
                     {
@@ -75,7 +78,22 @@ export class UsersService {
                     },
                 ],
             })
+            .populate('friends')
             .exec();
+
+        for (const user of usersSearch) {
+            if (
+                user.friends.includes(
+                    userId as unknown as MongooseSchema.Types.ObjectId,
+                )
+            ) {
+                response.push({ user: user, isFriend: true });
+            } else {
+                response.push({ user: user, isFriend: false });
+            }
+        }
+
+        return response;
     }
 
     async sendInvitation(userId: string, user: InvitationsDto) {
