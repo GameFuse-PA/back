@@ -82,17 +82,12 @@ export class UsersService {
             .exec();
 
         for (const user of usersSearch) {
-            if (
-                user.friends.includes(
-                    userId as unknown as MongooseSchema.Types.ObjectId,
-                )
-            ) {
+            if (user.friends.find((e) => e._id.toString() === userId)) {
                 response.push({ user: user, isFriend: true });
             } else {
                 response.push({ user: user, isFriend: false });
             }
         }
-
         return response;
     }
 
