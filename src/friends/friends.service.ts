@@ -94,6 +94,59 @@ export class FriendsService {
             message: 'Ami ajouté',
         };
     }
+    async refuseFriend(userId: string, friend: FriendsDto) {
+        if (!friend.idFriends) {
+            throw new Error("Erreur avec l'ami entré");
+        }
+        const user = await this.usersServices.findOneById(userId);
+        const userFriend = await this.usersServices.findOneById(
+            friend.idFriends,
+        );
+
+        if (!user || !userFriend) {
+            throw new Error("Erreur avec l'ami entré");
+        }
+        if (user._id.toString() === userFriend._id.toString()) {
+            throw new ConflictException('Vous ne pouvez pas vous refuser');
+        }
+
+        if (
+            user.friends.includes(userFriend._id) ||
+            userFriend.friends.includes(user._id)
+        ) {
+            throw new Error('Vous êtes déjà ami avec cette personne');
+        }
+        await this.invitationModel
+            .deleteOne({
+                $or: [
+                    {
+                        $and: [
+                            {
+                                sender: userFriend._id,
+                            },
+                            {
+                                receiver: user._id,
+                            },
+                        ],
+                    },
+                    {
+                        $and: [
+                            {
+                                sender: user._id,
+                            },
+                            {
+                                receiver: userFriend._id,
+                            },
+                        ],
+                    },
+                ],
+            })
+            .exec();
+
+        return {
+            message: 'Invitation refusée',
+        };
+    }
 
     async deleteFriend(idUser: string, idFriend: string) {
         const user = await this.friendsModel.findOne({ idUser: idUser });

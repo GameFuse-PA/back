@@ -1,7 +1,7 @@
-import { IsNotEmpty } from 'class-validator';
+import { IsNotEmpty, IsOptional } from 'class-validator';
 
 export class FriendsDto {
-    @IsNotEmpty({ message: "Id de l'utilisateur requis" })
+    @IsOptional()
     idUser: string;
 
     @IsNotEmpty({ message: "Info de l'ami requis" })
