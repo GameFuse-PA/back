@@ -20,7 +20,7 @@ export class MailConfigService {
         };
     }
 
-    getInvitationMail(username: string, token: string) {
+    getFriendRequestMail(username: string, token: string) {
         const mail = this.mailTemplates.invitations;
         const urlFront = this.appConfiguration.frontUrl;
         return {

@@ -70,7 +70,7 @@ export class ProfilService {
         if (!user) {
             throw new NotFoundException("L'utilisateur n'existe pas");
         }
-        const friends = await user.populate({
+        const userPopulate = await user.populate({
             path: 'friends',
             select: '-friends',
             populate: {
@@ -78,7 +78,7 @@ export class ProfilService {
             },
         });
         return {
-            friends: friends.friends,
+            friends: userPopulate.friends,
         };
     }
 

@@ -19,12 +19,12 @@ export class FriendsService {
     ) {}
 
     async addFriend(id: string, friend: FriendRequestDto) {
-        if (!friend.friend) {
+        if (!friend.idFriend) {
             throw new Error("Erreur avec l'ami entré");
         }
         const user = await this.usersServices.findOneById(id);
         const userFriend = await this.usersServices.findOneById(
-            friend.friend,
+            friend.idFriend,
         );
 
         if (!user || !userFriend) {

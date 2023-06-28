@@ -81,27 +81,27 @@ export class UsersService {
 
     async sendInvitation(userId: string, user: InvitationsDto) {
         const userFriend = await this.userModel.findById(user.receiver);
-        const userExist = await this.userModel.findById(userId);
+        const senderUser = await this.userModel.findById(userId);
 
-        if (!userFriend || !userExist) {
+        if (!userFriend || !senderUser) {
             throw new NotFoundException("L'utilisateur n'existe pas");
         }
 
-        if (userFriend._id.toString() === userExist._id.toString()) {
+        if (userFriend._id.toString() === senderUser._id.toString()) {
             throw new ConflictException(
                 "Vous ne pouvez pas vous ajouter vous même, c'est assez triste en y pensant",
             );
         }
 
-        if (userFriend.friends.includes(userExist._id.toString())) {
-            throw new InternalServerErrorException(
-                'La personne vous possède déjà dans ses amis',
+        if (userFriend.friends.includes(senderUser._id.toString())) {
+            throw new ConflictException(
+                "Une erreur s'est produite lors de l'invitation",
             );
         }
 
-        if (userExist.friends.includes(userFriend._id.toString())) {
-            throw new InternalServerErrorException(
-                'Vous êtes déjà amis avec cette personne',
+        if (senderUser.friends.includes(userFriend._id.toString())) {
+            throw new ConflictException(
+                "Une erreur s'est produite lors de l'invitation",
             );
         }
 
@@ -120,8 +120,8 @@ export class UsersService {
         });
         const inviteResponse = await newInvitation.save();
 
-        const mailSendInvit = this.mailerService.getInvitationMail(
-            userExist.username,
+        const mailSendInvit = this.mailerService.getFriendRequestMail(
+            senderUser.username,
             inviteResponse._id,
         );
 
