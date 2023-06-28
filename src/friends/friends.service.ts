@@ -1,5 +1,5 @@
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
-import { FriendsDto } from './dto/Friends.dto';
+import { FriendRequestDto } from './dto/friendRequest.dto';
 import { InjectModel } from '@nestjs/mongoose';
 import { FriendDocument, Friends } from '../schemas/friends.schema';
 import { Model } from 'mongoose';
@@ -18,13 +18,13 @@ export class FriendsService {
         private usersServices: UsersService,
     ) {}
 
-    async addFriend(id: string, friend: FriendsDto) {
-        if (!friend.idFriends) {
+    async addFriend(id: string, friend: FriendRequestDto) {
+        if (!friend.friend) {
             throw new Error("Erreur avec l'ami entré");
         }
         const user = await this.usersServices.findOneById(id);
         const userFriend = await this.usersServices.findOneById(
-            friend.idFriends,
+            friend.friend,
         );
 
         if (!user || !userFriend) {
