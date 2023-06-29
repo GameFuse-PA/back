@@ -79,8 +79,8 @@ export class UsersService {
             .exec();
     }
 
-    async sendInvitation(userId: string, user: InvitationsDto) {
-        const userFriend = await this.userModel.findById(user.receiver);
+    async sendInvitation(userId: string, idFriend: string) {
+        const userFriend = await this.userModel.findById(idFriend);
         const senderUser = await this.userModel.findById(userId);
 
         if (!userFriend || !senderUser) {
@@ -107,8 +107,8 @@ export class UsersService {
 
         const invitationExist = await this.invitationModel.findOne({
             $or: [
-                { $and: [{ sender: userId }, { receiver: user.receiver }] },
-                { $and: [{ sender: user.receiver }, { receiver: userId }] },
+                { $and: [{ sender: userId }, { receiver: idFriend }] },
+                { $and: [{ sender: idFriend }, { receiver: userId }] },
             ],
         });
         if (invitationExist) {
@@ -116,7 +116,7 @@ export class UsersService {
         }
         const newInvitation = new this.invitationModel({
             sender: userId,
-            receiver: user.receiver,
+            receiver: idFriend,
         });
         const inviteResponse = await newInvitation.save();
 
@@ -131,9 +131,6 @@ export class UsersService {
             mailSendInvit.body,
         );
 
-        return {
-            message: 'Invitation envoyée',
-            invitation: inviteResponse,
-        };
+        return inviteResponse;
     }
 }

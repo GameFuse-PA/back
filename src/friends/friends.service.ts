@@ -19,9 +19,6 @@ export class FriendsService {
     ) {}
 
     async addFriend(id: string, friend: FriendRequestDto) {
-        if (!friend.idFriend) {
-            throw new Error("Erreur avec l'ami entré");
-        }
         const user = await this.usersServices.findOneById(id);
         const userFriend = await this.usersServices.findOneById(
             friend.idFriend,
@@ -45,11 +42,8 @@ export class FriendsService {
         const conversation = new this.conversationModel({
             users: [user._id, userFriend._id],
         });
-        await conversation.save();
 
-        return {
-            message: 'Ami ajouté',
-        };
+        return await conversation.save();
     }
 
     async deleteFriend(idUser: string, idFriend: string) {

@@ -7,10 +7,11 @@ import {
 } from 'mongoose';
 
 export type ConversationDocument = HydratedDocument<Conversation>;
+export type MessageDocument = HydratedDocument<Message>;
 
-interface Message {
+interface Message extends Document {
     text: string;
-    from: string;
+    from: Types.ObjectId;
     date: Date;
 }
 
@@ -26,7 +27,7 @@ export class Conversation extends Document {
         type: [{ type: MongooseSchema.Types.Map }],
         default: [],
     })
-    messages: Message[];
+    messages: MessageDocument[];
 }
 
 export const ConversationSchema = SchemaFactory.createForClass(Conversation);
