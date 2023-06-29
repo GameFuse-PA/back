@@ -1,4 +1,5 @@
 import {
+    BadRequestException,
     Injectable,
     InternalServerErrorException,
     NotFoundException,
@@ -31,16 +32,29 @@ export class ProfilService {
         if (!user) {
             throw new NotFoundException("L'utilisateur n'existe pas");
         }
-        const userEmailExist = await this.usersServices.findOneByEmail(
-            profil.email,
-        );
-        if (userEmailExist && userEmailExist._id.toString() != id) {
-            throw new UnauthorizedException(
-                'Un utilisateur avec cet email existe déjà',
-            );
+
+        if (profil.username !== undefined) {
+            const userUsernameExist =
+                await this.usersServices.findOneByUsername(profil.username);
+
+            if (userUsernameExist && userUsernameExist._id.toString() != id) {
+                throw new BadRequestException(
+                    'Un utilisateur avec ce pseudo existe déjà',
+                );
+            }
+            user.username = profil.username;
         }
 
         if (profil.email !== undefined) {
+            const userEmailExist = await this.usersServices.findOneByEmail(
+                profil.email,
+            );
+            if (userEmailExist && userEmailExist._id.toString() != id) {
+                throw new BadRequestException(
+                    'Un utilisateur avec cet email existe déjà',
+                );
+            }
+
             user.email = profil.email;
         }
 
@@ -54,6 +68,10 @@ export class ProfilService {
 
         if (profil.lastname !== undefined) {
             user.lastname = profil.lastname;
+        }
+
+        if (profil.birthdate !== undefined) {
+            user.birthdate = profil.birthdate;
         }
 
         const updatedUser = await user.save();
