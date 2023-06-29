@@ -86,10 +86,18 @@ export class ProfilService {
         if (!user) {
             throw new NotFoundException("L'utilisateur n'existe pas");
         }
+
         try {
+            if (user.avatar) {
+                await this.fileServices.deleteFile(
+                    user.avatar._id,
+                    'profil-pic',
+                );
+            }
+
             const avatar = await this.fileServices.uploadFile(
                 file.buffer,
-                `${user.id}-${file.originalname}`,
+                `${user.id}.${file.mimetype.split('/')[1]}`,
                 `profil-pic`,
                 file.mimetype,
             );
