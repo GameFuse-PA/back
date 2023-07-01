@@ -1,7 +1,6 @@
 import {
     ConflictException,
     Injectable,
-    InternalServerErrorException,
     NotFoundException,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
@@ -12,10 +11,8 @@ import {
     Invitations,
     InvitationsDocument,
 } from '../schemas/invitations.schema';
-import { InvitationsDto } from './dto/invitations.dto';
 import { NotificationsConfigService } from '../configuration/notifications.config.service';
 import { MailConfigService } from '../configuration/mail.config.service';
-import * as MongooseSchema from 'mongoose';
 
 @Injectable()
 export class UsersService {
