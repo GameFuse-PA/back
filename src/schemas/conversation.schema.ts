@@ -1,4 +1,4 @@
-import { Prop, SchemaFactory } from '@nestjs/mongoose';
+import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import {
     Document,
     HydratedDocument,
@@ -7,14 +7,8 @@ import {
 } from 'mongoose';
 
 export type ConversationDocument = HydratedDocument<Conversation>;
-export type MessageDocument = HydratedDocument<Message>;
 
-interface Message extends Document {
-    text: string;
-    from: Types.ObjectId;
-    date: Date;
-}
-
+@Schema({ versionKey: false, timestamps: true })
 export class Conversation extends Document {
     @Prop({
         required: true,
@@ -24,10 +18,10 @@ export class Conversation extends Document {
 
     @Prop({
         required: true,
-        type: [{ type: MongooseSchema.Types.Map }],
+        type: [{ type: MongooseSchema.Types.ObjectId, ref: 'Message' }],
         default: [],
     })
-    messages: MessageDocument[];
+    messages: Types.ObjectId[];
 }
 
 export const ConversationSchema = SchemaFactory.createForClass(Conversation);
