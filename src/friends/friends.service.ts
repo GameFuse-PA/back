@@ -3,7 +3,7 @@ import {
     Injectable,
     InternalServerErrorException,
 } from '@nestjs/common';
-import { FriendsDto } from './dto/Friends.dto';
+import { FriendRequestDto } from './dto/friendRequest.dto';
 import { InjectModel } from '@nestjs/mongoose';
 import { FriendDocument, Friends } from '../schemas/friends.schema';
 import { Model } from 'mongoose';
@@ -28,13 +28,10 @@ export class FriendsService {
         private usersServices: UsersService,
     ) {}
 
-    async addFriend(id: string, friend: FriendsDto) {
-        if (!friend.idFriends) {
-            throw new Error("Erreur avec l'ami entré");
-        }
+    async addFriend(id: string, friend: FriendRequestDto) {
         const user = await this.usersServices.findOneById(id);
         const userFriend = await this.usersServices.findOneById(
-            friend.idFriends,
+            friend.idFriend,
         );
 
         if (!user || !userFriend) {
@@ -42,7 +39,7 @@ export class FriendsService {
         }
         if (user._id.toString() === userFriend._id.toString()) {
             throw new ConflictException(
-                'Vous essayez de vous ajouter en ami, je peux être le votre si vous le souhaitez 🙂',
+                "Vous ne pouvez pas vous ajouter en tant qu'ami, c'est bizarre",
             );
         }
 
@@ -88,10 +85,60 @@ export class FriendsService {
         const conversation = new this.conversationModel({
             users: [user._id, userFriend._id],
         });
-        await conversation.save();
+
+        return await conversation.save();
+    }
+    async refuseFriend(userId: string, friend: FriendRequestDto) {
+        if (!friend.idFriend) {
+            throw new Error("Erreur avec l'ami entré");
+        }
+        const user = await this.usersServices.findOneById(userId);
+        const userFriend = await this.usersServices.findOneById(
+            friend.idFriend,
+        );
+
+        if (!user || !userFriend) {
+            throw new Error("Erreur avec l'ami entré");
+        }
+        if (user._id.toString() === userFriend._id.toString()) {
+            throw new ConflictException('Vous ne pouvez pas vous refuser');
+        }
+
+        if (
+            user.friends.includes(userFriend._id) ||
+            userFriend.friends.includes(user._id)
+        ) {
+            throw new Error('Vous êtes déjà ami avec cette personne');
+        }
+        await this.invitationModel
+            .deleteOne({
+                $or: [
+                    {
+                        $and: [
+                            {
+                                sender: userFriend._id,
+                            },
+                            {
+                                receiver: user._id,
+                            },
+                        ],
+                    },
+                    {
+                        $and: [
+                            {
+                                sender: user._id,
+                            },
+                            {
+                                receiver: userFriend._id,
+                            },
+                        ],
+                    },
+                ],
+            })
+            .exec();
 
         return {
-            message: 'Ami ajouté',
+            message: 'Invitation refusée',
         };
     }
 

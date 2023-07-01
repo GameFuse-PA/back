@@ -5,6 +5,6 @@
   },
   "invitations": {
     "subject": "Invitation à devenir ami",
-    "html": "<h1>Bonjour</h1>\n<p>{{username}} vous a invité à devenir ami</p>\n<a href=\"http://localhost:4200/invitation?token={{token}}\">http://localhost:4200/invitation?token={{token}}</a>"
+    "html": "<h1>Bonjour</h1>\n<p>{{username}} vous a invité à devenir ami</p>\n<a href=\"{{urlFront}}/invitation?token={{token}}\">{{urlFront}}/invitation?token={{token}}</a>"
   }
 }

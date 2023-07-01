@@ -5,7 +5,6 @@ import {
     Delete,
     HttpCode,
     Param,
-    Post,
     Request,
     UseGuards,
 } from '@nestjs/common';
@@ -17,7 +16,6 @@ export class FriendsController {
 
     @UseGuards(AuthGuard)
     @HttpCode(201)
-    @Post()
     addFriend(@Request() req, @Body() id) {
         return this.friendsService.addFriend(req.userId, id);
     }

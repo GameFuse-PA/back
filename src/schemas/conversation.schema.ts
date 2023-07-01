@@ -8,12 +8,6 @@ import {
 
 export type ConversationDocument = HydratedDocument<Conversation>;
 
-interface Message {
-    text: string;
-    from: string;
-    date: Date;
-}
-
 @Schema({ versionKey: false, timestamps: true })
 export class Conversation extends Document {
     @Prop({
@@ -24,10 +18,10 @@ export class Conversation extends Document {
 
     @Prop({
         required: true,
-        type: [{ type: MongooseSchema.Types.Map }],
+        type: [{ type: MongooseSchema.Types.ObjectId, ref: 'Message' }],
         default: [],
     })
-    messages: Message[];
+    messages: Types.ObjectId[];
 }
 
 export const ConversationSchema = SchemaFactory.createForClass(Conversation);
