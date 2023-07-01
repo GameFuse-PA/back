@@ -1,6 +1,7 @@
 import {
     ConflictException,
     Injectable,
+    InternalServerErrorException,
     NotFoundException,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
@@ -78,28 +79,49 @@ export class UsersService {
             .exec();
     }
 
-    async sendInvitation(userId: string, user: InvitationsDto) {
-        const userFriend = await this.userModel.findById(user.receiver);
-        const userExist = await this.userModel.findById(userId);
+    async sendInvitation(userId: string, idFriend: string) {
+        const userFriend = await this.userModel.findById(idFriend);
+        const senderUser = await this.userModel.findById(userId);
 
-        if (!userFriend || !userExist) {
+        if (!userFriend || !senderUser) {
             throw new NotFoundException("L'utilisateur n'existe pas");
         }
 
+        if (userFriend._id.toString() === senderUser._id.toString()) {
+            throw new ConflictException(
+                "Vous ne pouvez pas vous ajouter vous même, c'est assez triste en y pensant",
+            );
+        }
+
+        if (userFriend.friends.includes(senderUser._id.toString())) {
+            throw new ConflictException(
+                "Une erreur s'est produite lors de l'invitation",
+            );
+        }
+
+        if (senderUser.friends.includes(userFriend._id.toString())) {
+            throw new ConflictException(
+                "Une erreur s'est produite lors de l'invitation",
+            );
+        }
+
         const invitationExist = await this.invitationModel.findOne({
-            $and: [{ sender: userId }, { receiver: user.receiver }],
+            $or: [
+                { $and: [{ sender: userId }, { receiver: idFriend }] },
+                { $and: [{ sender: idFriend }, { receiver: userId }] },
+            ],
         });
         if (invitationExist) {
             throw new ConflictException('Une invitation a déjà été envoyée');
         }
         const newInvitation = new this.invitationModel({
             sender: userId,
-            receiver: user.receiver,
+            receiver: idFriend,
         });
         const inviteResponse = await newInvitation.save();
 
-        const mailSendInvit = this.mailerService.getInvitationMail(
-            userExist.username,
+        const mailSendInvit = this.mailerService.getFriendRequestMail(
+            senderUser.username,
             inviteResponse._id,
         );
 
@@ -109,9 +131,6 @@ export class UsersService {
             mailSendInvit.body,
         );
 
-        return {
-            message: 'Invitation envoyée',
-            invitation: inviteResponse,
-        };
+        return inviteResponse;
     }
 }

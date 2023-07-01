@@ -6,12 +6,10 @@ import {
     UseGuards,
     Request,
     Post,
-    Body,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { SearchUserDto } from './dto/SearchUserDto';
 import { AuthGuard } from '../guards/auth.guard';
-import { InvitationsDto } from './dto/invitations.dto';
 
 @Controller('users')
 export class UsersController {
@@ -33,8 +31,16 @@ export class UsersController {
     }
 
     @UseGuards(AuthGuard)
-    @Post('invitations')
-    async sendInvitation(@Request() req, @Body() user: InvitationsDto) {
-        return this.userService.sendInvitation(req.userId, user);
+    @Post(':id/invite')
+    async sendInvitation(@Request() req, @Param('id') user: string) {
+        const invitation = await this.userService.sendInvitation(
+            req.userId,
+            user,
+        );
+
+        return {
+            message: 'Invitation envoyée',
+            invitation: invitation,
+        };
     }
 }

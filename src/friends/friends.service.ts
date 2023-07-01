@@ -1,9 +1,5 @@
-import {
-    ConflictException,
-    Injectable,
-    InternalServerErrorException,
-} from '@nestjs/common';
-import { FriendsDto } from './dto/Friends.dto';
+import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import { FriendRequestDto } from './dto/friendRequest.dto';
 import { InjectModel } from '@nestjs/mongoose';
 import { FriendDocument, Friends } from '../schemas/friends.schema';
 import { Model } from 'mongoose';
@@ -28,13 +24,10 @@ export class FriendsService {
         private usersServices: UsersService,
     ) {}
 
-    async addFriend(id: string, friend: FriendsDto) {
-        if (!friend.idFriends) {
-            throw new Error("Erreur avec l'ami entré");
-        }
+    async addFriend(id: string, friend: FriendRequestDto) {
         const user = await this.usersServices.findOneById(id);
         const userFriend = await this.usersServices.findOneById(
-            friend.idFriends,
+            friend.idFriend,
         );
 
         if (!user || !userFriend) {
@@ -88,11 +81,8 @@ export class FriendsService {
         const conversation = new this.conversationModel({
             users: [user._id, userFriend._id],
         });
-        await conversation.save();
 
-        return {
-            message: 'Ami ajouté',
-        };
+        return await conversation.save();
     }
     async refuseFriend(userId: string, friend: FriendsDto) {
         if (!friend.idFriends) {

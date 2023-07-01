@@ -26,6 +26,9 @@ export class User extends Document {
     @Prop({ required: true, select: false })
     password: string;
 
+    @Prop({ required: false })
+    birthdate: Date;
+
     @Prop({ required: false, unique: true, sparse: true })
     newPasswordToken: string;
 
