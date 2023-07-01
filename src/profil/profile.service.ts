@@ -1,5 +1,6 @@
 import {
     BadRequestException,
+    ForbiddenException,
     Injectable,
     InternalServerErrorException,
     NotFoundException,
@@ -10,12 +11,14 @@ import { FileService } from '../amazon/file.service';
 import { ProfilDto } from './dto/profil.dto';
 import { PasswordDto } from './dto/password.dto';
 import * as bcrypt from 'bcrypt';
+import { InvitationsService } from '../invitations/invitations.service';
 
 @Injectable()
 export class ProfilService {
     constructor(
         private usersServices: UsersService,
         private fileServices: FileService,
+        private invitationsService: InvitationsService,
     ) {}
 
     async getProfil(id: string) {
@@ -98,6 +101,41 @@ export class ProfilService {
         return {
             friends: userPopulate.friends,
         };
+    }
+
+    async getInvitation(userId: any, id: string) {
+        const invitations = await this.invitationsService.findInvitationById(
+            id,
+        );
+
+        if (!invitations) {
+            throw new NotFoundException("L'invitation n'existe pas");
+        }
+
+        if (
+            invitations.receiver.toString() !== userId &&
+            invitations.sender.toString() !== userId
+        ) {
+            throw new ForbiddenException(
+                "Vous n'êtes pas autorisé à voir cette invitation",
+            );
+        }
+
+        return (
+            await invitations.populate({
+                path: 'sender',
+                select: '-friends',
+                populate: { path: 'avatar' },
+            })
+        ).populate({
+            path: 'receiver',
+            select: '-friends -_id',
+            populate: { path: 'avatar' },
+        });
+    }
+
+    async getInvitations(userId: any) {
+        return await this.invitationsService.findMyInvitations(userId);
     }
 
     async updatePassword(id: string, user: PasswordDto) {
