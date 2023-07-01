@@ -44,4 +44,8 @@ export class AppConfigService {
     get mailjetEmail(): string {
         return this.configService.get<string>('MAILJET_EMAIL_FROM');
     }
+
+    get frontUrl(): string {
+        return this.configService.get<string>('FRONT_URL');
+    }
 }

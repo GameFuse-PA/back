@@ -83,6 +83,23 @@ export class ProfilService {
         };
     }
 
+    async getFriends(id: string) {
+        const user = await this.usersServices.findOneById(id);
+        if (!user) {
+            throw new NotFoundException("L'utilisateur n'existe pas");
+        }
+        const userPopulate = await user.populate({
+            path: 'friends',
+            select: '-friends',
+            populate: {
+                path: 'avatar',
+            },
+        });
+        return {
+            friends: userPopulate.friends,
+        };
+    }
+
     async updatePassword(id: string, user: PasswordDto) {
         const userExist = await this.usersServices.findOneById(id);
         if (!userExist) {
