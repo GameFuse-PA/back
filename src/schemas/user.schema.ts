@@ -1,5 +1,10 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { HydratedDocument, Schema as MongooseSchema, Document } from 'mongoose';
+import {
+    HydratedDocument,
+    Schema as MongooseSchema,
+    Document,
+    Types,
+} from 'mongoose';
 import { File } from './file.schema';
 
 export type UserDocument = HydratedDocument<User>;
@@ -21,8 +26,18 @@ export class User extends Document {
     @Prop({ required: true, select: false })
     password: string;
 
+    @Prop({ required: false })
+    birthdate: Date;
+
     @Prop({ required: false, unique: true, sparse: true })
     newPasswordToken: string;
+
+    @Prop({
+        required: false,
+        type: [{ type: MongooseSchema.Types.ObjectId, ref: 'User' }],
+        default: [],
+    })
+    friends: Types.ObjectId[];
 
     @Prop({
         type: MongooseSchema.Types.ObjectId,

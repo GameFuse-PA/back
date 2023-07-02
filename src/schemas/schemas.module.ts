@@ -6,6 +6,9 @@ import { Friends, FriendsSchema } from './friends.schema';
 import { Game, GameSchema } from './game.schema';
 import { Room, RoomSchema } from './room.schema';
 import { GameSessions, GameSessionsSchema } from './game-sessions.schema';
+import { Invitations, InvitationsSchema } from './invitations.schema';
+import { Conversation, ConversationSchema } from './conversation.schema';
+import { Message, MessageSchema } from './messages.schema';
 
 @Global()
 @Module({
@@ -20,6 +23,15 @@ import { GameSessions, GameSessionsSchema } from './game-sessions.schema';
         MongooseModule.forFeature([
             { name: GameSessions.name, schema: GameSessionsSchema },
         ]),
+        MongooseModule.forFeature([
+            { name: Invitations.name, schema: InvitationsSchema },
+        ]),
+        MongooseModule.forFeature([
+            { name: Conversation.name, schema: ConversationSchema },
+        ]),
+        MongooseModule.forFeature([
+            { name: Message.name, schema: MessageSchema },
+        ]),
     ],
     exports: [
         MongooseModule.forFeature([{ name: User.name, schema: UserSchema }]),
@@ -31,6 +43,15 @@ import { GameSessions, GameSessionsSchema } from './game-sessions.schema';
         MongooseModule.forFeature([{ name: Room.name, schema: RoomSchema }]),
         MongooseModule.forFeature([
             { name: GameSessions.name, schema: GameSessionsSchema },
+        ]),
+        MongooseModule.forFeature([
+            { name: Invitations.name, schema: InvitationsSchema },
+        ]),
+        MongooseModule.forFeature([
+            { name: Conversation.name, schema: ConversationSchema },
+        ]),
+        MongooseModule.forFeature([
+            { name: Message.name, schema: MessageSchema },
         ]),
     ],
 })

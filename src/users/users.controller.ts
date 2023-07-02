@@ -5,6 +5,7 @@ import {
     Query,
     UseGuards,
     Request,
+    Post,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { SearchUserDto } from './dto/SearchUserDto';
@@ -27,5 +28,19 @@ export class UsersController {
     @Get()
     async getAllUsers() {
         return this.userService.findAll();
+    }
+
+    @UseGuards(AuthGuard)
+    @Post(':id/invite')
+    async sendInvitation(@Request() req, @Param('id') user: string) {
+        const invitation = await this.userService.sendInvitation(
+            req.userId,
+            user,
+        );
+
+        return {
+            message: 'Invitation envoyée',
+            invitation: invitation,
+        };
     }
 }

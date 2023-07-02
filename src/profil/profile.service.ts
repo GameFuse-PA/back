@@ -1,4 +1,6 @@
 import {
+    BadRequestException,
+    ForbiddenException,
     Injectable,
     InternalServerErrorException,
     NotFoundException,
@@ -9,12 +11,14 @@ import { FileService } from '../amazon/file.service';
 import { ProfilDto } from './dto/profil.dto';
 import { PasswordDto } from './dto/password.dto';
 import * as bcrypt from 'bcrypt';
+import { InvitationsService } from '../invitations/invitations.service';
 
 @Injectable()
 export class ProfilService {
     constructor(
         private usersServices: UsersService,
         private fileServices: FileService,
+        private invitationsService: InvitationsService,
     ) {}
 
     async getProfil(id: string) {
@@ -31,16 +35,29 @@ export class ProfilService {
         if (!user) {
             throw new NotFoundException("L'utilisateur n'existe pas");
         }
-        const userEmailExist = await this.usersServices.findOneByEmail(
-            profil.email,
-        );
-        if (userEmailExist && userEmailExist._id.toString() != id) {
-            throw new UnauthorizedException(
-                'Un utilisateur avec cet email existe déjà',
-            );
+
+        if (profil.username !== undefined) {
+            const userUsernameExist =
+                await this.usersServices.findOneByUsername(profil.username);
+
+            if (userUsernameExist && userUsernameExist._id.toString() != id) {
+                throw new BadRequestException(
+                    'Un utilisateur avec ce pseudo existe déjà',
+                );
+            }
+            user.username = profil.username;
         }
 
         if (profil.email !== undefined) {
+            const userEmailExist = await this.usersServices.findOneByEmail(
+                profil.email,
+            );
+            if (userEmailExist && userEmailExist._id.toString() != id) {
+                throw new BadRequestException(
+                    'Un utilisateur avec cet email existe déjà',
+                );
+            }
+
             user.email = profil.email;
         }
 
@@ -56,6 +73,10 @@ export class ProfilService {
             user.lastname = profil.lastname;
         }
 
+        if (profil.birthdate !== undefined) {
+            user.birthdate = profil.birthdate;
+        }
+
         const updatedUser = await user.save();
         updatedUser.password = undefined;
         await updatedUser.populate('avatar');
@@ -63,6 +84,58 @@ export class ProfilService {
             message: 'Profil mis à jour avec succès',
             user: updatedUser,
         };
+    }
+
+    async getFriends(id: string) {
+        const user = await this.usersServices.findOneById(id);
+        if (!user) {
+            throw new NotFoundException("L'utilisateur n'existe pas");
+        }
+        const userPopulate = await user.populate({
+            path: 'friends',
+            select: '-friends',
+            populate: {
+                path: 'avatar',
+            },
+        });
+        return {
+            friends: userPopulate.friends,
+        };
+    }
+
+    async getInvitation(userId: any, id: string) {
+        const invitations = await this.invitationsService.findInvitationById(
+            id,
+        );
+
+        if (!invitations) {
+            throw new NotFoundException("L'invitation n'existe pas");
+        }
+
+        if (
+            invitations.receiver.toString() !== userId &&
+            invitations.sender.toString() !== userId
+        ) {
+            throw new ForbiddenException(
+                "Vous n'êtes pas autorisé à voir cette invitation",
+            );
+        }
+
+        return (
+            await invitations.populate({
+                path: 'sender',
+                select: '-friends',
+                populate: { path: 'avatar' },
+            })
+        ).populate({
+            path: 'receiver',
+            select: '-friends -_id',
+            populate: { path: 'avatar' },
+        });
+    }
+
+    async getInvitations(userId: any) {
+        return await this.invitationsService.findMyInvitations(userId);
     }
 
     async updatePassword(id: string, user: PasswordDto) {
@@ -86,10 +159,18 @@ export class ProfilService {
         if (!user) {
             throw new NotFoundException("L'utilisateur n'existe pas");
         }
+
         try {
+            if (user.avatar) {
+                await this.fileServices.deleteFile(
+                    user.avatar._id,
+                    'profil-pic',
+                );
+            }
+
             const avatar = await this.fileServices.uploadFile(
                 file.buffer,
-                `${user.id}-${file.originalname}`,
+                `${user.id}.${file.mimetype.split('/')[1]}`,
                 `profil-pic`,
                 file.mimetype,
             );

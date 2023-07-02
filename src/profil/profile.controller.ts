@@ -8,6 +8,7 @@ import {
     UploadedFile,
     Body,
     Get,
+    Param,
 } from '@nestjs/common';
 import { AuthGuard } from '../guards/auth.guard';
 import { ProfilService } from './profile.service';
@@ -36,7 +37,7 @@ export class ProfilController {
     @UseGuards(AuthGuard)
     @Get('friends')
     getFriends(@Request() req) {
-        return this.friendsService.getFriends(req.userId);
+        return this.profileService.getFriends(req.userId);
     }
 
     @UseGuards(AuthGuard)
@@ -49,6 +50,18 @@ export class ProfilController {
     @Get('game-sessions')
     getGameSessions(@Request() req) {
         return this.gameSessionService.getMyGameSessions(req.userId);
+    }
+
+    @UseGuards(AuthGuard)
+    @Get('invitations')
+    getInvitations(@Request() req, @Param('id') id: string) {
+        return this.profileService.getInvitations(req.userId);
+    }
+
+    @UseGuards(AuthGuard)
+    @Get('invitations/:id')
+    getInvitation(@Request() req, @Param('id') id: string) {
+        return this.profileService.getInvitation(req.userId, id);
     }
 
     @UseGuards(AuthGuard)
