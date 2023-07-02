@@ -11,7 +11,7 @@ export class GameSessionDto {
     @IsNotEmpty({
         message: 'Au moins un membre est requis pour créer la partie',
     })
-    members: string[];
+    players: string[];
 
     @IsNotEmpty({ message: 'Un jeu est requis' })
     game: string;

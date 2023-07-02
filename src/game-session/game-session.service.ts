@@ -41,7 +41,7 @@ export class GameSessionService {
     }
 
     async createGameSession(party: GameSessionDto) {
-        const newParty = new this.gameSessionModel(party);
-        return await newParty.save();
+        const newGameSession = new this.gameSessionModel(party);
+        return await newGameSession.save();
     }
 }
