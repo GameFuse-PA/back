@@ -16,10 +16,10 @@ export class GameSessionService {
 
     async getMyGameSessions(id: string) {
         return await this.gameSessionModel
-            .find({ $or: [{ createdBy: id }, { members: id }] })
+            .find({ $or: [{ createdBy: id }, { players: id }] })
             .populate('createdBy')
             .populate({
-                path: 'members',
+                path: 'players',
                 populate: {
                     path: 'avatar',
                 },
