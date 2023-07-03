@@ -2,6 +2,7 @@ import {
     ConflictException,
     Injectable,
     InternalServerErrorException,
+    NotFoundException,
 } from '@nestjs/common';
 import { FriendRequestDto } from './dto/friendRequest.dto';
 import { InjectModel } from '@nestjs/mongoose';
@@ -143,23 +144,23 @@ export class FriendsService {
     }
 
     async deleteFriend(idUser: string, idFriend: string) {
-        const user = await this.friendsModel.findOne({ idUser: idUser });
-        if (user && user.idFriends) {
-            const newArrayUser = [];
-            for (const userElement of user.idFriends) {
-                if (userElement.toString() === idFriend) {
-                    continue;
-                }
-                newArrayUser.push(userElement);
-            }
-            user.idFriends = newArrayUser;
-            await user.save();
-            return {
-                message: 'Ami supprimé',
-            };
+        const user = await this.usersServices.findOneById(idUser);
+        const userFriend = await this.usersServices.findOneById(idFriend);
+
+        if (!user || !userFriend) {
+            throw new NotFoundException("L'utilisateur n'existe pas");
         }
-        throw new InternalServerErrorException(
-            "Erreur lors de la suppression de l'ami",
-        );
+        const newArrayOfFriends = user.friends.filter((friend) => {
+            return friend._id.toString() !== userFriend._id.toString();
+        });
+        const newArrayOfFriendsFriend = userFriend.friends.filter((friend) => {
+            return friend._id.toString() !== user._id.toString();
+        });
+
+        user.friends = newArrayOfFriends;
+        userFriend.friends = newArrayOfFriendsFriend;
+
+        await userFriend.save();
+        return await user.save();
     }
 }
