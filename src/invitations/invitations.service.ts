@@ -20,7 +20,7 @@ export class InvitationsService {
             })
             .populate({
                 path: 'sender',
-                select: '-friends -_id',
+                select: '-friends',
                 populate: { path: 'avatar' },
             })
             .populate({

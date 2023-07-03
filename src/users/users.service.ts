@@ -76,6 +76,7 @@ export class UsersService {
                     },
                 ],
             })
+            .populate('avatar')
             .populate('friends')
             .exec();
 
