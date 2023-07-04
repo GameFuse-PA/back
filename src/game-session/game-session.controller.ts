@@ -10,6 +10,6 @@ export class GameSessionController {
     @UseGuards(AuthGuard)
     @Post()
     createGameSession(@Request() req, @Body() body: GameSessionDto) {
-        return this.gameSessionService.createGameSession(body);
+        return this.gameSessionService.createGameSession(req.userId, body);
     }
 }

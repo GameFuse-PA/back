@@ -40,8 +40,11 @@ export class GameSessionService {
             .exec();
     }
 
-    async createGameSession(gameSessionDto: GameSessionDto) {
-        const newGameSession = new this.gameSessionModel(gameSessionDto);
+    async createGameSession(userId: string, gameSessionDto: GameSessionDto) {
+        const newGameSession = new this.gameSessionModel({
+            ...gameSessionDto,
+            createdBy: userId,
+        });
         return await newGameSession.save();
     }
 }
