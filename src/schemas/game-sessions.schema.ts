@@ -26,7 +26,7 @@ export class GameSessions extends Document {
         type: [{ type: MongooseSchema.Types.ObjectId, ref: 'User' }],
         default: [],
     })
-    members: Types.ObjectId[];
+    players: Types.ObjectId[];
 
     @Prop({
         required: true,
@@ -34,6 +34,13 @@ export class GameSessions extends Document {
         ref: 'Game',
     })
     game: Types.ObjectId;
+
+    @Prop({
+        required: true,
+        type: [{ type: MongooseSchema.Types.ObjectId, ref: 'Message' }],
+        default: [],
+    })
+    messages: Types.ObjectId[];
 
     @Prop({
         required: false,
