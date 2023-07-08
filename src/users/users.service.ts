@@ -81,11 +81,34 @@ export class UsersService {
             .exec();
 
         for (const user of usersSearch) {
-            if (user.friends.find((e) => e._id.toString() === userId)) {
-                response.push({ user: user, isFriend: true });
-            } else {
-                response.push({ user: user, isFriend: false });
-            }
+            const isFriend = user.friends.find(
+                (e) => e._id.toString() === userId,
+            );
+
+            const invitExist = await this.invitationModel
+                .findOne({
+                    $or: [
+                        {
+                            $and: [
+                                { sender: userId },
+                                { receiver: user._id.toString() },
+                            ],
+                        },
+                        {
+                            $and: [
+                                { sender: user._id.toString() },
+                                { receiver: userId },
+                            ],
+                        },
+                    ],
+                })
+                .exec();
+
+            response.push({
+                user: user,
+                isFriend: !!isFriend,
+                isInvited: !!invitExist,
+            });
         }
         return response;
     }
