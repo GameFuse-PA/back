@@ -1,6 +1,5 @@
 import { Injectable } from '@nestjs/common';
 import { Socket } from 'socket.io';
-import { ChatFormatter } from './ChatFormatter';
 import { UsersService } from '../users/users.service';
 import { UserFromFrontDTO } from './Models/UserFromFrontDTO';
 import { MessageForChat } from './Models/MessageForChat';
@@ -10,56 +9,21 @@ export class LiveChatService {
     constructor(private usersService: UsersService) {}
 
     public connect(client: Socket, user: UserFromFrontDTO) {
-        client.join(user.conversationId);
-        client.broadcast
-            .to(user.conversationId)
-            .emit('user-connected', user.peerId);
-    }
-
-    public connectToChat(client: Socket, message: MessageForChat) {
-        client.join(message.conversationId);
-        client.broadcast.to(message.conversationId).emit('user-connected');
+        client.join(user.roomId);
+        client.broadcast.to(user.roomId).emit('user-connected', user.roomId);
     }
 
     public disconnect(client: Socket, user: UserFromFrontDTO) {
-        client.broadcast
-            .to(user.conversationId)
-            .emit('user-disconnected', user.peerId);
+        client.leave(user.roomId);
+        client.broadcast.to(user.roomId).emit('user-disconnected', user.roomId);
     }
 
-    public disconnectFromChat(client: Socket, messageForChat: MessageForChat) {
-        client.broadcast.to(messageForChat.conversationId).emit('user-left');
-    }
-
-    public async chatToRoom(
+    public async chat(
         client: Socket,
         user: UserFromFrontDTO,
-        content: string,
+        message: MessageForChat,
     ) {
-        console.log('new msg to room');
-        const userDocument = await this.usersService.findOneById(user.id);
-        const chatToFront = await ChatFormatter.makeChatForRoom(
-            content,
-            userDocument.username,
-        );
-        client.broadcast
-            .to(user.conversationId)
-            .emit('new-message-room', chatToFront);
-    }
-
-    public async chatToConversation(
-        client: Socket,
-        messageForChat: MessageForChat,
-        userId: string,
-    ) {
-        console.log('new msg to conversation');
-        const userDocument = await this.usersService.findOneById(userId);
-        const chatToFront = await ChatFormatter.makeChatForConversation(
-            messageForChat,
-            userDocument.username,
-        );
-        client.broadcast
-            .to(messageForChat.conversationId)
-            .emit('new-message-conversation', chatToFront);
+        message.from = await this.usersService.findOneById(user.id);
+        client.broadcast.to(user.roomId).emit('new-message', message);
     }
 }

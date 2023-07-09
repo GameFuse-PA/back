@@ -4,7 +4,6 @@ import {
     Injectable,
     InternalServerErrorException,
     NotFoundException,
-    UnauthorizedException,
 } from '@nestjs/common';
 import { UsersService } from '../users/users.service';
 import { FileService } from '../amazon/file.service';
@@ -12,7 +11,6 @@ import { ProfilDto } from './dto/profil.dto';
 import { PasswordDto } from './dto/password.dto';
 import * as bcrypt from 'bcrypt';
 import { InvitationsService } from '../invitations/invitations.service';
-import { ConversationsService } from "../conversations/conversations.service";
 
 @Injectable()
 export class ProfilService {
@@ -20,7 +18,6 @@ export class ProfilService {
         private usersServices: UsersService,
         private fileServices: FileService,
         private invitationsService: InvitationsService,
-        private conversationService: ConversationsService
     ) {}
 
     async getProfil(id: string) {
