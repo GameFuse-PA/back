@@ -1,5 +1,5 @@
 export interface UserFromFrontDTO {
     id: string;
-    roomId: string;
+    conversationId: string;
     peerId: string;
 }
