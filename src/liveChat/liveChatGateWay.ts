@@ -43,6 +43,7 @@ export class LiveChatGateWay
 
         client.on('chat', async (content) => {
             console.log('jai recu un message : ' + content);
+            console.log(client.id)
             this.liveChatService.chat(client, user, content);
         });
     }
@@ -50,6 +51,7 @@ export class LiveChatGateWay
     @UseGuards(WebSocketAuthGuard)
     @SubscribeMessage('roomLeaveRequest')
     handleLeaveRoom(client: Socket, user: UserFromFrontDTO) {
+        console.log('demande de leave la room');
         this.liveChatService.disconnect(client, user);
     }
 }

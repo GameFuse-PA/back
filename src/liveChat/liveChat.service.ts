@@ -10,12 +10,13 @@ export class LiveChatService {
 
     public connect(client: Socket, user: UserFromFrontDTO) {
         client.join(user.roomId);
+        console.log("je me connecte au socket " + user.roomId)
         client.broadcast.to(user.roomId).emit('user-connected', user.roomId);
     }
 
     public disconnect(client: Socket, user: UserFromFrontDTO) {
+        console.log("je me deco du socket " + user.roomId)
         client.leave(user.roomId);
-        client.broadcast.to(user.roomId).emit('user-disconnected', user.roomId);
     }
 
     public async chat(
