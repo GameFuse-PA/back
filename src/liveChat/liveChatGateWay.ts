@@ -35,16 +35,23 @@ export class LiveChatGateWay
     @UseGuards(WebSocketAuthGuard)
     @SubscribeMessage('roomAccessRequest')
     handleJoinRoom(client: Socket, user: UserFromFrontDTO) {
-        this.liveChatService.connect(client, user);
+        client.on('roomAccessRequest', () => {
+            console.log('je me connecte a une romm : ' + user.roomId)
+            this.liveChatService.connect(client, user);
+        })
 
         client.on('disconnect', () => {
             this.liveChatService.disconnect(client, user);
         });
 
+        client.on('leaveRoom', () => {
+            this.liveChatService.quitRoom(client, user);
+        })
+
         client.on('chat', async (content) => {
-            console.log('jai recu un message : ' + content);
-            console.log(client.id)
-            this.liveChatService.chat(client, user, content);
+            console.log('jai recu un message : ' + content.content);
+            console.log(client.id);
+            await this.liveChatService.sendChat(client, user, content);
         });
     }
 

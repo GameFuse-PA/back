@@ -4,4 +4,5 @@ export interface MessageForChat {
     content?: string;
     from?: User;
     date?: number;
+    conversationId: string;
 }

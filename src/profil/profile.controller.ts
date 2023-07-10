@@ -8,17 +8,17 @@ import {
     Request,
     UploadedFile,
     UseGuards,
-    UseInterceptors
-} from "@nestjs/common";
-import { AuthGuard } from "../guards/auth.guard";
-import { ProfilService } from "./profile.service";
-import { FileInterceptor } from "@nestjs/platform-express";
-import { ProfilDto } from "./dto/profil.dto";
-import { PasswordDto } from "./dto/password.dto";
-import { FriendsService } from "../friends/friends.service";
-import { GamesService } from "../games/games.service";
-import { GameSessionService } from "../game-session/game-session.service";
-import { ConversationsService } from "../conversations/conversations.service";
+    UseInterceptors,
+} from '@nestjs/common';
+import { AuthGuard } from '../guards/auth.guard';
+import { ProfilService } from './profile.service';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { ProfilDto } from './dto/profil.dto';
+import { PasswordDto } from './dto/password.dto';
+import { FriendsService } from '../friends/friends.service';
+import { GamesService } from '../games/games.service';
+import { GameSessionService } from '../game-session/game-session.service';
+import { ConversationsService } from '../conversations/conversations.service';
 
 @Controller('me')
 export class ProfilController {
@@ -70,6 +70,13 @@ export class ProfilController {
     @Get('conversations')
     async getConversations(@Request() req, @Param('id') id: string) {
         return await this.conversationsService.getConversations(req.userId);
+    }
+
+    @UseGuards(AuthGuard)
+    @Get('conversations/:id')
+    async getConversationById(@Request() req, @Param('id') id: string) {
+        console.log('je demande une nouvelle conversation');
+        return await this.conversationsService.getConversation(req.userId, id);
     }
 
     @UseGuards(AuthGuard)
