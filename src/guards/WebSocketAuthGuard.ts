@@ -2,6 +2,7 @@ import { CanActivate, Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { AppConfigService } from '../configuration/app.config.service';
 import { UserFromFrontDTO } from '../liveChat/Models/UserFromFrontDTO';
+import { LiveChatGateWay } from "../liveChat/liveChatGateWay";
 
 @Injectable()
 export class WebSocketAuthGuard implements CanActivate {
@@ -22,6 +23,7 @@ export class WebSocketAuthGuard implements CanActivate {
             });
             const user: UserFromFrontDTO = context.switchToWs().getData();
             user.id = payload.sub;
+            LiveChatGateWay.user = user;
         } catch {
             console.log('Le token renseigné est invalide');
             throw new UnauthorizedException();
