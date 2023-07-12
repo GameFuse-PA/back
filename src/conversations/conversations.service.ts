@@ -53,7 +53,6 @@ export class ConversationsService {
             if (user._id.toString() === userId) {
                 return conversation;
             }
-
         }
 
         throw new ForbiddenException(
@@ -61,10 +60,18 @@ export class ConversationsService {
         );
     }
 
-    async updateConversation(message: MessageDocument, conversationId: string) {
-        const conversation = await this.conversationModel.findById(
-            conversationId,
-        );
+    async updateConversation(
+        message: MessageDocument,
+        senderId: string,
+        recipientId: string,
+    ) {
+        const conversation = await this.conversationModel.findOne({
+            users: {
+                $all: [senderId, recipientId],
+                $size: 2,
+            },
+        });
+
         if (!conversation.messages.includes(message._id)) {
             conversation.messages.push(message._id);
             return conversation.save();
@@ -73,20 +80,24 @@ export class ConversationsService {
         }
     }
 
-    async saveMessage(message: MessageForChat) {
+    async saveMessage(
+        message: MessageForChat,
+        senderId: string,
+    ): Promise<MessageDocument> {
         const newMessage = new this.messageModel({
-            from: message.from._id,
+            from: senderId,
             content: message.content,
         });
         return newMessage.save();
     }
 
-    async publishMessage(message: MessageForChat) {
-        //TODO : verfiier que le user est bien dans la conv, que le user existe et que la conv aussi
-        const messageToDb = await this.saveMessage(message);
-        return await this.updateConversation(
-            messageToDb,
-            message.conversationId,
-        );
+    async publishMessage(
+        message: MessageForChat,
+        senderId: string,
+    ): Promise<MessageDocument> {
+        //TODO : verfiier que le userId est bien dans la conv, que le userId existe et que la conv aussi
+        const messageToDb = await this.saveMessage(message, senderId);
+        await this.updateConversation(messageToDb, senderId, message.to);
+        return messageToDb;
     }
 }

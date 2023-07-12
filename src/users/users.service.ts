@@ -40,7 +40,6 @@ export class UsersService {
     }
 
     async findOneById(id: string): Promise<UserDocument> {
-        console.log("je find by id");
         return this.userModel.findById(id).exec();
     }
     async updateOneById(id: string, user: ProfilDto) {

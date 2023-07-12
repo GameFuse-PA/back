@@ -1,9 +1,11 @@
 import { Injectable } from '@nestjs/common';
-import { Socket } from 'socket.io';
+import { Server, Socket } from "socket.io";
 import { UsersService } from '../users/users.service';
 import { UserFromFrontDTO } from './Models/UserFromFrontDTO';
 import { MessageForChat } from './Models/MessageForChat';
 import { ConversationsService } from '../conversations/conversations.service';
+import { MessageForFrontConversation } from "./Models/MessageForFrontConversation";
+import { MessageForFront } from "./Models/MessageForFront";
 
 @Injectable()
 export class LiveChatService {
@@ -12,55 +14,35 @@ export class LiveChatService {
         private conversationsService: ConversationsService,
     ) {}
 
-    private connectedUsers: string[] = [];
-
-    public connect(client: Socket, user: UserFromFrontDTO) {
-        console.log('tentative de connexion');
-        if (!this.connectedUsers.includes(user.id.toString())) {
-            this.connectedUsers.push(user.id.toString());
-            console.log('users connected : ' + this.connectedUsers);
-            client.join(user.roomId);
-            console.log('je me connecte au socket ' + user.roomId);
-            client.broadcast
-                .to(user.roomId)
-                .emit('user-connected', user.roomId);
-        } else {
-            console.log('already connected');
-        }
+    public connect(client: Socket, userId: string) {
+        console.log('new userId connected');
+        client.join(userId);
     }
 
-    public disconnect(client: Socket, user: UserFromFrontDTO) {
-        console.log('deconnected ' + user.roomId);
+    public disconnect(client: Socket, userId: string) {
+        console.log('deconnected ' + userId);
         client.disconnect();
-        this.connectedUsers.forEach((item, index) => {
-            if (item === user.id) {
-                this.connectedUsers.splice(index, 1);
-            }
-        });
-    }
-
-    public quitRoom(client: Socket, user: UserFromFrontDTO) {
-        console.log('je leave la room ' + user.roomId);
-        client.leave(user.roomId);
-        this.connectedUsers.forEach((item, index) => {
-            if (item === user.id) {
-                this.connectedUsers.splice(index, 1);
-            }
-        });
     }
 
     public async sendChat(
-        client: Socket,
-        user: UserFromFrontDTO,
+        server: Server,
+        senderId: string,
         message: MessageForChat,
     ) {
-        console.log(this.connectedUsers);
         console.log("j'emet un message");
-        message.from = await this.usersService.findOneById(user.id);
-        const savedMessage = this.conversationsService.publishMessage(message);
-        //TODO : controle que le user et la conv sont ok
-        if (savedMessage != null) {
-            client.broadcast.to(user.roomId).emit('new-message', message);
-        }
+        await this.usersService.findOneById(senderId);
+        const savedMessage = await this.conversationsService.publishMessage(
+            message,
+            senderId,
+        );
+        const messageToReturn: MessageForFrontConversation = {
+            content: savedMessage.content,
+            from: savedMessage.from.toString(),
+            date: Date.now(),
+            conversationId: message.to.toString(),
+        };
+        //TODO : controle que message.to est valide
+        console.log("je suis " + senderId + "et message addressé à " + message.to)
+        server.to(message.to).emit('new-message', messageToReturn);
     }
 }

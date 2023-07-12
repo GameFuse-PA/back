@@ -75,10 +75,7 @@ export class ProfilController {
     @UseGuards(AuthGuard)
     @Get('conversations/:id')
     async getConversationById(@Request() req, @Param('id') id: string) {
-        console.log('je demande une nouvelle conversation');
-        const conv = await this.conversationsService.getConversation(req.userId, id);
-        console.log(conv);
-        return conv;
+        return await this.conversationsService.getConversation(req.userId, id);
     }
 
     @UseGuards(AuthGuard)

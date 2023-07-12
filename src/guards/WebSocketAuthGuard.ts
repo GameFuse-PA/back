@@ -21,9 +21,7 @@ export class WebSocketAuthGuard implements CanActivate {
             const payload = await this.jwtService.verify(bearerToken, {
                 secret: this.appConfigService.jwtSecret,
             });
-            const user: UserFromFrontDTO = context.switchToWs().getData();
-            user.id = payload.sub;
-            LiveChatGateWay.user = user;
+            LiveChatGateWay.userId = payload.sub;
         } catch {
             console.log('Le token renseigné est invalide');
             throw new UnauthorizedException();
