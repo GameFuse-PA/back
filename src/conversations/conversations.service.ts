@@ -41,14 +41,23 @@ export class ConversationsService {
                     path: 'avatar',
                 },
             })
+            .populate({
+                path: 'messages',
+                populate: {
+                    path: 'from',
+                },
+            })
             .exec();
+
         for (const user of conversation.users) {
             if (user._id.toString() === userId) {
                 return conversation;
             }
+
         }
+
         throw new ForbiddenException(
-            'User not allowed to send message to this conversation',
+            'User not allowed to send a message to this conversation',
         );
     }
 
@@ -56,15 +65,28 @@ export class ConversationsService {
         const conversation = await this.conversationModel.findById(
             conversationId,
         );
-        conversation.messages.push(message._id);
-        return conversation.save();
+        if (!conversation.messages.includes(message._id)) {
+            conversation.messages.push(message._id);
+            return conversation.save();
+        } else {
+            return;
+        }
     }
 
     async saveMessage(message: MessageForChat) {
         const newMessage = new this.messageModel({
             from: message.from._id,
-            text: message.content,
+            content: message.content,
         });
         return newMessage.save();
+    }
+
+    async publishMessage(message: MessageForChat) {
+        //TODO : verfiier que le user est bien dans la conv, que le user existe et que la conv aussi
+        const messageToDb = await this.saveMessage(message);
+        return await this.updateConversation(
+            messageToDb,
+            message.conversationId,
+        );
     }
 }

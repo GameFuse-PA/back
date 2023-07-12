@@ -32,6 +32,10 @@ export class LiveChatGateWay
 
     handleDisconnect(client: Socket) {
         console.log('Client disconnected:', client.id);
+        Object.keys(client.rooms).forEach((roomId) => {
+            client.leave(roomId);
+        });
+
     }
 
     @UseGuards(WebSocketAuthGuard)
@@ -48,6 +52,7 @@ export class LiveChatGateWay
         });
 
         client.on('leaveRoom', () => {
+            console.log("demande de leave la room")
             this.liveChatService.quitRoom(client, user);
         });
 
