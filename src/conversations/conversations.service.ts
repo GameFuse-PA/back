@@ -7,6 +7,7 @@ import {
 import { InjectModel } from '@nestjs/mongoose';
 import { Message, MessageDocument } from '../schemas/messages.schema';
 import { MessageForChat } from '../liveChat/Models/MessageForChat';
+import {ConversationToFront} from "./dto/ConversationToFront";
 
 @Injectable()
 export class ConversationsService {
@@ -60,6 +61,17 @@ export class ConversationsService {
         );
     }
 
+    private convertConversationToFrontObject(
+        conversationDocument: ConversationDocument,
+    ) {
+
+        const convToFront : ConversationToFront =  {
+            _id: conversationDocument._id,
+            users: conversationDocument.users,
+
+        }
+    }
+
     async updateConversation(
         message: MessageDocument,
         senderId: string,
@@ -96,8 +108,6 @@ export class ConversationsService {
         senderId: string,
     ): Promise<MessageDocument> {
         //TODO : verfiier que le userId est bien dans la conv, que le userId existe et que la conv aussi
-        const messageToDb = await this.saveMessage(message, senderId);
-        await this.updateConversation(messageToDb, senderId, message.to);
-        return messageToDb;
+        return await this.saveMessage(message, senderId);
     }
 }

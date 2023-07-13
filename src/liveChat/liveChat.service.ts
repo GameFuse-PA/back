@@ -30,19 +30,22 @@ export class LiveChatService {
         message: MessageForChat,
     ) {
         console.log("j'emet un message");
-        await this.usersService.findOneById(senderId);
         const savedMessage = await this.conversationsService.publishMessage(
             message,
             senderId,
         );
+        const conversation = await this.conversationsService.updateConversation(savedMessage, senderId, message.to);
+
         const messageToReturn: MessageForFrontConversation = {
             content: savedMessage.content,
             from: savedMessage.from.toString(),
             date: Date.now(),
-            conversationId: message.to.toString(),
+            conversationId: conversation._id,
         };
         //TODO : controle que message.to est valide
-        console.log("je suis " + senderId + "et message addressé à " + message.to)
+        console.log(
+            'je suis ' + senderId + 'et message addressé à ' + message.to,
+        );
         server.to(message.to).emit('new-message', messageToReturn);
     }
 }

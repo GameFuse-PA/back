@@ -26,7 +26,7 @@ export class LiveChatGateWay
     constructor(private liveChatService: LiveChatService) {}
 
     handleConnection(client: Socket) {
-        console.log('Client connected:', LiveChatGateWay.userId);
+        console.log('Client connected:', client.data.user);
     }
 
     handleDisconnect(client: Socket) {
@@ -42,11 +42,11 @@ export class LiveChatGateWay
         console.log('le userId appelant est : ' + user.id);
         client.on('roomAccessRequest', () => {
             console.log('je me connecte a une romm : ' + user.roomId);
-            this.liveChatService.connect(client, LiveChatGateWay.userId);
+            this.liveChatService.connect(client, client.data.user);
         });
 
         client.on('disconnect', () => {
-            this.liveChatService.disconnect(client, LiveChatGateWay.userId);
+            this.liveChatService.disconnect(client, client.data.user);
         });
         /*client.on('chat', async (content) => {
             console.log('jai recu un message : ' + content.content);
@@ -58,19 +58,18 @@ export class LiveChatGateWay
     @UseGuards(WebSocketAuthGuard)
     @SubscribeMessage('chatAccessRequest')
     handleJoinConversation(client: Socket) {
-        console.log('le userId appelant est : ' + LiveChatGateWay.userId);
-        client.on('chatAccessRequest', () => {
-            this.liveChatService.connect(client, LiveChatGateWay.userId);
-        });
+        console.log('la data  : ' + client.data.user);
+        console.log('je me connecte en tant que : ' + client.data.user);
+        this.liveChatService.connect(client, client.data.user);
 
         client.on('disconnect', () => {
-            this.liveChatService.disconnect(client, LiveChatGateWay.userId);
+            this.liveChatService.disconnect(client, client.data.user);
         });
         client.on('chat', async (content) => {
             console.log('jai recu un message : ' + content.content);
             await this.liveChatService.sendChat(
                 this.server,
-                //ICI LE USERID
+                client.data.user,
                 content,
             );
         });
