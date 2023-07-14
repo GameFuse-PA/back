@@ -19,6 +19,9 @@ export class Message extends Document {
         ref: 'User',
     })
     from: Types.ObjectId;
+
+    @Prop({ required: true, type: MongooseSchema.Types.Number })
+    date: number;
 }
 
 export const MessageSchema = SchemaFactory.createForClass(Message);

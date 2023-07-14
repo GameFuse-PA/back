@@ -25,7 +25,7 @@ export class ConversationsService {
             })
             .populate({
                 path: 'users',
-                select: 'firstname lastname',
+                select: 'username',
                 populate: {
                     path: 'avatar',
                 },
@@ -61,17 +61,6 @@ export class ConversationsService {
         );
     }
 
-    private convertConversationToFrontObject(
-        conversationDocument: ConversationDocument,
-    ) {
-
-        const convToFront : ConversationToFront =  {
-            _id: conversationDocument._id,
-            users: conversationDocument.users,
-
-        }
-    }
-
     async updateConversation(
         message: MessageDocument,
         senderId: string,
@@ -99,6 +88,7 @@ export class ConversationsService {
         const newMessage = new this.messageModel({
             from: senderId,
             content: message.content,
+            date: Date.now(),
         });
         return newMessage.save();
     }
