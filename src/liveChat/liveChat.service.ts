@@ -6,6 +6,7 @@ import { MessageForChat } from './Models/MessageForChat';
 import { ConversationsService } from '../conversations/conversations.service';
 import { MessageForFrontConversation } from "./Models/MessageForFrontConversation";
 import { MessageForFront } from "./Models/MessageForFront";
+import { User, UserDocument } from "../schemas/user.schema";
 
 @Injectable()
 export class LiveChatService {
@@ -34,11 +35,16 @@ export class LiveChatService {
             message,
             senderId,
         );
+        console.log("saved message : " + savedMessage)
         const conversation = await this.conversationsService.updateConversation(savedMessage, senderId, message.to);
+
+        const sender: UserDocument = await this.usersService.findOneById(senderId);
 
         const messageToReturn: MessageForFrontConversation = {
             content: savedMessage.content,
-            from: savedMessage.from.toString(),
+            from: {
+                username: sender.username,
+            },
             date: Date.now(),
             conversationId: conversation._id,
         };
