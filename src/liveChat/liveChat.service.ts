@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException, UnauthorizedException } from "@nestjs/common";
 import { Server, Socket } from 'socket.io';
 import { UsersService } from '../users/users.service';
 import { UserFromFrontDTO } from './Models/UserFromFrontDTO';
@@ -50,31 +50,25 @@ export class LiveChatService {
         message: MessageForChat,
     ) {
         if (message.to === undefined || message.to === null) {
-            console.log('error 1');
-            //TODO : exception handling
-            return;
+            throw new BadRequestException('Any recipiend has been defined');
         }
 
         const sender = await this.usersService.findOneById(senderId);
         if (sender === undefined || sender === null) {
-            console.log('error 2');
-            //TODO: exception handling
-            return;
+            throw new BadRequestException('Any sender has been defined');
         }
         const receiver = await this.usersService.findOneById(message.to);
         if (receiver === undefined || receiver === null) {
-            console.log('error 3');
-            //TODO: exception handling
-            return;
+            throw new NotFoundException('Invalid receiver');
         }
 
         if (
             !sender.friends.includes(receiver._id) ||
             !receiver.friends.includes(sender._id)
         ) {
-            console.log('error 4');
-            //TODO: exception handling
-            return;
+            throw new UnauthorizedException(
+                'You need to be friend with the receiver to contact him',
+            );
         }
 
         const savedMessage = await this.conversationsService.publishMessage(
@@ -95,7 +89,6 @@ export class LiveChatService {
             date: Date.now(),
             conversationId: conversation._id,
         };
-        //TODO : controle que message.to est valide
         server.to(message.to).emit('new-message', messageToReturn);
     }
 
@@ -108,14 +101,12 @@ export class LiveChatService {
         const room = await this.roomService.getRoom(roomId);
         const sender = await this.usersService.findOneById(senderId);
         if (sender === undefined || sender === null) {
-            console.log('error 5');
-            //TODO: exception handling
-            return;
+            throw new BadRequestException('Any sender has been defined');
         }
         if (!room.idUsers.includes(sender._id)) {
-            console.log('error 6');
-            //TODO: exception handling
-            return;
+            throw new UnauthorizedException(
+                'You need to join the room to send messages',
+            );
         }
         const savedMessage = await this.conversationsService.publishMessage(
             message,
