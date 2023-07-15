@@ -25,7 +25,6 @@ export class WebSocketAuthGuard implements CanActivate {
             // @ts-ignore
             const socket: Socket = context.switchToWs().getClient<Socket>();
             socket.data.user = payload.sub;
-            LiveChatGateWay.userId = payload.sub;
         } catch {
             console.log('Le token renseigné est invalide');
             throw new UnauthorizedException();

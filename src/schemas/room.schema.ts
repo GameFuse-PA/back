@@ -11,6 +11,12 @@ export class Room {
         default: [],
     })
     idUsers: Types.ObjectId[];
+
+    @Prop({
+        type: Types.ObjectId,
+        ref: 'Conversation',
+    })
+    conversation: Types.ObjectId;
 }
 
 export const RoomSchema = SchemaFactory.createForClass(Room);

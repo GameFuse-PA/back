@@ -18,6 +18,11 @@ export class LiveChatService {
     public connect(client: Socket, userId: string) {
         console.log('new userId connected');
         client.join(userId);
+    }    
+    
+    public connectRoom(client: Socket, roomId: string) {
+        console.log('new userId connected');
+        client.join(roomId);
     }
 
     public disconnect(client: Socket, userId: string) {
@@ -30,6 +35,9 @@ export class LiveChatService {
         senderId: string,
         message: MessageForChat,
     ) {
+        if (message.to === undefined || message.to === null) {
+            return;
+        }
         console.log("j'emet un message");
         const savedMessage = await this.conversationsService.publishMessage(
             message,
@@ -53,5 +61,42 @@ export class LiveChatService {
             'je suis ' + senderId + 'et message addressé à ' + message.to,
         );
         server.to(message.to).emit('new-message', messageToReturn);
+    }    
+    
+    public async sendChatToRoom(
+        server: Server,
+        senderId: string,
+        message: MessageForChat,
+        roomId: string
+    ) {
+        console.log("j'emet un message");
+        const savedMessage = await this.conversationsService.publishMessage(
+            message,
+            senderId,
+        );
+        console.log("saved message : " + savedMessage)
+        const conversation = await this.conversationsService.updateRoomChat(
+            savedMessage,
+            senderId,
+            roomId,
+        );
+
+        const sender: UserDocument = await this.usersService.findOneById(
+            senderId,
+        );
+
+        const messageToReturn: MessageForFrontConversation = {
+            content: savedMessage.content,
+            from: {
+                username: sender.username,
+            },
+            date: Date.now(),
+            conversationId: conversation._id,
+        };
+        //TODO : controle que message.to est valide
+        console.log(
+            'je suis ' + senderId + 'et message addressé à ' + message.to,
+        );
+        server.to(roomId).emit('new-message', messageToReturn);
     }
 }

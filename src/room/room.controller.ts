@@ -9,6 +9,6 @@ export class RoomController {
     @UseGuards(AuthGuard)
     @Post()
     roomCreation(@Request() req) {
-        return this.roomService.joinRoom(req.userId);
+        return this.roomService.createRoom(req.userId);
     }
 }
