@@ -7,12 +7,14 @@ import { ConversationsService } from '../conversations/conversations.service';
 import { MessageForFrontConversation } from './Models/MessageForFrontConversation';
 import { UserDocument } from '../schemas/user.schema';
 import { JoinRoomRequestDTO } from './dto/JoinRoomRequestDTO';
+import { RoomService } from '../room/room.service';
 
 @Injectable()
 export class LiveChatService {
     constructor(
         private usersService: UsersService,
         private conversationsService: ConversationsService,
+        private roomService: RoomService,
     ) {}
 
     public connect(client: Socket, userId: string) {
@@ -20,8 +22,8 @@ export class LiveChatService {
         client.join(userId);
     }
 
-    public connectRoom(client: Socket, request: JoinRoomRequestDTO) {
-        console.log('new userId connected');
+    public async connectRoom(client: Socket, request: JoinRoomRequestDTO) {
+        await this.roomService.addUserToRoom(request.roomId, client.data.user);
         client.join(request.roomId);
         client.broadcast
             .to(request.roomId)
@@ -48,22 +50,41 @@ export class LiveChatService {
         message: MessageForChat,
     ) {
         if (message.to === undefined || message.to === null) {
+            console.log('error 1');
+            //TODO : exception handling
             return;
         }
-        console.log("j'emet un message");
+
+        const sender = await this.usersService.findOneById(senderId);
+        if (sender === undefined || sender === null) {
+            console.log('error 2');
+            //TODO: exception handling
+            return;
+        }
+        const receiver = await this.usersService.findOneById(message.to);
+        if (receiver === undefined || receiver === null) {
+            console.log('error 3');
+            //TODO: exception handling
+            return;
+        }
+
+        if (
+            !sender.friends.includes(receiver._id) ||
+            !receiver.friends.includes(sender._id)
+        ) {
+            console.log('error 4');
+            //TODO: exception handling
+            return;
+        }
+
         const savedMessage = await this.conversationsService.publishMessage(
             message,
             senderId,
         );
-        console.log('saved message : ' + savedMessage);
         const conversation = await this.conversationsService.updateConversation(
             savedMessage,
             senderId,
             message.to,
-        );
-
-        const sender: UserDocument = await this.usersService.findOneById(
-            senderId,
         );
 
         const messageToReturn: MessageForFrontConversation = {
@@ -79,12 +100,23 @@ export class LiveChatService {
     }
 
     public async sendChatToRoom(
-        server: Server,
+        client: Socket,
         senderId: string,
         message: MessageForChat,
         roomId: string,
     ) {
-        console.log("j'emet un message");
+        const room = await this.roomService.getRoom(roomId);
+        const sender = await this.usersService.findOneById(senderId);
+        if (sender === undefined || sender === null) {
+            console.log('error 5');
+            //TODO: exception handling
+            return;
+        }
+        if (!room.idUsers.includes(sender._id)) {
+            console.log('error 6');
+            //TODO: exception handling
+            return;
+        }
         const savedMessage = await this.conversationsService.publishMessage(
             message,
             senderId,
@@ -96,10 +128,6 @@ export class LiveChatService {
             roomId,
         );
 
-        const sender: UserDocument = await this.usersService.findOneById(
-            senderId,
-        );
-
         const messageToReturn: MessageForFrontConversation = {
             content: savedMessage.content,
             from: {
@@ -108,10 +136,7 @@ export class LiveChatService {
             date: Date.now(),
             conversationId: conversation._id,
         };
-        //TODO : controle que message.to est valide
-        console.log(
-            'je suis ' + senderId + 'et message addressé à ' + message.to,
-        );
-        server.to(roomId).emit('new-message', messageToReturn);
+        console.log('jenvoie le msg')
+        client.broadcast.to(roomId).emit('new-message', messageToReturn);
     }
 }

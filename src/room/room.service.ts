@@ -6,12 +6,13 @@ import {
     Conversation,
     ConversationDocument,
 } from '../schemas/conversation.schema';
-import { GameSessionDto } from '../game-session/dto/game-session.dto';
+import { User, UserDocument } from '../schemas/user.schema';
 
 @Injectable()
 export class RoomService {
     constructor(
         @InjectModel(Room.name) private roomModel: Model<RoomDocument>,
+        @InjectModel(User.name) private userModel: Model<UserDocument>,
         @InjectModel(Conversation.name)
         private conversationModel: Model<ConversationDocument>,
     ) {}
@@ -28,13 +29,6 @@ export class RoomService {
             idUsers: userId,
             conversation: savedConverstion._id,
         });
-        console.log(
-            'on save ' +
-                savedConverstion +
-                ' dans une nouvelle room : ' +
-                newRoom +
-                ' puis un return',
-        );
         return await newRoom.save();
     }
 
@@ -47,11 +41,19 @@ export class RoomService {
                     path: 'messages',
                     populate: {
                         path: 'from',
-                    }
+                    },
                 },
             })
             .exec();
-        console.log(room);
         return room;
+    }
+
+    public async addUserToRoom(roomId: string, userId: string) {
+        const room = await this.roomModel.findById(roomId);
+        const user = await this.userModel.findById(userId);
+        if (!room.idUsers.includes(user._id)) {
+            room.idUsers.push(user._id);
+        }
+        room.save();
     }
 }

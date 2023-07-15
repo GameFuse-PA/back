@@ -36,9 +36,8 @@ export class LiveChatGateWay
 
     @UseGuards(WebSocketAuthGuard)
     @SubscribeMessage('roomAccessRequest')
-    handleJoinRoom(client: Socket, request: JoinRoomRequestDTO) {
-        console.log('roomAccess');
-        this.liveChatService.connectRoom(client, request);
+    async handleJoinRoom(client: Socket, request: JoinRoomRequestDTO) {
+        await this.liveChatService.connectRoom(client, request);
 
         client.on('disconnect', () => {
             this.liveChatService.disconnectFromRoom(
@@ -50,7 +49,7 @@ export class LiveChatGateWay
         client.on('chat', async (content) => {
             console.log('jai recu un message : ' + content.content);
             await this.liveChatService.sendChatToRoom(
-                this.server,
+                client,
                 client.data.user,
                 content,
                 request.roomId,
@@ -61,7 +60,6 @@ export class LiveChatGateWay
     @UseGuards(WebSocketAuthGuard)
     @SubscribeMessage('chatAccessRequest')
     handleJoinConversation(client: Socket) {
-        console.log('chat access');
         this.liveChatService.connect(client, client.data.user);
 
         client.on('disconnect', () => {

@@ -5,6 +5,7 @@ import { JwtService } from '@nestjs/jwt';
 import { UsersService } from '../users/users.service';
 import { ConversationsController } from '../conversations/conversations.controller';
 import { ConversationsService } from "../conversations/conversations.service";
+import { RoomService } from "../room/room.service";
 
 @Module({
     imports: [],
@@ -15,7 +16,8 @@ import { ConversationsService } from "../conversations/conversations.service";
         LiveChatService,
         JwtService,
         ConversationsController,
-        ConversationsService
+        ConversationsService,
+        RoomService,
     ],
 })
 export class LiveChatModule {}

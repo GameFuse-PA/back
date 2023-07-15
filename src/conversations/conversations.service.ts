@@ -119,7 +119,6 @@ export class ConversationsService {
         message: MessageForChat,
         senderId: string,
     ): Promise<MessageDocument> {
-        //TODO : verfiier que le userId est bien dans la conv, que le userId existe et que la conv aussi
         return await this.saveMessage(message, senderId);
     }
 }
