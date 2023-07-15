@@ -10,6 +10,7 @@ import { UseGuards } from '@nestjs/common';
 import { Server, Socket } from 'socket.io';
 import { LiveChatService } from './liveChat.service';
 import { WebSocketAuthGuard } from '../guards/WebSocketAuthGuard';
+import { JoinRoomRequestDTO } from './dto/JoinRoomRequestDTO';
 @WebSocketGateway({
     cors: { origin: '*', methods: ['GET', 'POST'] },
     path: '/socket',
@@ -35,13 +36,16 @@ export class LiveChatGateWay
 
     @UseGuards(WebSocketAuthGuard)
     @SubscribeMessage('roomAccessRequest')
-    handleJoinRoom(client: Socket, roomId: string) {
+    handleJoinRoom(client: Socket, request: JoinRoomRequestDTO) {
         console.log('roomAccess');
-        console.log(roomId);
-        this.liveChatService.connectRoom(client, roomId);
+        this.liveChatService.connectRoom(client, request);
 
         client.on('disconnect', () => {
-            this.liveChatService.disconnect(client, client.data.user);
+            this.liveChatService.disconnectFromRoom(
+                client,
+                client.data.user,
+                request.peerId,
+            );
         });
         client.on('chat', async (content) => {
             console.log('jai recu un message : ' + content.content);
@@ -49,7 +53,7 @@ export class LiveChatGateWay
                 this.server,
                 client.data.user,
                 content,
-                roomId,
+                request.roomId,
             );
         });
     }

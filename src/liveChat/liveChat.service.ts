@@ -1,12 +1,12 @@
 import { Injectable } from '@nestjs/common';
-import { Server, Socket } from "socket.io";
+import { Server, Socket } from 'socket.io';
 import { UsersService } from '../users/users.service';
 import { UserFromFrontDTO } from './Models/UserFromFrontDTO';
 import { MessageForChat } from './Models/MessageForChat';
 import { ConversationsService } from '../conversations/conversations.service';
-import { MessageForFrontConversation } from "./Models/MessageForFrontConversation";
-import { MessageForFront } from "./Models/MessageForFront";
-import { User, UserDocument } from "../schemas/user.schema";
+import { MessageForFrontConversation } from './Models/MessageForFrontConversation';
+import { UserDocument } from '../schemas/user.schema';
+import { JoinRoomRequestDTO } from './dto/JoinRoomRequestDTO';
 
 @Injectable()
 export class LiveChatService {
@@ -18,16 +18,28 @@ export class LiveChatService {
     public connect(client: Socket, userId: string) {
         console.log('new userId connected');
         client.join(userId);
-    }    
-    
-    public connectRoom(client: Socket, roomId: string) {
+    }
+
+    public connectRoom(client: Socket, request: JoinRoomRequestDTO) {
         console.log('new userId connected');
-        client.join(roomId);
+        client.join(request.roomId);
+        client.broadcast
+            .to(request.roomId)
+            .emit('user-connected', request.peerId);
     }
 
     public disconnect(client: Socket, userId: string) {
         console.log('deconnected ' + userId);
         client.disconnect();
+    }
+
+    public disconnectFromRoom(
+        client: Socket,
+        user: UserFromFrontDTO,
+        peerId: string,
+    ) {
+        client.disconnect();
+        client.broadcast.to(user.roomId).emit('user-disconnected', peerId);
     }
 
     public async sendChat(
@@ -43,10 +55,16 @@ export class LiveChatService {
             message,
             senderId,
         );
-        console.log("saved message : " + savedMessage)
-        const conversation = await this.conversationsService.updateConversation(savedMessage, senderId, message.to);
+        console.log('saved message : ' + savedMessage);
+        const conversation = await this.conversationsService.updateConversation(
+            savedMessage,
+            senderId,
+            message.to,
+        );
 
-        const sender: UserDocument = await this.usersService.findOneById(senderId);
+        const sender: UserDocument = await this.usersService.findOneById(
+            senderId,
+        );
 
         const messageToReturn: MessageForFrontConversation = {
             content: savedMessage.content,
@@ -57,24 +75,21 @@ export class LiveChatService {
             conversationId: conversation._id,
         };
         //TODO : controle que message.to est valide
-        console.log(
-            'je suis ' + senderId + 'et message addressé à ' + message.to,
-        );
         server.to(message.to).emit('new-message', messageToReturn);
-    }    
-    
+    }
+
     public async sendChatToRoom(
         server: Server,
         senderId: string,
         message: MessageForChat,
-        roomId: string
+        roomId: string,
     ) {
         console.log("j'emet un message");
         const savedMessage = await this.conversationsService.publishMessage(
             message,
             senderId,
         );
-        console.log("saved message : " + savedMessage)
+        console.log('saved message : ' + savedMessage);
         const conversation = await this.conversationsService.updateRoomChat(
             savedMessage,
             senderId,

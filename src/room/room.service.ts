@@ -17,7 +17,6 @@ export class RoomService {
     ) {}
 
     async createRoom(userId: string) {
-        console.log('debut de creation de room');
         const conversation = new this.conversationModel({
             users: [userId],
             isGameChat: true,
