@@ -80,8 +80,8 @@ export class GameSessionService {
         return await newGameSession.save();
     }
 
-    public async addUserToGameSession(roomId: string, userId: string) {
-        const gameSession = await this.gameSessionModel.findById(roomId);
+    public async addUserToGameSession(gameSessionId: string, userId: string) {
+        const gameSession = await this.gameSessionModel.findById(gameSessionId);
         const user = await this.userModel.findById(userId);
         if (!gameSession.players.includes(user._id)) {
             gameSession.players.push(user._id);

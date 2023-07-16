@@ -96,7 +96,7 @@ export class ConversationsService {
     ) {
         const gameSession = await this.gameSessionModel.findById(gameSessionId);
         const gameSessionConversation = await this.conversationModel.findById(
-            gameSession.conversation,
+            gameSession.conversation._id,
         );
         gameSessionConversation.messages.push(message._id);
         return gameSessionConversation.save();

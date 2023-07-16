@@ -12,6 +12,7 @@ import { ConversationsService } from '../conversations/conversations.service';
 import { MessageForFrontConversation } from './Models/MessageForFrontConversation';
 import { JoinGameSessionDTO } from './dto/JoinGameSessionDTO';
 import { GameSessionService } from '../game-session/game-session.service';
+import { JoinGameSessionVisioDTO } from "./dto/JoinGameSessionVisioDTO";
 
 @Injectable()
 export class LiveChatService {
@@ -26,15 +27,22 @@ export class LiveChatService {
         client.join(userId);
     }
 
-    public async connectRoom(client: Socket, request: JoinGameSessionDTO) {
+    public async connectRoom(
+        client: Socket,
+        joinGameSessionDTO: JoinGameSessionDTO
+    ) {
         await this.gameSessionService.addUserToGameSession(
-            request.gameSessionId,
+            joinGameSessionDTO.gameSessionId,
             client.data.user,
         );
-        client.join(request.gameSessionId);
-        client.broadcast
-            .to(request.gameSessionId)
-            .emit('user-connected', request.peerId);
+        client.join(joinGameSessionDTO.conversationId);
+    }
+    
+    public async joinVisio(
+        client: Socket,
+        joinGameSessionVisioDTO: JoinGameSessionVisioDTO,
+    ) {
+        client.broadcast.to(joinGameSessionVisioDTO.conversationId).emit('user-connected', joinGameSessionVisioDTO.peerId);
     }
 
     public disconnect(client: Socket, userId: string) {
@@ -45,10 +53,9 @@ export class LiveChatService {
     public disconnectFromRoom(
         client: Socket,
         user: UserFromFrontDTO,
-        peerId: string,
     ) {
         client.disconnect();
-        client.broadcast.to(user.roomId).emit('user-disconnected', peerId);
+        client.broadcast.to(user.roomId).emit('user-disconnected', user.id);
     }
 
     public async sendChat(
@@ -103,20 +110,20 @@ export class LiveChatService {
         client: Socket,
         senderId: string,
         message: MessageForChat,
-        gameSessionId: string,
+        joinGameSessionDTO: JoinGameSessionDTO,
     ) {
         const gameSession = await this.gameSessionService.getGameSession(
-            gameSessionId,
+            joinGameSessionDTO.gameSessionId,
         );
         const sender = await this.usersService.findOneById(senderId);
         if (sender === undefined || sender === null) {
             throw new BadRequestException('Any sender has been defined');
         }
-        if (!gameSession.players.includes(sender._id)) {
+        /*if (!gameSession.players.includes(sender._id)) {
             throw new UnauthorizedException(
                 'You need to join the room to send messages',
             );
-        }
+        }*/
         const savedMessage = await this.conversationsService.publishMessage(
             message,
             senderId,
@@ -126,7 +133,7 @@ export class LiveChatService {
             await this.conversationsService.updateGameSessionChat(
                 savedMessage,
                 senderId,
-                gameSessionId,
+                joinGameSessionDTO.gameSessionId,
             );
 
         const messageToReturn: MessageForFrontConversation = {
@@ -138,6 +145,6 @@ export class LiveChatService {
             conversationId: conversation._id,
         };
         console.log('jenvoie le msg');
-        client.broadcast.to(gameSessionId).emit('new-message', messageToReturn);
+        client.broadcast.to(joinGameSessionDTO.conversationId).emit('new-message', messageToReturn);
     }
 }

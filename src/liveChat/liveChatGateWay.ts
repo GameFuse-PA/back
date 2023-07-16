@@ -36,14 +36,20 @@ export class LiveChatGateWay
 
     @UseGuards(WebSocketAuthGuard)
     @SubscribeMessage('roomAccessRequest')
-    async handleJoinRoom(client: Socket, request: JoinGameSessionDTO) {
-        await this.liveChatService.connectRoom(client, request);
+    async handleJoinRoom(
+        client: Socket,
+        joinGameSessionDTO: JoinGameSessionDTO,
+    ) {
+        await this.liveChatService.connectRoom(client, joinGameSessionDTO);
+        
+        client.on('joinGameSessionVisio', async (content) => {
+            this.liveChatService.joinVisio(client, content);
+        })
 
         client.on('disconnect', () => {
             this.liveChatService.disconnectFromRoom(
                 client,
                 client.data.user,
-                request.peerId,
             );
         });
         client.on('chat', async (content) => {
@@ -52,7 +58,7 @@ export class LiveChatGateWay
                 client,
                 client.data.user,
                 content,
-                request.gameSessionId,
+                joinGameSessionDTO,
             );
         });
     }
