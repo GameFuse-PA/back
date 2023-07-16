@@ -1,20 +1,24 @@
-import { BadRequestException, Injectable, NotFoundException, UnauthorizedException } from "@nestjs/common";
+import {
+    BadRequestException,
+    Injectable,
+    NotFoundException,
+    UnauthorizedException,
+} from '@nestjs/common';
 import { Server, Socket } from 'socket.io';
 import { UsersService } from '../users/users.service';
 import { UserFromFrontDTO } from './Models/UserFromFrontDTO';
 import { MessageForChat } from './Models/MessageForChat';
 import { ConversationsService } from '../conversations/conversations.service';
 import { MessageForFrontConversation } from './Models/MessageForFrontConversation';
-import { UserDocument } from '../schemas/user.schema';
-import { JoinRoomRequestDTO } from './dto/JoinRoomRequestDTO';
-import { RoomService } from '../room/room.service';
+import { JoinGameSessionDTO } from './dto/JoinGameSessionDTO';
+import { GameSessionService } from '../game-session/game-session.service';
 
 @Injectable()
 export class LiveChatService {
     constructor(
         private usersService: UsersService,
         private conversationsService: ConversationsService,
-        private roomService: RoomService,
+        private gameSessionService: GameSessionService,
     ) {}
 
     public connect(client: Socket, userId: string) {
@@ -22,11 +26,14 @@ export class LiveChatService {
         client.join(userId);
     }
 
-    public async connectRoom(client: Socket, request: JoinRoomRequestDTO) {
-        await this.roomService.addUserToRoom(request.roomId, client.data.user);
-        client.join(request.roomId);
+    public async connectRoom(client: Socket, request: JoinGameSessionDTO) {
+        await this.gameSessionService.addUserToGameSession(
+            request.gameSessionId,
+            client.data.user,
+        );
+        client.join(request.gameSessionId);
         client.broadcast
-            .to(request.roomId)
+            .to(request.gameSessionId)
             .emit('user-connected', request.peerId);
     }
 
@@ -92,18 +99,20 @@ export class LiveChatService {
         server.to(message.to).emit('new-message', messageToReturn);
     }
 
-    public async sendChatToRoom(
+    public async sendChatToGameSession(
         client: Socket,
         senderId: string,
         message: MessageForChat,
-        roomId: string,
+        gameSessionId: string,
     ) {
-        const room = await this.roomService.getRoom(roomId);
+        const gameSession = await this.gameSessionService.getGameSession(
+            gameSessionId,
+        );
         const sender = await this.usersService.findOneById(senderId);
         if (sender === undefined || sender === null) {
             throw new BadRequestException('Any sender has been defined');
         }
-        if (!room.idUsers.includes(sender._id)) {
+        if (!gameSession.players.includes(sender._id)) {
             throw new UnauthorizedException(
                 'You need to join the room to send messages',
             );
@@ -113,11 +122,12 @@ export class LiveChatService {
             senderId,
         );
         console.log('saved message : ' + savedMessage);
-        const conversation = await this.conversationsService.updateRoomChat(
-            savedMessage,
-            senderId,
-            roomId,
-        );
+        const conversation =
+            await this.conversationsService.updateGameSessionChat(
+                savedMessage,
+                senderId,
+                gameSessionId,
+            );
 
         const messageToReturn: MessageForFrontConversation = {
             content: savedMessage.content,
@@ -127,7 +137,7 @@ export class LiveChatService {
             date: Date.now(),
             conversationId: conversation._id,
         };
-        console.log('jenvoie le msg')
-        client.broadcast.to(roomId).emit('new-message', messageToReturn);
+        console.log('jenvoie le msg');
+        client.broadcast.to(gameSessionId).emit('new-message', messageToReturn);
     }
 }

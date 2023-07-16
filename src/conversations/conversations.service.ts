@@ -7,8 +7,7 @@ import {
 import { InjectModel } from '@nestjs/mongoose';
 import { Message, MessageDocument } from '../schemas/messages.schema';
 import { MessageForChat } from '../liveChat/Models/MessageForChat';
-import { ConversationToFront } from './dto/ConversationToFront';
-import { Room, RoomDocument } from '../schemas/room.schema';
+import { GameSessions, GameSessionsDocument } from "../schemas/game-sessions.schema";
 
 @Injectable()
 export class ConversationsService {
@@ -17,8 +16,8 @@ export class ConversationsService {
         private conversationModel: Model<ConversationDocument>,
         @InjectModel(Message.name)
         private messageModel: Model<MessageDocument>,
-        @InjectModel(Room.name)
-        private roomModel: Model<RoomDocument>,
+        @InjectModel(GameSessions.name)
+        private gameSessionModel: Model<GameSessionsDocument>,
     ) {}
 
     async getConversations(userId: string): Promise<ConversationDocument[]> {
@@ -90,17 +89,17 @@ export class ConversationsService {
         }
     }
 
-    async updateRoomChat(
+    async updateGameSessionChat(
         message: MessageDocument,
         senderId: string,
-        roomId: string,
+        gameSessionId: string,
     ) {
-        const room = await this.roomModel.findById(roomId);
-        const roomConversation = await this.conversationModel.findById(
-            room.conversation._id,
+        const gameSession = await this.gameSessionModel.findById(gameSessionId);
+        const gameSessionConversation = await this.conversationModel.findById(
+            gameSession.conversation,
         );
-        roomConversation.messages.push(message._id);
-        return roomConversation.save();
+        gameSessionConversation.messages.push(message._id);
+        return gameSessionConversation.save();
     }
 
     async saveMessage(

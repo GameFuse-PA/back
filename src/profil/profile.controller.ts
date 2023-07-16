@@ -19,7 +19,6 @@ import { FriendsService } from '../friends/friends.service';
 import { GamesService } from '../games/games.service';
 import { GameSessionService } from '../game-session/game-session.service';
 import { ConversationsService } from '../conversations/conversations.service';
-import { RoomService } from "../room/room.service";
 
 @Controller('me')
 export class ProfilController {
@@ -29,7 +28,6 @@ export class ProfilController {
         private gamesService: GamesService,
         private gameSessionService: GameSessionService,
         private conversationsService: ConversationsService,
-        private roomService: RoomService,
     ) {}
 
     @UseGuards(AuthGuard)
@@ -48,6 +46,12 @@ export class ProfilController {
     @Get('games')
     getGames(@Request() req) {
         return this.gamesService.getUserGames(req.userId);
+    }
+
+    @UseGuards(AuthGuard)
+    @Get('game-session/:id')
+    getGameSession(@Request() req, @Param('id') gameSessionId: string) {
+        return this.gameSessionService.getGameSession(gameSessionId);
     }
 
     @UseGuards(AuthGuard)
@@ -78,12 +82,6 @@ export class ProfilController {
     @Get('conversations/:id')
     async getConversationById(@Request() req, @Param('id') id: string) {
         return await this.conversationsService.getConversation(req.userId, id);
-    }
-
-    @UseGuards(AuthGuard)
-    @Get('room/:id')
-    async getRoomById(@Request() req, @Param('id') id: string) {
-        return await this.roomService.getRoom(id);
     }
 
     @UseGuards(AuthGuard)
