@@ -112,23 +112,14 @@ export class LiveChatService {
         message: MessageForChat,
         joinGameSessionDTO: JoinGameSessionDTO,
     ) {
-        const gameSession = await this.gameSessionService.getGameSession(
-            joinGameSessionDTO.gameSessionId,
-        );
         const sender = await this.usersService.findOneById(senderId);
         if (sender === undefined || sender === null) {
             throw new BadRequestException('Any sender has been defined');
         }
-        /*if (!gameSession.players.includes(sender._id)) {
-            throw new UnauthorizedException(
-                'You need to join the room to send messages',
-            );
-        }*/
         const savedMessage = await this.conversationsService.publishMessage(
             message,
             senderId,
         );
-        console.log('saved message : ' + savedMessage);
         const conversation =
             await this.conversationsService.updateGameSessionChat(
                 savedMessage,
@@ -144,7 +135,6 @@ export class LiveChatService {
             date: Date.now(),
             conversationId: conversation._id,
         };
-        console.log('jenvoie le msg');
         client.broadcast.to(joinGameSessionDTO.conversationId).emit('new-message', messageToReturn);
     }
 }
