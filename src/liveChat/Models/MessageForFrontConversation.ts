@@ -1,9 +1,7 @@
-import { User } from "../../schemas/user.schema";
-
 export interface MessageForFrontConversation {
     content: string;
     from: any;
-    date: number;
+    date: Date;
     conversationId: string;
 }
 

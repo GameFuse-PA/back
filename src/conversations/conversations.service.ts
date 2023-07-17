@@ -109,7 +109,7 @@ export class ConversationsService {
         const newMessage = new this.messageModel({
             from: senderId,
             content: message.content,
-            date: Date.now(),
+            date: new Date(),
         });
         return newMessage.save();
     }

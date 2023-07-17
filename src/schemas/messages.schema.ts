@@ -20,8 +20,8 @@ export class Message extends Document {
     })
     from: Types.ObjectId;
 
-    @Prop({ required: true, type: MongooseSchema.Types.Number })
-    date: number;
+    @Prop({ required: true, type: MongooseSchema.Types.Date })
+    date: Date;
 }
 
 export const MessageSchema = SchemaFactory.createForClass(Message);

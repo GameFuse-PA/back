@@ -100,7 +100,7 @@ export class LiveChatService {
             from: {
                 username: sender.username,
             },
-            date: Date.now(),
+            date: new Date(),
             conversationId: conversation._id,
         };
         server.to(message.to).emit('new-message', messageToReturn);
@@ -132,7 +132,7 @@ export class LiveChatService {
             from: {
                 username: sender.username,
             },
-            date: Date.now(),
+            date: new Date(),
             conversationId: conversation._id,
         };
         client.broadcast.to(joinGameSessionDTO.conversationId).emit('new-message', messageToReturn);
