@@ -1,7 +1,6 @@
 import {
     ConflictException,
     Injectable,
-    InternalServerErrorException,
     NotFoundException,
 } from '@nestjs/common';
 import { FriendRequestDto } from './dto/friendRequest.dto';
@@ -82,6 +81,14 @@ export class FriendsService {
                 ],
             })
             .exec();
+
+        const conversationExist = await this.conversationModel.findOne({
+            users: [user._id, userFriend._id],
+        });
+
+        if (conversationExist) {
+            return conversationExist;
+        }
 
         const conversation = new this.conversationModel({
             users: [user._id, userFriend._id],
