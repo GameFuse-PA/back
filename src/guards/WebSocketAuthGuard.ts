@@ -1,7 +1,7 @@
 import { CanActivate, Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { AppConfigService } from '../configuration/app.config.service';
-import { UserFromFrontDTO } from '../liveChat/Models/UserFromFrontDTO';
+import { Socket } from 'socket.io';
 
 @Injectable()
 export class WebSocketAuthGuard implements CanActivate {
@@ -20,13 +20,11 @@ export class WebSocketAuthGuard implements CanActivate {
             const payload = await this.jwtService.verify(bearerToken, {
                 secret: this.appConfigService.jwtSecret,
             });
-            const user: UserFromFrontDTO = context.switchToWs().getData();
-            user.id = payload.sub;
+            const socket: Socket = context.switchToWs().getClient();
+            socket.data.user = payload.sub;
         } catch {
-            console.log('Le token renseigné est invalide');
-            throw new UnauthorizedException();
+            throw new UnauthorizedException('Le token renseigné est invalide');
         }
         return true;
     }
-    //https://stackoverflow.com/questions/58670553/nestjs-gateway-websocket-how-to-send-jwt-access-token-through-socket-emit
 }

@@ -22,6 +22,12 @@ export class Conversation extends Document {
         default: [],
     })
     messages: Types.ObjectId[];
+
+    @Prop({
+        required: true,
+        default: false,
+    })
+    isGameChat: boolean;
 }
 
 export const ConversationSchema = SchemaFactory.createForClass(Conversation);
