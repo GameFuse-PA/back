@@ -9,6 +9,7 @@ import { GameSessions, GameSessionsSchema } from './game-sessions.schema';
 import { Invitations, InvitationsSchema } from './invitations.schema';
 import { Conversation, ConversationSchema } from './conversation.schema';
 import { Message, MessageSchema } from './messages.schema';
+import { Action, ActionSchema } from './action.schema';
 
 @Global()
 @Module({
@@ -32,6 +33,9 @@ import { Message, MessageSchema } from './messages.schema';
         MongooseModule.forFeature([
             { name: Message.name, schema: MessageSchema },
         ]),
+        MongooseModule.forFeature([
+            { name: Action.name, schema: ActionSchema },
+        ]),
     ],
     exports: [
         MongooseModule.forFeature([{ name: User.name, schema: UserSchema }]),
@@ -52,6 +56,9 @@ import { Message, MessageSchema } from './messages.schema';
         ]),
         MongooseModule.forFeature([
             { name: Message.name, schema: MessageSchema },
+        ]),
+        MongooseModule.forFeature([
+            { name: Action.name, schema: ActionSchema },
         ]),
     ],
 })
