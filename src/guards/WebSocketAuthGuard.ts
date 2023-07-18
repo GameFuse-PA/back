@@ -20,8 +20,7 @@ export class WebSocketAuthGuard implements CanActivate {
             const payload = await this.jwtService.verify(bearerToken, {
                 secret: this.appConfigService.jwtSecret,
             });
-            // @ts-ignore
-            const socket: Socket = context.switchToWs().getClient<Socket>();
+            const socket: Socket = context.switchToWs().getClient();
             socket.data.user = payload.sub;
         } catch {
             throw new UnauthorizedException('Le token renseigné est invalide');

@@ -63,9 +63,9 @@ export class LiveChatService {
         senderId: string,
         message: MessageForChat,
     ) {
-        if (message.to === undefined || message.to === null) {
+        /*if (message.to === undefined || message.to === null) {
             throw new BadRequestException('Any recipiend has been defined');
-        }
+        }*/
 
         const sender = await this.usersService.findOneById(senderId);
         if (sender === undefined || sender === null) {
