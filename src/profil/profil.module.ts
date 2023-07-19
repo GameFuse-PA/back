@@ -8,6 +8,7 @@ import { FriendsModule } from '../friends/friends.module';
 import { GamesModule } from '../games/games.module';
 import { GameSessionModule } from '../game-session/game-session.module';
 import { InvitationsModule } from '../invitations/invitations.module';
+import { ConversationsModule } from '../conversations/conversations.module';
 
 @Module({
     imports: [
@@ -18,6 +19,7 @@ import { InvitationsModule } from '../invitations/invitations.module';
         GamesModule,
         GameSessionModule,
         InvitationsModule,
+        ConversationsModule,
     ],
     controllers: [ProfilController],
     providers: [ProfilService],

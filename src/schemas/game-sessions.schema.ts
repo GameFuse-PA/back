@@ -39,13 +39,6 @@ export class GameSessions extends Document {
     game: Game;
 
     @Prop({
-        required: true,
-        type: [{ type: MongooseSchema.Types.ObjectId, ref: 'Message' }],
-        default: [],
-    })
-    messages: Types.ObjectId[];
-
-    @Prop({
         required: false,
         type: MongooseSchema.Types.ObjectId,
         ref: 'User',
@@ -58,6 +51,13 @@ export class GameSessions extends Document {
         default: GameSessionStatus.In_Progress,
     })
     status: GameSessionStatus;
+
+    @Prop({
+        required: false,
+        type: MongooseSchema.Types.ObjectId,
+        ref: 'Conversation',
+    })
+    conversation: Types.ObjectId;
 
     @Prop({
         required: true,

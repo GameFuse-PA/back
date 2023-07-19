@@ -4,7 +4,6 @@ import {
     Injectable,
     InternalServerErrorException,
     NotFoundException,
-    UnauthorizedException,
 } from '@nestjs/common';
 import { UsersService } from '../users/users.service';
 import { FileService } from '../amazon/file.service';
