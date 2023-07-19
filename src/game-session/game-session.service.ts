@@ -88,4 +88,34 @@ export class GameSessionService {
         }
         gameSession.save();
     }
+
+    async getGameSessionById(id: string) {
+        return await this.gameSessionModel
+            .findById(id)
+            .populate({
+                path: 'game',
+                populate: {
+                    path: 'program',
+                },
+            })
+            .populate({
+                path: 'game',
+                populate: {
+                    path: 'entry',
+                },
+            })
+            .populate({
+                path: 'players',
+            })
+            .populate({
+                path: 'winner',
+            })
+            .populate({
+                path: 'actions',
+                populate: {
+                    path: 'player',
+                },
+            })
+            .exec();
+    }
 }
