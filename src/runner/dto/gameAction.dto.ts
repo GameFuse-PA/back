@@ -11,4 +11,6 @@ export class GameActionDto {
     key: string;
 
     text: string;
+
+    button: string;
 }
