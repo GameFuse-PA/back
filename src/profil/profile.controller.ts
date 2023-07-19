@@ -1,14 +1,14 @@
 import {
-    Controller,
-    UseGuards,
-    Request,
-    Put,
-    Post,
-    UseInterceptors,
-    UploadedFile,
     Body,
+    Controller,
     Get,
     Param,
+    Post,
+    Put,
+    Request,
+    UploadedFile,
+    UseGuards,
+    UseInterceptors,
 } from '@nestjs/common';
 import { AuthGuard } from '../guards/auth.guard';
 import { ProfilService } from './profile.service';
@@ -18,6 +18,7 @@ import { PasswordDto } from './dto/password.dto';
 import { FriendsService } from '../friends/friends.service';
 import { GamesService } from '../games/games.service';
 import { GameSessionService } from '../game-session/game-session.service';
+import { ConversationsService } from '../conversations/conversations.service';
 
 @Controller('me')
 export class ProfilController {
@@ -26,6 +27,7 @@ export class ProfilController {
         private friendsService: FriendsService,
         private gamesService: GamesService,
         private gameSessionService: GameSessionService,
+        private conversationsService: ConversationsService,
     ) {}
 
     @UseGuards(AuthGuard)
@@ -47,6 +49,12 @@ export class ProfilController {
     }
 
     @UseGuards(AuthGuard)
+    @Get('game-sessions/:id')
+    getGameSession(@Request() req, @Param('id') gameSessionId: string) {
+        return this.gameSessionService.getGameSession(gameSessionId);
+    }
+
+    @UseGuards(AuthGuard)
     @Get('game-sessions')
     getGameSessions(@Request() req) {
         return this.gameSessionService.getMyGameSessions(req.userId);
@@ -62,6 +70,18 @@ export class ProfilController {
     @Get('invitations/:id')
     getInvitation(@Request() req, @Param('id') id: string) {
         return this.profileService.getInvitation(req.userId, id);
+    }
+
+    @UseGuards(AuthGuard)
+    @Get('conversations')
+    async getConversations(@Request() req, @Param('id') id: string) {
+        return await this.conversationsService.getConversations(req.userId);
+    }
+
+    @UseGuards(AuthGuard)
+    @Get('conversations/:id')
+    async getConversationById(@Request() req, @Param('id') id: string) {
+        return await this.conversationsService.getConversation(req.userId, id);
     }
 
     @UseGuards(AuthGuard)
