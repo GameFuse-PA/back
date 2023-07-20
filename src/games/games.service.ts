@@ -165,7 +165,7 @@ export class GamesService {
 
         const gameFile = await this.fileService.uploadFile(
             newFile.buffer,
-            `${Date.now()}.${newFile.mimetype.split('/')[1]}`,
+            `${Date.now()}.${newFile.originalname.split('.').pop()}`,
             `game-${type}`,
             newFile.mimetype,
         );
