@@ -7,7 +7,10 @@ import {
 import { InjectModel } from '@nestjs/mongoose';
 import { Message, MessageDocument } from '../schemas/messages.schema';
 import { MessageForChat } from '../liveChat/Models/MessageForChat';
-import { GameSessions, GameSessionsDocument } from "../schemas/game-sessions.schema";
+import {
+    GameSessions,
+    GameSessionsDocument,
+} from '../schemas/game-sessions.schema';
 
 @Injectable()
 export class ConversationsService {
@@ -49,6 +52,9 @@ export class ConversationsService {
                 path: 'messages',
                 populate: {
                     path: 'from',
+                    populate: {
+                        path: 'avatar',
+                    },
                 },
             })
             .exec();
