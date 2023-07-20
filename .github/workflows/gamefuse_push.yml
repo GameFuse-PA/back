@@ -70,11 +70,11 @@ jobs:
           username: ${{ secrets.USERNAME }}
           key: ${{ secrets.KEY }}
           script: |
-            rm -r ${{PATH_TO_CODE}}/*
+            rm -r ${{env.PATH_TO_CODE}}/*
 
       - name: transfer files to remote server
         run: |
-          scp -r ${{ github.workspace }}/dist ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }}:${{PATH_TO_CODE}}
+          scp -r ${{ github.workspace }}/dist ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }}:${{env.PATH_TO_CODE}}
 
       - name: executing remote ssh commands using password
         uses: appleboy/ssh-action@v0.1.10
