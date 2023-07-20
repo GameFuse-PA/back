@@ -19,7 +19,6 @@ import { GamesService } from './games.service';
 import { FileFieldsInterceptor } from '@nestjs/platform-express';
 import { AuthGuard } from '../guards/auth.guard';
 import { AddGameDto } from './dto/addGame.dto';
-import { GameDocument } from '../schemas/game.schema';
 import { UpdateGameDto } from './dto/updateGame.dto';
 
 @Controller('games')
