@@ -97,6 +97,7 @@ export class GamesService {
         if (game) {
             await this.fileService.deleteFile(game.banner._id, `game-banner`);
             await this.fileService.deleteFile(game.program._id, `game-program`);
+            await this.fileService.deleteFile(game.entry._id, `game-entry`);
             await game.deleteOne();
 
             return true;

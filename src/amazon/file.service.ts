@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import {
     DeleteObjectCommand,
+    GetObjectCommand,
     PutObjectCommand,
     S3Client,
 } from '@aws-sdk/client-s3';
@@ -8,6 +9,8 @@ import { AppConfigService } from '../configuration/app.config.service';
 import { InjectModel } from '@nestjs/mongoose';
 import { File, FileDocument } from '../schemas/file.schema';
 import { Model } from 'mongoose';
+import * as fs from 'fs';
+import * as path from 'path';
 
 @Injectable()
 export class FileService {
@@ -59,7 +62,7 @@ export class FileService {
 
     async deleteFile(fileId: string, path: string) {
         try {
-            const file = await this.fileModel.findById(fileId);
+            const file = await this.fileModel.findById(fileId).exec();
 
             const params = {
                 Bucket: this.appConfigService.awsBucketName,
@@ -72,6 +75,36 @@ export class FileService {
         } catch (e) {
             throw new Error(
                 `Erreur lors de la suppression du fichier. Error: ${e}`,
+            );
+        }
+    }
+
+    async downloadFile(fileId: string, outputDir: string, bucketPath: string) {
+        try {
+            const file = await this.fileModel.findById(fileId).exec();
+
+            const params = {
+                Bucket: this.appConfigService.awsBucketName,
+                Key: `${bucketPath}/${file.name}`,
+            };
+
+            const stream = await this.s3.send(new GetObjectCommand(params));
+
+            const data = stream.Body as any;
+
+            const filePath = path.join(__dirname, `../../${outputDir}`);
+            if (!fs.existsSync(filePath)) {
+                fs.mkdirSync(filePath, { recursive: true });
+            }
+
+            const fileStream = fs.createWriteStream(`${filePath}/${file.name}`);
+
+            data.pipe(fileStream);
+
+            return `${filePath}/${file.name}`;
+        } catch (e) {
+            throw new Error(
+                `Erreur lors de la récupération du fichier. Error: ${e}`,
             );
         }
     }
