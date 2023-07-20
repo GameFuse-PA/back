@@ -23,7 +23,6 @@ export class LiveChatService {
     ) {}
 
     public connect(client: Socket, userId: string) {
-        console.log('new userId connected');
         client.join(userId);
     }
 
@@ -48,7 +47,6 @@ export class LiveChatService {
     }
 
     public disconnect(client: Socket, userId: string) {
-        console.log('deconnected ' + userId);
         client.disconnect();
     }
 
