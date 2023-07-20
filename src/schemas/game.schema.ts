@@ -2,6 +2,7 @@ import { HydratedDocument, Schema as MongooseSchema, Document } from 'mongoose';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { File } from './file.schema';
 import { User } from './user.schema';
+import { LanguageEnum } from '../games/enum/language.enum';
 
 export type GameDocument = HydratedDocument<Game>;
 
@@ -46,6 +47,9 @@ export class Game extends Document {
 
     @Prop({ required: true })
     minPlayers: number;
+
+    @Prop({ required: true, enum: LanguageEnum })
+    language: LanguageEnum;
 }
 
 export const GameSchema = SchemaFactory.createForClass(Game);

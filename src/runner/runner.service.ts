@@ -17,6 +17,7 @@ import {
 } from '../schemas/game-sessions.schema';
 import { User } from '../schemas/user.schema';
 import { GameSessionStatus } from '../game-session/enum/game-session.enum';
+import { LanguageEnum } from '../games/enum/language.enum';
 
 @Injectable()
 export class RunnerService {
@@ -60,13 +61,18 @@ export class RunnerService {
             res = await this.runNewAction(gameSession, player, process, action);
 
             if (res.game_state.game_over == true) {
-                gameSession.winner = player;
+                const winnerIndex = res.game_state.scores.findIndex(
+                    (score: any) => score == 1,
+                );
+
+                gameSession.winner = gameSession.players[winnerIndex];
                 gameSession.status = GameSessionStatus.Terminated;
 
                 await gameSession.save();
             }
         }
 
+        process.stdin.end();
         process.kill();
 
         return await this.buildResponse(res, gameSessionId);
@@ -139,7 +145,15 @@ export class RunnerService {
 
         await this.downloadGameFiles(game, outputDir);
 
-        const process = spawn(`python`, [`${outputDir}/${game.program.name}`]);
+        let processArgs = [];
+
+        if (game.language == LanguageEnum.Java) {
+            processArgs = ['-jar', `${outputDir}/${game.program.name}`];
+        } else {
+            processArgs = [`${outputDir}/${game.program.name}`];
+        }
+
+        const process = spawn(game.language, processArgs);
 
         const args = this.buildInitArgs(gameSession.players.length);
         const res = (await this.run(process, JSON.stringify(args))) as any;
