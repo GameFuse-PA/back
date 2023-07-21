@@ -1,12 +1,8 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import {
-    Document,
-    HydratedDocument,
-    Schema as MongooseSchema,
-    Types,
-} from 'mongoose';
+import { Document, HydratedDocument, Schema as MongooseSchema } from 'mongoose';
 import { ActionTypeEnum } from '../runner/enum/action-type.enum';
 import { User } from './user.schema';
+import { MouseButtonEnum } from '../runner/enum/mouse-button.enum';
 
 export type ActionDocument = HydratedDocument<Action>;
 
@@ -44,6 +40,12 @@ export class Action extends Document {
         required: false,
     })
     text: string;
+
+    @Prop({
+        required: false,
+        enum: MouseButtonEnum,
+    })
+    button: MouseButtonEnum;
 }
 
 export const ActionSchema = SchemaFactory.createForClass(Action);

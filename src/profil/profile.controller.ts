@@ -62,7 +62,7 @@ export class ProfilController {
 
     @UseGuards(AuthGuard)
     @Get('invitations')
-    getInvitations(@Request() req, @Param('id') id: string) {
+    getInvitations(@Request() req) {
         return this.profileService.getInvitations(req.userId);
     }
 
@@ -74,7 +74,7 @@ export class ProfilController {
 
     @UseGuards(AuthGuard)
     @Get('conversations')
-    async getConversations(@Request() req, @Param('id') id: string) {
+    async getConversations(@Request() req) {
         return await this.conversationsService.getConversations(req.userId);
     }
 

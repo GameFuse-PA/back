@@ -41,16 +41,13 @@ export class LiveChatGateWay
         joinGameSessionDTO: JoinGameSessionDTO,
     ) {
         await this.liveChatService.connectRoom(client, joinGameSessionDTO);
-        
+
         client.on('joinGameSessionVisio', async (content) => {
             this.liveChatService.joinVisio(client, content);
-        })
+        });
 
         client.on('disconnect', () => {
-            this.liveChatService.disconnectFromRoom(
-                client,
-                client.data.user,
-            );
+            this.liveChatService.disconnectFromRoom(client, client.data.user);
         });
         client.on('chat', async (content) => {
             console.log('jai recu un message : ' + content.content);
