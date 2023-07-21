@@ -74,7 +74,7 @@ jobs:
 
       - name: transfer files to remote server
         run: |
-          scp -o StrictHostKeyChecking=no -r ${{ github.workspace }} ${{ secrets.USERNAME }}@${{ secrets.HOST }}:${{env.PATH_TO_CODE}}
+          scp -o StrictHostKeyChecking=no -r git@github.com:${{ github.workspace }} ${{ secrets.USERNAME }}@${{ secrets.HOST }}:${{env.PATH_TO_CODE}}
 
       - name: executing remote ssh commands using password
         uses: appleboy/ssh-action@v0.1.10
