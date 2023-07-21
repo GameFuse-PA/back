@@ -147,7 +147,7 @@ export class RunnerService {
 
         let processArgs = [];
 
-        if (game.language == LanguageEnum.Java) {
+        if (game.language === LanguageEnum.Java) {
             processArgs = ['-jar', `${outputDir}/${game.program.name}`];
         } else {
             processArgs = [`${outputDir}/${game.program.name}`];
