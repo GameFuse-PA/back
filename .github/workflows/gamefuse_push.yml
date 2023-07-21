@@ -92,7 +92,7 @@ jobs:
           host: ${{ secrets.HOST }}
           username: ${{ secrets.USERNAME }}
           key: ${{ secrets.KEY }}
-          source: app/*
+          source: app
           target: ${{env.PATH_TO_CODE}}
 
       - name: executing remote ssh commands using password
@@ -105,5 +105,4 @@ jobs:
             cd /var/www/html
             npm install
             npm run build
-            npm run start
 
