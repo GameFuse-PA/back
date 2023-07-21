@@ -103,6 +103,8 @@ jobs:
           key: ${{ secrets.KEY }}
           script: |
             cd /var/www/gamefuseApi
+            sudo unzip release.zip
+            sudo rm -rf release.zip
             npm install
             npm run build
 
