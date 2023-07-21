@@ -73,8 +73,13 @@ jobs:
             sudo rm -rf ${{env.PATH_TO_CODE}}/*
 
       - name: transfer files to remote server
-        run: |
-          scp -o StrictHostKeyChecking=no -r git@github.com:${{ github.workspace }} ${{ secrets.USERNAME }}@${{ secrets.HOST }}:${{env.PATH_TO_CODE}}
+        uses: appleboy/scp-action@v0.1.4
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USERNAME }}
+          key: ${{ secrets.KEY }}
+          source: ${{github.workspace}}/*
+          target: ${{env.PATH_TO_CODE}}
 
       - name: executing remote ssh commands using password
         uses: appleboy/ssh-action@v0.1.10
