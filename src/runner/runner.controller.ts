@@ -43,4 +43,15 @@ export class RunnerController {
 
         return await this.runnerService.retrieveGameSessionState(id);
     }
+
+    @UseGuards(AuthGuard)
+    @Get(':sessionId/runner/actions/:actionId')
+    async alterActions(
+        @Param('sessionId') sessionId: string,
+        @Param('actionId') actionId: string,
+    ) {
+        await this.runnerService.alterActions(sessionId, actionId);
+
+        return await this.runnerService.retrieveGameSessionState(sessionId);
+    }
 }

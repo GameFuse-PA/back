@@ -284,4 +284,26 @@ export class RunnerService {
 
         return await gameSession.save();
     }
+
+    public async alterActions(gameSessionId: string, actionId: string) {
+        const gameSession = await this.gameSessionService.getGameSessionById(
+            gameSessionId,
+        );
+
+        if (!gameSession) {
+            throw new NotFoundException("La session de jeu n'existe pas");
+        }
+
+        const index = gameSession.actions.findIndex(
+            (action) => action._id.toString() == actionId,
+        );
+
+        if (index == -1) {
+            throw new NotFoundException("L'action n'existe pas");
+        }
+
+        gameSession.actions = gameSession.actions.slice(0, index + 1);
+
+        return await gameSession.save();
+    }
 }
