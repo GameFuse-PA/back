@@ -106,7 +106,7 @@ export class GamesController {
             program: Express.Multer.File[];
             entry: Express.Multer.File[];
         },
-        @Body() addGameDto: UpdateGameDto,
+        @Body() updateGameDto: UpdateGameDto,
         @Request() req,
         @Param('id') gameId: string,
     ) {
@@ -134,7 +134,7 @@ export class GamesController {
 
         return this.gamesService.updateGame(
             gameId,
-            addGameDto,
+            updateGameDto,
             files.banner ? files.banner[0] : null,
             files.program ? files.program[0] : null,
             files.entry ? files.entry[0] : null,

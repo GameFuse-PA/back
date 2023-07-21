@@ -6,4 +6,7 @@ export class AddGameDto {
 
     @IsNotEmpty({ message: 'Description requise' })
     description: string;
+
+    @IsNotEmpty({ message: 'Langage requis' })
+    language: string;
 }

@@ -7,6 +7,8 @@ import { AddGameDto } from './dto/addGame.dto';
 import { UsersService } from '../users/users.service';
 import { EntryArgumentDto } from './dto/entryArgument.dto';
 import { validate } from 'class-validator';
+import { UpdateGameDto } from './dto/updateGame.dto';
+import { LanguageEnum } from './enum/language.enum';
 
 @Injectable()
 export class GamesService {
@@ -48,14 +50,13 @@ export class GamesService {
         );
 
         const newGame = new this.gameModel({
-            name: game.name,
-            description: game.description,
             banner: bannerFile,
             program: programFile,
             entry: entryFile,
             createdBy: user,
             minPlayers: playersEntry.min,
             maxPlayers: playersEntry.max,
+            ...game,
         });
 
         return await newGame.save();
@@ -108,7 +109,7 @@ export class GamesService {
 
     async updateGame(
         gameId: string,
-        game: AddGameDto,
+        game: UpdateGameDto,
         banner: Express.Multer.File,
         program: Express.Multer.File,
         entry: Express.Multer.File,
@@ -164,7 +165,7 @@ export class GamesService {
 
         const gameFile = await this.fileService.uploadFile(
             newFile.buffer,
-            `${Date.now()}.${newFile.mimetype.split('/')[1]}`,
+            `${Date.now()}.${newFile.originalname.split('.').pop()}`,
             `game-${type}`,
             newFile.mimetype,
         );
