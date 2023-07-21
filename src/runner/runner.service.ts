@@ -303,6 +303,8 @@ export class RunnerService {
         }
 
         gameSession.actions = gameSession.actions.slice(0, index + 1);
+        gameSession.winner = null;
+        gameSession.status = GameSessionStatus.In_Progress;
 
         return await gameSession.save();
     }
