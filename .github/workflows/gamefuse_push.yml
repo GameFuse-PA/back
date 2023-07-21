@@ -74,7 +74,7 @@ jobs:
 
       - name: transfer files to remote server
         run: |
-          scp -r ${{ github.workspace }}/dist ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }}:${{env.PATH_TO_CODE}}
+          scp -r ${{ github.workspace }}/dist ${{ secrets.USERNAME }}@${{ secrets.HOST }}:${{env.PATH_TO_CODE}}
 
       - name: executing remote ssh commands using password
         uses: appleboy/ssh-action@v0.1.10
