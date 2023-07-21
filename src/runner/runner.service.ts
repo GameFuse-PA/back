@@ -176,6 +176,7 @@ export class RunnerService {
                         key: pastAction.key,
                         type: pastAction.type,
                         player: indexOfPlayer,
+                        button: pastAction.button,
                     },
                 ],
             };
