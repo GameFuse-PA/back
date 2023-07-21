@@ -79,7 +79,8 @@ jobs:
           username: ${{ secrets.USERNAME }}
           key: ${{ secrets.KEY }}
           script: |
-            sudo rm -rf ${{env.PATH_TO_CODE}}/*
+            cd /var/www/gamefuseApi
+            sudo rm -v !("back")
 
       - name: Download artifact from build job
         uses: actions/download-artifact@v3
@@ -103,8 +104,6 @@ jobs:
           key: ${{ secrets.KEY }}
           script: |
             cd /var/www/gamefuseApi
-            sudo unzip release.zip
+            sudo unzip -o release.zip
             sudo rm -rf release.zip
-            npm install
-            npm run build
 
