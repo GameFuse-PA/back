@@ -70,6 +70,10 @@ export class ConversationsService {
         );
     }
 
+    async getConversationById(conversationId: string) {
+        return this.conversationModel.findById(conversationId);
+    }
+
     async updateConversation(
         message: MessageDocument,
         senderId: string,

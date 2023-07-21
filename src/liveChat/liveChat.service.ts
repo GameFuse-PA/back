@@ -13,6 +13,7 @@ import { MessageForFrontConversation } from './Models/MessageForFrontConversatio
 import { JoinGameSessionDTO } from './dto/JoinGameSessionDTO';
 import { GameSessionService } from '../game-session/game-session.service';
 import { JoinGameSessionVisioDTO } from './dto/JoinGameSessionVisioDTO';
+import { ConversationDocument } from '../schemas/conversation.schema';
 
 @Injectable()
 export class LiveChatService {
@@ -34,7 +35,7 @@ export class LiveChatService {
             joinGameSessionDTO.gameSessionId,
             client.data.user,
         );
-        client.join(joinGameSessionDTO.conversationId);
+        client.join(`game-session${joinGameSessionDTO.conversationId}`);
     }
 
     public async joinVisio(
@@ -55,7 +56,7 @@ export class LiveChatService {
         client.broadcast.to(user.roomId).emit('user-disconnected', user.id);
     }
 
-    public async sendChat(
+    public async sendChatToConversation(
         server: Server,
         senderId: string,
         message: MessageForChat,
@@ -103,11 +104,27 @@ export class LiveChatService {
         server.to(message.to).emit('new-message', messageToReturn);
     }
 
+    public async sendChat(
+        client: Socket,
+        server: Server,
+        senderId: string,
+        message: MessageForChat,
+    ) {
+        const conversation: ConversationDocument =
+            await this.conversationsService.getConversationById(
+                message.conversationId,
+            );
+        if (conversation.isGameChat === true) {
+            await this.sendChatToGameSession(client, senderId, message);
+        } else {
+            await this.sendChatToConversation(server, senderId, message);
+        }
+    }
+
     public async sendChatToGameSession(
         client: Socket,
         senderId: string,
         message: MessageForChat,
-        joinGameSessionDTO: JoinGameSessionDTO,
     ) {
         const sender = await this.usersService.findOneById(senderId);
         if (sender === undefined || sender === null) {
@@ -121,7 +138,7 @@ export class LiveChatService {
             await this.conversationsService.updateGameSessionChat(
                 savedMessage,
                 senderId,
-                joinGameSessionDTO.gameSessionId,
+                message.to,
             );
 
         const messageToReturn: MessageForFrontConversation = {
@@ -132,8 +149,6 @@ export class LiveChatService {
             date: new Date(),
             conversationId: conversation._id,
         };
-        client.broadcast
-            .to(joinGameSessionDTO.conversationId)
-            .emit('new-message', messageToReturn);
+        client.broadcast.to(message.to).emit('new-message', messageToReturn);
     }
 }

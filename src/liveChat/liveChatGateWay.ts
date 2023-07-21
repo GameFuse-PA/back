@@ -11,6 +11,8 @@ import { Server, Socket } from 'socket.io';
 import { LiveChatService } from './liveChat.service';
 import { WebSocketAuthGuard } from '../guards/WebSocketAuthGuard';
 import { JoinGameSessionDTO } from './dto/JoinGameSessionDTO';
+import { MessageForFrontConversation } from './Models/MessageForFrontConversation';
+import { MessageForChat } from './Models/MessageForChat';
 @WebSocketGateway({
     cors: { origin: '*', methods: ['GET', 'POST'] },
     path: '/socket',
@@ -35,44 +37,50 @@ export class LiveChatGateWay
     }
 
     @UseGuards(WebSocketAuthGuard)
-    @SubscribeMessage('roomAccessRequest')
+    @SubscribeMessage('connect-game-session') //roomAccessRequest
     async handleJoinRoom(
         client: Socket,
         joinGameSessionDTO: JoinGameSessionDTO,
     ) {
         await this.liveChatService.connectRoom(client, joinGameSessionDTO);
-
-        client.on('joinGameSessionVisio', async (content) => {
-            this.liveChatService.joinVisio(client, content);
-        });
-
-        client.on('disconnect', () => {
-            this.liveChatService.disconnectFromRoom(client, client.data.user);
-        });
-        client.on('chat', async (content) => {
-            await this.liveChatService.sendChatToGameSession(
-                client,
-                client.data.user,
-                content,
-                joinGameSessionDTO,
-            );
-        });
     }
 
     @UseGuards(WebSocketAuthGuard)
-    @SubscribeMessage('chatAccessRequest')
-    handleJoinConversation(client: Socket) {
-        this.liveChatService.connect(client, client.data.user);
+    @SubscribeMessage('connect-game-session-visio')
+    async handleJoinVisio(client: Socket, content: any) {
+        console.log("connexion a la gamesession")
+        await this.liveChatService.joinVisio(client, content);
+    }
 
-        client.on('disconnect', () => {
-            this.liveChatService.disconnect(client, client.data.user);
-        });
-        client.on('chat', async (content) => {
-            await this.liveChatService.sendChat(
-                this.server,
-                client.data.user,
-                content,
-            );
-        });
+    @UseGuards(WebSocketAuthGuard)
+    @SubscribeMessage('disconnect-game-session')
+    async disconnect(client: Socket) {
+        console.log("deco de la gamesession")
+        this.liveChatService.disconnectFromRoom(client, client.data.user);
+    }
+
+    @UseGuards(WebSocketAuthGuard)
+    @SubscribeMessage('chat')
+    async gameSessionChat(client: Socket, content: MessageForChat) {
+        await this.liveChatService.sendChat(
+            client,
+            this.server,
+            client.data.user,
+            content,
+        );
+    }
+
+    @UseGuards(WebSocketAuthGuard)
+    @SubscribeMessage('connect-chat')
+    handleJoinConversation(client: Socket) {
+        console.log("connexion au chat")
+        this.liveChatService.connect(client, client.data.user);
+    }
+
+    @UseGuards(WebSocketAuthGuard)
+    @SubscribeMessage('disconnect-chat')
+    disconnectFromChat(client: Socket) {
+        console.log("deconnexion au chat")
+        this.liveChatService.disconnect(client, client.data.user);
     }
 }
