@@ -23,7 +23,10 @@ export class FriendsController {
     @UseGuards(AuthGuard)
     @Delete(':id')
     async deleteFriend(@Request() req, @Param('id') id: string) {
-        const deletedFriend = await this.friendsService.deleteFriend(req.userId, id);
+        const deletedFriend = await this.friendsService.deleteFriend(
+            req.userId,
+            id,
+        );
         return {
             message: `${deletedFriend.username} a été supprimé de vos amis`,
         };

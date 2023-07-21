@@ -4,4 +4,3 @@ export interface MessageForFrontConversation {
     date: Date;
     conversationId: string;
 }
-

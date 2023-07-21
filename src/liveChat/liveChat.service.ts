@@ -12,7 +12,7 @@ import { ConversationsService } from '../conversations/conversations.service';
 import { MessageForFrontConversation } from './Models/MessageForFrontConversation';
 import { JoinGameSessionDTO } from './dto/JoinGameSessionDTO';
 import { GameSessionService } from '../game-session/game-session.service';
-import { JoinGameSessionVisioDTO } from "./dto/JoinGameSessionVisioDTO";
+import { JoinGameSessionVisioDTO } from './dto/JoinGameSessionVisioDTO';
 
 @Injectable()
 export class LiveChatService {
@@ -29,7 +29,7 @@ export class LiveChatService {
 
     public async connectRoom(
         client: Socket,
-        joinGameSessionDTO: JoinGameSessionDTO
+        joinGameSessionDTO: JoinGameSessionDTO,
     ) {
         await this.gameSessionService.addUserToGameSession(
             joinGameSessionDTO.gameSessionId,
@@ -37,12 +37,14 @@ export class LiveChatService {
         );
         client.join(joinGameSessionDTO.conversationId);
     }
-    
+
     public async joinVisio(
         client: Socket,
         joinGameSessionVisioDTO: JoinGameSessionVisioDTO,
     ) {
-        client.broadcast.to(joinGameSessionVisioDTO.conversationId).emit('user-connected', joinGameSessionVisioDTO.peerId);
+        client.broadcast
+            .to(joinGameSessionVisioDTO.conversationId)
+            .emit('user-connected', joinGameSessionVisioDTO.peerId);
     }
 
     public disconnect(client: Socket, userId: string) {
@@ -50,10 +52,7 @@ export class LiveChatService {
         client.disconnect();
     }
 
-    public disconnectFromRoom(
-        client: Socket,
-        user: UserFromFrontDTO,
-    ) {
+    public disconnectFromRoom(client: Socket, user: UserFromFrontDTO) {
         client.disconnect();
         client.broadcast.to(user.roomId).emit('user-disconnected', user.id);
     }
@@ -135,6 +134,8 @@ export class LiveChatService {
             date: new Date(),
             conversationId: conversation._id,
         };
-        client.broadcast.to(joinGameSessionDTO.conversationId).emit('new-message', messageToReturn);
+        client.broadcast
+            .to(joinGameSessionDTO.conversationId)
+            .emit('new-message', messageToReturn);
     }
 }

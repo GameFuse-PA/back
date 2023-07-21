@@ -1,10 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import {
-    Document,
-    HydratedDocument,
-    Schema as MongooseSchema,
-    Types,
-} from 'mongoose';
+import { Document, HydratedDocument, Schema as MongooseSchema } from 'mongoose';
 import { ActionTypeEnum } from '../runner/enum/action-type.enum';
 import { User } from './user.schema';
 import { MouseButtonEnum } from '../runner/enum/mouse-button.enum';
