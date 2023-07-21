@@ -18,6 +18,7 @@ import {
 import { User } from '../schemas/user.schema';
 import { GameSessionStatus } from '../game-session/enum/game-session.enum';
 import { LanguageEnum } from '../games/enum/language.enum';
+import { Score, ScoreDocument } from '../schemas/score.schema';
 
 @Injectable()
 export class RunnerService {
@@ -28,6 +29,8 @@ export class RunnerService {
         private readonly actionModel: Model<ActionDocument>,
         @InjectModel(GameSessions.name)
         private readonly gameSessionModel: Model<GameSessionsDocument>,
+        @InjectModel(Score.name)
+        private readonly scoreModel: Model<ScoreDocument>,
     ) {}
 
     async retrieveGameSessionState(
@@ -65,10 +68,18 @@ export class RunnerService {
                     (score: any) => score == 1,
                 );
 
-                gameSession.winner = gameSession.players[winnerIndex];
-                gameSession.status = GameSessionStatus.Terminated;
+                const winner = gameSession.players[winnerIndex];
 
+                gameSession.winner = winner;
+                gameSession.status = GameSessionStatus.Terminated;
                 await gameSession.save();
+
+                const score = await this.scoreModel.create({
+                    game: gameSession.game,
+                });
+
+                winner.scores.push(score);
+                await winner.save();
             }
         }
 
