@@ -70,7 +70,7 @@ jobs:
           username: ${{ secrets.USERNAME }}
           key: ${{ secrets.KEY }}
           script: |
-            sudo rm -r ${{env.PATH_TO_CODE}}/*
+            sudo rm -rf ${{env.PATH_TO_CODE}}/*
 
       - name: transfer files to remote server
         run: |
