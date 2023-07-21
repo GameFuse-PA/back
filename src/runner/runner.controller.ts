@@ -1,6 +1,7 @@
 import {
     Body,
     Controller,
+    Delete,
     Get,
     Param,
     Post,
@@ -33,5 +34,13 @@ export class RunnerController {
             action,
             req.userId,
         );
+    }
+
+    @UseGuards(AuthGuard)
+    @Delete(':id/runner')
+    async resetRunner(@Param('id') id: string) {
+        await this.runnerService.resetGameSession(id);
+
+        return await this.runnerService.retrieveGameSessionState(id);
     }
 }

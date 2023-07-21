@@ -268,4 +268,20 @@ export class RunnerService {
 
         return player;
     }
+
+    public async resetGameSession(gameSessionId: string) {
+        const gameSession = await this.gameSessionService.getGameSessionById(
+            gameSessionId,
+        );
+
+        if (!gameSession) {
+            throw new NotFoundException("La session de jeu n'existe pas");
+        }
+
+        gameSession.actions = [];
+        gameSession.winner = null;
+        gameSession.status = GameSessionStatus.In_Progress;
+
+        return await gameSession.save();
+    }
 }
