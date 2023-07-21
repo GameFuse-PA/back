@@ -51,7 +51,7 @@ jobs:
 
   deploy_to_production:
     runs-on: ubuntu-latest
-    #needs: create_release
+    needs: build
     #if: github.ref == 'refs/heads/main'
     steps:
 #      - name: Deploy to Production
@@ -70,7 +70,7 @@ jobs:
           username: ${{ secrets.USERNAME }}
           key: ${{ secrets.KEY }}
           script: |
-            rm -r ${{env.PATH_TO_CODE}}/*
+            sudo rm -r ${{env.PATH_TO_CODE}}/*
 
       - name: transfer files to remote server
         run: |
