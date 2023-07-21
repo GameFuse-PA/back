@@ -24,7 +24,7 @@ export class LiveChatGateWay
     constructor(private liveChatService: LiveChatService) {}
 
     handleConnection(client: Socket) {
-        console.log('Client connected:', client.data.user);
+        console.log('Client connected:', client.id);
     }
 
     handleDisconnect(client: Socket) {
@@ -50,7 +50,6 @@ export class LiveChatGateWay
             this.liveChatService.disconnectFromRoom(client, client.data.user);
         });
         client.on('chat', async (content) => {
-            console.log('jai recu un message : ' + content.content);
             await this.liveChatService.sendChatToGameSession(
                 client,
                 client.data.user,
@@ -69,7 +68,6 @@ export class LiveChatGateWay
             this.liveChatService.disconnect(client, client.data.user);
         });
         client.on('chat', async (content) => {
-            console.log('jai recu un message : ' + content.content);
             await this.liveChatService.sendChat(
                 this.server,
                 client.data.user,
