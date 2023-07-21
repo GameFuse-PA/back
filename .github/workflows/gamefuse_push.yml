@@ -92,7 +92,7 @@ jobs:
           host: ${{ secrets.HOST }}
           username: ${{ secrets.USERNAME }}
           key: ${{ secrets.KEY }}
-          source: app
+          source: release.zip
           target: ${{env.PATH_TO_CODE}}
 
       - name: executing remote ssh commands using password
