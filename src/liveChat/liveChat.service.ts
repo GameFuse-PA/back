@@ -6,7 +6,6 @@ import {
 } from '@nestjs/common';
 import { Server, Socket } from 'socket.io';
 import { UsersService } from '../users/users.service';
-import { UserFromFrontDTO } from './Models/UserFromFrontDTO';
 import { MessageForChat } from './Models/MessageForChat';
 import { ConversationsService } from '../conversations/conversations.service';
 import { MessageForFrontConversation } from './Models/MessageForFrontConversation';
@@ -43,17 +42,19 @@ export class LiveChatService {
         joinGameSessionVisioDTO: JoinGameSessionVisioDTO,
     ) {
         client.broadcast
-            .to(joinGameSessionVisioDTO.conversationId)
+            .to(`game-session${joinGameSessionVisioDTO.conversationId}`)
             .emit('user-connected', joinGameSessionVisioDTO.peerId);
     }
 
-    public disconnect(client: Socket, userId: string) {
-        client.disconnect();
-    }
-
-    public disconnectFromRoom(client: Socket, user: UserFromFrontDTO) {
-        client.disconnect();
-        client.broadcast.to(user.roomId).emit('user-disconnected', user.id);
+    public disconnectFromGameSession(
+        client: Socket,
+        userId: string,
+        conversationId: string,
+    ) {
+        client.leave(`game-session${conversationId}`);
+        client.broadcast
+            .to(`game-session${conversationId}`)
+            .emit('user-disconnected', userId);
     }
 
     public async sendChatToConversation(
@@ -61,10 +62,6 @@ export class LiveChatService {
         senderId: string,
         message: MessageForChat,
     ) {
-        /*if (message.to === undefined || message.to === null) {
-            throw new BadRequestException('Any recipiend has been defined');
-        }*/
-
         const sender = await this.usersService.findOneById(senderId);
         if (sender === undefined || sender === null) {
             throw new BadRequestException('Any sender has been defined');
@@ -114,11 +111,19 @@ export class LiveChatService {
             await this.conversationsService.getConversationById(
                 message.conversationId,
             );
-        if (conversation.isGameChat === true) {
-            await this.sendChatToGameSession(client, senderId, message);
-        } else {
-            await this.sendChatToConversation(server, senderId, message);
+        for(let i = 0; i < conversation.users.length; i++){
+            const newUserId = conversation.users[i].toString()
+            if(newUserId == senderId) {
+                if (conversation.isGameChat === true) {
+                    await this.sendChatToGameSession(client, senderId, message);
+                } else {
+                    await this.sendChatToConversation(server, senderId, message);
+                }
+                return;
+            }
         }
+        throw new UnauthorizedException("You do not have the right to send this message here")
+
     }
 
     public async sendChatToGameSession(
@@ -138,7 +143,7 @@ export class LiveChatService {
             await this.conversationsService.updateGameSessionChat(
                 savedMessage,
                 senderId,
-                message.to,
+                message.conversationId,
             );
 
         const messageToReturn: MessageForFrontConversation = {
@@ -149,6 +154,6 @@ export class LiveChatService {
             date: new Date(),
             conversationId: conversation._id,
         };
-        client.broadcast.to(message.to).emit('new-message', messageToReturn);
+        client.broadcast.to(`game-session${message.conversationId}`).emit('new-message', messageToReturn);
     }
 }

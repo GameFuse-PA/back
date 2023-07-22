@@ -48,15 +48,13 @@ export class LiveChatGateWay
     @UseGuards(WebSocketAuthGuard)
     @SubscribeMessage('connect-game-session-visio')
     async handleJoinVisio(client: Socket, content: any) {
-        console.log("connexion a la gamesession")
         await this.liveChatService.joinVisio(client, content);
     }
 
     @UseGuards(WebSocketAuthGuard)
     @SubscribeMessage('disconnect-game-session')
-    async disconnect(client: Socket) {
-        console.log("deco de la gamesession")
-        this.liveChatService.disconnectFromRoom(client, client.data.user);
+    async disconnect(client: Socket, gameSessionId: string) {
+        this.liveChatService.disconnectFromGameSession(client, client.data.user, gameSessionId);
     }
 
     @UseGuards(WebSocketAuthGuard)
@@ -71,16 +69,14 @@ export class LiveChatGateWay
     }
 
     @UseGuards(WebSocketAuthGuard)
-    @SubscribeMessage('connect-chat')
+    @SubscribeMessage('connect-conversation')
     handleJoinConversation(client: Socket) {
-        console.log("connexion au chat")
         this.liveChatService.connect(client, client.data.user);
     }
 
     @UseGuards(WebSocketAuthGuard)
-    @SubscribeMessage('disconnect-chat')
-    disconnectFromChat(client: Socket) {
-        console.log("deconnexion au chat")
-        this.liveChatService.disconnect(client, client.data.user);
+    @SubscribeMessage('disconnect-conversation')
+    handleDisconnectConversation(client: any) {
+        client.leave(client.data.user);
     }
 }

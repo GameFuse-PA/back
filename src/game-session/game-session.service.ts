@@ -66,7 +66,7 @@ export class GameSessionService {
 
     async createGameSession(userId: string, gameSessionDto: GameSessionDto) {
         const conversation = new this.conversationModel({
-            users: [userId],
+            users: gameSessionDto.players,
             isGameChat: true,
         });
 
