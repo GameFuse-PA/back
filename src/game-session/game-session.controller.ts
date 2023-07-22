@@ -1,4 +1,12 @@
-import { Controller, Post, UseGuards, Request, Body } from '@nestjs/common';
+import {
+    Controller,
+    Post,
+    UseGuards,
+    Request,
+    Body,
+    Get,
+    Param,
+} from '@nestjs/common';
 import { GameSessionService } from './game-session.service';
 import { AuthGuard } from '../guards/auth.guard';
 import { GameSessionDto } from './dto/game-session.dto';
@@ -11,5 +19,11 @@ export class GameSessionController {
     @Post()
     createGameSession(@Request() req, @Body() body: GameSessionDto) {
         return this.gameSessionService.createGameSession(req.userId, body);
+    }
+
+    @UseGuards(AuthGuard)
+    @Get(':id')
+    getGameSession(@Param('id') id: string) {
+        return this.gameSessionService.getGameSessionById(id);
     }
 }
