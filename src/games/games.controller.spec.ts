@@ -1,6 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { GamesController } from './games.controller';
-import { JwtModule, JwtService } from "@nestjs/jwt";
+import { GamesModule } from './games.module';
+import { CommonModule } from '../common/common.module';
 
 describe('GamesController', () => {
     let controller: GamesController;
@@ -8,7 +9,7 @@ describe('GamesController', () => {
     beforeEach(async () => {
         const module: TestingModule = await Test.createTestingModule({
             controllers: [GamesController],
-            imports: [JwtModule],
+            imports: [GamesModule, CommonModule],
         }).compile();
 
         controller = module.get<GamesController>(GamesController);

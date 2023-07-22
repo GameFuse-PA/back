@@ -9,5 +9,6 @@ import { FileModule } from '../amazon/file.module';
     imports: [JwtModule, GameSessionModule, FileModule],
     controllers: [RunnerController],
     providers: [RunnerService],
+    exports: [RunnerService],
 })
 export class RunnerModule {}
