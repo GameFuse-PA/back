@@ -13,12 +13,6 @@ import { JwtModule } from '@nestjs/jwt';
         MailModule,
         JwtModule,
     ],
-    exports: [
-        SchemasModule,
-        DatabaseModule,
-        ConfigurationModule,
-        MailModule,
-        JwtModule,
-    ],
+    exports: [SchemasModule, ConfigurationModule, MailModule, JwtModule],
 })
 export class CommonModule {}
