@@ -1,5 +1,6 @@
 import {
     BadRequestException,
+    ForbiddenException,
     Injectable,
     NotFoundException,
     UnauthorizedException,
@@ -30,11 +31,17 @@ export class LiveChatService {
         client: Socket,
         joinGameSessionDTO: JoinGameSessionDTO,
     ) {
-        await this.gameSessionService.addUserToGameSession(
-            joinGameSessionDTO.gameSessionId,
-            client.data.user,
-        );
-        client.join(`game-session${joinGameSessionDTO.conversationId}`);
+        try {
+            await this.gameSessionService.joiningGameSessionControl(
+                joinGameSessionDTO.gameSessionId,
+                client.data.user,
+            );
+            client.join(`game-session${joinGameSessionDTO.conversationId}`);
+        } catch {
+            throw new ForbiddenException(
+                'You do not have the right to do this action.',
+            );
+        }
     }
 
     public async joinVisio(
@@ -43,7 +50,7 @@ export class LiveChatService {
     ) {
         client.broadcast
             .to(`game-session${joinGameSessionVisioDTO.conversationId}`)
-            .emit('user-connected', joinGameSessionVisioDTO.peerId);
+            .emit('user-connected', joinGameSessionVisioDTO.peerId, client.data.user);
     }
 
     public disconnectFromGameSession(
@@ -111,19 +118,24 @@ export class LiveChatService {
             await this.conversationsService.getConversationById(
                 message.conversationId,
             );
-        for(let i = 0; i < conversation.users.length; i++){
-            const newUserId = conversation.users[i].toString()
-            if(newUserId == senderId) {
+        for (let i = 0; i < conversation.users.length; i++) {
+            const newUserId = conversation.users[i].toString();
+            if (newUserId == senderId) {
                 if (conversation.isGameChat === true) {
                     await this.sendChatToGameSession(client, senderId, message);
                 } else {
-                    await this.sendChatToConversation(server, senderId, message);
+                    await this.sendChatToConversation(
+                        server,
+                        senderId,
+                        message,
+                    );
                 }
                 return;
             }
         }
-        throw new UnauthorizedException("You do not have the right to send this message here")
-
+        throw new UnauthorizedException(
+            'You do not have the right to send this message here',
+        );
     }
 
     public async sendChatToGameSession(
@@ -154,6 +166,8 @@ export class LiveChatService {
             date: new Date(),
             conversationId: conversation._id,
         };
-        client.broadcast.to(`game-session${message.conversationId}`).emit('new-message', messageToReturn);
+        client.broadcast
+            .to(`game-session${message.conversationId}`)
+            .emit('new-message', messageToReturn);
     }
 }

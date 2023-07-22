@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { ForbiddenException, Injectable } from "@nestjs/common";
 import {
     GameSessions,
     GameSessionsDocument,
@@ -23,8 +23,8 @@ export class GameSessionService {
         private userModel: Model<UserDocument>,
     ) {}
 
-    async getGameSession(gameSessionId: string) {
-        return await this.gameSessionModel
+    async getGameSession(gameSessionId: string, userId: string) {
+        const gameSession = await this.gameSessionModel
             .findById(gameSessionId)
             .populate({
                 path: 'conversation',
@@ -36,6 +36,12 @@ export class GameSessionService {
                 },
             })
             .exec();
+        for (let i = 0; i < gameSession.players.length; i++){
+            if (gameSession.players[i]._id.toString() === userId) {
+                return gameSession;
+            }
+        }
+        throw new ForbiddenException("Vous n'avez pas les droits nécessaires pour voir cette partie.")
     }
 
     async getMyGameSessions(id: string) {
@@ -80,13 +86,17 @@ export class GameSessionService {
         return await newGameSession.save();
     }
 
-    public async addUserToGameSession(gameSessionId: string, userId: string) {
+    public async joiningGameSessionControl(
+        gameSessionId: string,
+        userId: string,
+    ) {
         const gameSession = await this.gameSessionModel.findById(gameSessionId);
         const user = await this.userModel.findById(userId);
         if (!gameSession.players.includes(user._id)) {
-            gameSession.players.push(user._id);
+            throw new ForbiddenException(
+                "Vous n'avez pas les droits nécessaires pour cette action.",
+            );
         }
-        gameSession.save();
     }
 
     async getGameSessionById(id: string) {

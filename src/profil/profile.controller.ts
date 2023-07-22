@@ -51,7 +51,10 @@ export class ProfilController {
     @UseGuards(AuthGuard)
     @Get('game-sessions/:id')
     getGameSession(@Request() req, @Param('id') gameSessionId: string) {
-        return this.gameSessionService.getGameSession(gameSessionId);
+        return this.gameSessionService.getGameSession(
+            gameSessionId,
+            req.userId,
+        );
     }
 
     @UseGuards(AuthGuard)
