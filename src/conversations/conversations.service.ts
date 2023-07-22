@@ -52,6 +52,9 @@ export class ConversationsService {
                 path: 'messages',
                 populate: {
                     path: 'from',
+                    populate: {
+                        path: 'avatar',
+                    },
                 },
             })
             .exec();
