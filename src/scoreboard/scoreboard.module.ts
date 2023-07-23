@@ -7,5 +7,6 @@ import { JwtModule } from '@nestjs/jwt';
     imports: [JwtModule],
     controllers: [ScoreboardController],
     providers: [ScoreboardService],
+    exports: [ScoreboardService],
 })
 export class ScoreboardModule {}
