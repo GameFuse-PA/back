@@ -1,4 +1,4 @@
-import { Mongoose } from 'mongoose';
+import mongoose, { Mongoose } from 'mongoose';
 import { Test, TestingModule } from '@nestjs/testing';
 import { AppModule } from '../src/app.module';
 
@@ -16,5 +16,5 @@ beforeAll(async () => {
 });
 
 afterAll(async () => {
-    await mongoConnection.disconnect();
+    await mongoose.connection.close();
 });
