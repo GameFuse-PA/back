@@ -18,6 +18,7 @@ import {
 import { User } from '../schemas/user.schema';
 import { GameSessionStatus } from '../game-session/enum/game-session.enum';
 import { LanguageEnum } from '../games/enum/language.enum';
+import { AppConfigService } from '../configuration/app.config.service';
 
 @Injectable()
 export class RunnerService {
@@ -28,6 +29,7 @@ export class RunnerService {
         private readonly actionModel: Model<ActionDocument>,
         @InjectModel(GameSessions.name)
         private readonly gameSessionModel: Model<GameSessionsDocument>,
+        private appConfigService: AppConfigService,
     ) {}
 
     async retrieveGameSessionState(
@@ -101,6 +103,17 @@ export class RunnerService {
         };
     }
 
+    private getRunCommand(language: LanguageEnum) {
+        switch (language) {
+            case LanguageEnum.Python:
+                return this.appConfigService.getPythonRunCommand();
+            case LanguageEnum.Java:
+                return this.appConfigService.getJavaRunCommand();
+            default:
+                throw new BadRequestException('Langage non supporté');
+        }
+    }
+
     private async downloadGameFiles(game: any, outputDir: string) {
         if (!fs.existsSync(outputDir + `/${game.program.name}`)) {
             await this.fileService.downloadFile(
@@ -153,7 +166,7 @@ export class RunnerService {
             processArgs = [`${outputDir}/${game.program.name}`];
         }
 
-        const process = spawn(game.language, processArgs);
+        const process = spawn(this.getRunCommand(game.language), processArgs);
 
         const args = this.buildInitArgs(gameSession.players.length);
         const res = (await this.run(process, JSON.stringify(args))) as any;
