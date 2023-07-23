@@ -9,6 +9,7 @@ import { Invitations, InvitationsSchema } from './invitations.schema';
 import { Conversation, ConversationSchema } from './conversation.schema';
 import { Message, MessageSchema } from './messages.schema';
 import { Action, ActionSchema } from './action.schema';
+import { Score, ScoreSchema } from './score.schema';
 
 @Global()
 @Module({
@@ -34,6 +35,7 @@ import { Action, ActionSchema } from './action.schema';
         MongooseModule.forFeature([
             { name: Action.name, schema: ActionSchema },
         ]),
+        MongooseModule.forFeature([{ name: Score.name, schema: ScoreSchema }]),
     ],
     exports: [
         MongooseModule.forFeature([{ name: User.name, schema: UserSchema }]),
@@ -57,6 +59,7 @@ import { Action, ActionSchema } from './action.schema';
         MongooseModule.forFeature([
             { name: Action.name, schema: ActionSchema },
         ]),
+        MongooseModule.forFeature([{ name: Score.name, schema: ScoreSchema }]),
     ],
 })
 export class SchemasModule {}
