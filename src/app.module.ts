@@ -19,6 +19,7 @@ import { InvitationsModule } from './invitations/invitations.module';
 import { RunnerModule } from './runner/runner.module';
 import { SocketModule } from './socket/socket.module';
 import { ScoreboardModule } from './scoreboard/scoreboard.module';
+import { CommonModule } from './common/common.module';
 
 @Module({
     imports: [
@@ -40,6 +41,7 @@ import { ScoreboardModule } from './scoreboard/scoreboard.module';
         RunnerModule,
         SocketModule,
         ScoreboardModule,
+        CommonModule,
     ],
     controllers: [AppController],
     providers: [AppService],

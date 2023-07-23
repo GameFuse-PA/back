@@ -14,9 +14,10 @@ export class MailConfigService {
 
     getResetPasswordMail(token: string) {
         const mail = this.mailTemplates.forgotPassword;
+        const urlFront = this.appConfiguration.frontUrl;
         return {
             subject: mail.subject,
-            body: this.renderMailBody(mail.html, { token }),
+            body: this.renderMailBody(mail.html, { urlFront, token }),
         };
     }
 
