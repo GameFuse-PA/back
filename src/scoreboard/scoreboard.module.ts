@@ -1,9 +1,11 @@
 import { Module } from '@nestjs/common';
 import { ScoreboardController } from './scoreboard.controller';
 import { ScoreboardService } from './scoreboard.service';
+import { JwtModule } from '@nestjs/jwt';
 
 @Module({
-  controllers: [ScoreboardController],
-  providers: [ScoreboardService]
+    imports: [JwtModule],
+    controllers: [ScoreboardController],
+    providers: [ScoreboardService],
 })
 export class ScoreboardModule {}
