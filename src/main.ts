@@ -11,7 +11,7 @@ async function bootstrap() {
             'http://localhost:4200',
             'https://gamefuse.fr',
             'https://www.gamefuse.fr',
-            'https://develop.dy4skeilg164o.amplifyapp.com/',
+            'https://develop.dy4skeilg164o.amplifyapp.com',
         ],
     });
     await app.listen(3000);
