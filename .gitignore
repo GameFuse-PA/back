@@ -36,3 +36,8 @@ lerna-debug.log*
 
 # IntelliJ IDEA
 .idea/*
+
+# Env files
+.env
+
+sessions/*

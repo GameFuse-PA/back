@@ -1,0 +1,10 @@
+{
+  "forgotPassword": {
+    "subject": "Réinitialisation de votre mot de passe",
+    "html": "<h1>Bonjour</h1>\n<p>Vous avez demandé récemment un changement de mot de passe voici le lien vous permettant de le réinitialiser</p>\n<a href=\"{{urlFront}}/newPassword?token={{token}}\">{{urlFront}}/newPassword?token={{token}}</a>"
+  },
+  "invitations": {
+    "subject": "Invitation à devenir ami",
+    "html": "<h1>Bonjour</h1>\n<p>{{username}} vous a invité à devenir ami</p>\n<a href=\"{{urlFront}}/invitation?token={{token}}\">{{urlFront}}/invitation?token={{token}}</a>"
+  }
+}
