@@ -70,6 +70,10 @@ export class ConversationsService {
         );
     }
 
+    async getConversationById(conversationId: string) {
+        return this.conversationModel.findById(conversationId);
+    }
+
     async updateConversation(
         message: MessageDocument,
         senderId: string,
@@ -98,9 +102,11 @@ export class ConversationsService {
     async updateGameSessionChat(
         message: MessageDocument,
         senderId: string,
-        gameSessionId: string,
+        conversationId: string,
     ) {
-        const gameSession = await this.gameSessionModel.findById(gameSessionId);
+        const gameSession = await this.gameSessionModel.findOne({
+            conversation: conversationId,
+        });
         const gameSessionConversation = await this.conversationModel.findById(
             gameSession.conversation._id,
         );
