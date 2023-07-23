@@ -18,6 +18,7 @@ import { ConversationsModule } from './conversations/conversations.module';
 import { InvitationsModule } from './invitations/invitations.module';
 import { RunnerModule } from './runner/runner.module';
 import { SocketModule } from './socket/socket.module';
+import { ScoreboardModule } from './scoreboard/scoreboard.module';
 import { CommonModule } from './common/common.module';
 
 @Module({
@@ -39,6 +40,7 @@ import { CommonModule } from './common/common.module';
         InvitationsModule,
         RunnerModule,
         SocketModule,
+        ScoreboardModule,
         CommonModule,
     ],
     controllers: [AppController],

@@ -48,4 +48,12 @@ export class AppConfigService {
     get frontUrl(): string {
         return this.configService.get<string>('FRONT_URL');
     }
+
+    getPythonRunCommand(): string {
+        return this.configService.get<string>('PYTHON_COMMAND');
+    }
+
+    getJavaRunCommand(): string {
+        return this.configService.get<string>('JAVA_COMMAND');
+    }
 }

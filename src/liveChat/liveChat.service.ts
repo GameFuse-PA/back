@@ -1,18 +1,19 @@
 import {
     BadRequestException,
+    ForbiddenException,
     Injectable,
     NotFoundException,
     UnauthorizedException,
 } from '@nestjs/common';
 import { Server, Socket } from 'socket.io';
 import { UsersService } from '../users/users.service';
-import { UserFromFrontDTO } from './Models/UserFromFrontDTO';
 import { MessageForChat } from './Models/MessageForChat';
 import { ConversationsService } from '../conversations/conversations.service';
 import { MessageForFrontConversation } from './Models/MessageForFrontConversation';
 import { JoinGameSessionDTO } from './dto/JoinGameSessionDTO';
 import { GameSessionService } from '../game-session/game-session.service';
 import { JoinGameSessionVisioDTO } from './dto/JoinGameSessionVisioDTO';
+import { ConversationDocument } from '../schemas/conversation.schema';
 
 @Injectable()
 export class LiveChatService {
@@ -30,11 +31,17 @@ export class LiveChatService {
         client: Socket,
         joinGameSessionDTO: JoinGameSessionDTO,
     ) {
-        await this.gameSessionService.addUserToGameSession(
-            joinGameSessionDTO.gameSessionId,
-            client.data.user,
-        );
-        client.join(joinGameSessionDTO.conversationId);
+        try {
+            await this.gameSessionService.joiningGameSessionControl(
+                joinGameSessionDTO.gameSessionId,
+                client.data.user,
+            );
+            client.join(`game-session${joinGameSessionDTO.conversationId}`);
+        } catch {
+            throw new ForbiddenException(
+                'You do not have the right to do this action.',
+            );
+        }
     }
 
     public async joinVisio(
@@ -42,28 +49,26 @@ export class LiveChatService {
         joinGameSessionVisioDTO: JoinGameSessionVisioDTO,
     ) {
         client.broadcast
-            .to(joinGameSessionVisioDTO.conversationId)
-            .emit('user-connected', joinGameSessionVisioDTO.peerId);
+            .to(`game-session${joinGameSessionVisioDTO.conversationId}`)
+            .emit('user-connected', joinGameSessionVisioDTO.peerId, client.data.user);
     }
 
-    public disconnect(client: Socket, userId: string) {
-        client.disconnect();
+    public disconnectFromGameSession(
+        client: Socket,
+        userId: string,
+        conversationId: string,
+    ) {
+        client.leave(`game-session${conversationId}`);
+        client.broadcast
+            .to(`game-session${conversationId}`)
+            .emit('user-disconnected', userId);
     }
 
-    public disconnectFromRoom(client: Socket, user: UserFromFrontDTO) {
-        client.disconnect();
-        client.broadcast.to(user.roomId).emit('user-disconnected', user.id);
-    }
-
-    public async sendChat(
+    public async sendChatToConversation(
         server: Server,
         senderId: string,
         message: MessageForChat,
     ) {
-        /*if (message.to === undefined || message.to === null) {
-            throw new BadRequestException('Any recipiend has been defined');
-        }*/
-
         const sender = await this.usersService.findOneById(senderId);
         if (sender === undefined || sender === null) {
             throw new BadRequestException('Any sender has been defined');
@@ -103,11 +108,40 @@ export class LiveChatService {
         server.to(message.to).emit('new-message', messageToReturn);
     }
 
+    public async sendChat(
+        client: Socket,
+        server: Server,
+        senderId: string,
+        message: MessageForChat,
+    ) {
+        const conversation: ConversationDocument =
+            await this.conversationsService.getConversationById(
+                message.conversationId,
+            );
+        for (let i = 0; i < conversation.users.length; i++) {
+            const newUserId = conversation.users[i].toString();
+            if (newUserId == senderId) {
+                if (conversation.isGameChat === true) {
+                    await this.sendChatToGameSession(client, senderId, message);
+                } else {
+                    await this.sendChatToConversation(
+                        server,
+                        senderId,
+                        message,
+                    );
+                }
+                return;
+            }
+        }
+        throw new UnauthorizedException(
+            'You do not have the right to send this message here',
+        );
+    }
+
     public async sendChatToGameSession(
         client: Socket,
         senderId: string,
         message: MessageForChat,
-        joinGameSessionDTO: JoinGameSessionDTO,
     ) {
         const sender = await this.usersService.findOneById(senderId);
         if (sender === undefined || sender === null) {
@@ -121,7 +155,7 @@ export class LiveChatService {
             await this.conversationsService.updateGameSessionChat(
                 savedMessage,
                 senderId,
-                joinGameSessionDTO.gameSessionId,
+                message.conversationId,
             );
 
         const messageToReturn: MessageForFrontConversation = {
@@ -133,7 +167,7 @@ export class LiveChatService {
             conversationId: conversation._id,
         };
         client.broadcast
-            .to(joinGameSessionDTO.conversationId)
+            .to(`game-session${message.conversationId}`)
             .emit('new-message', messageToReturn);
     }
 }

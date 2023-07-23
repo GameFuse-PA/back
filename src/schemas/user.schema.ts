@@ -6,6 +6,7 @@ import {
     Types,
 } from 'mongoose';
 import { File } from './file.schema';
+import { Score } from './score.schema';
 
 export type UserDocument = HydratedDocument<User>;
 
@@ -44,6 +45,13 @@ export class User extends Document {
         ref: 'File',
     })
     avatar: File;
+
+    @Prop({
+        required: false,
+        type: [{ type: MongooseSchema.Types.ObjectId, ref: 'Score' }],
+        default: [],
+    })
+    scores: Score[];
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);

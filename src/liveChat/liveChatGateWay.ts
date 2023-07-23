@@ -11,6 +11,8 @@ import { Server, Socket } from 'socket.io';
 import { LiveChatService } from './liveChat.service';
 import { WebSocketAuthGuard } from '../guards/WebSocketAuthGuard';
 import { JoinGameSessionDTO } from './dto/JoinGameSessionDTO';
+import { MessageForFrontConversation } from './Models/MessageForFrontConversation';
+import { MessageForChat } from './Models/MessageForChat';
 @WebSocketGateway({
     cors: { origin: '*', methods: ['GET', 'POST'] },
     path: '/socket',
@@ -35,44 +37,46 @@ export class LiveChatGateWay
     }
 
     @UseGuards(WebSocketAuthGuard)
-    @SubscribeMessage('roomAccessRequest')
+    @SubscribeMessage('connect-game-session') //roomAccessRequest
     async handleJoinRoom(
         client: Socket,
         joinGameSessionDTO: JoinGameSessionDTO,
     ) {
         await this.liveChatService.connectRoom(client, joinGameSessionDTO);
-
-        client.on('joinGameSessionVisio', async (content) => {
-            this.liveChatService.joinVisio(client, content);
-        });
-
-        client.on('disconnect', () => {
-            this.liveChatService.disconnectFromRoom(client, client.data.user);
-        });
-        client.on('chat', async (content) => {
-            await this.liveChatService.sendChatToGameSession(
-                client,
-                client.data.user,
-                content,
-                joinGameSessionDTO,
-            );
-        });
     }
 
     @UseGuards(WebSocketAuthGuard)
-    @SubscribeMessage('chatAccessRequest')
+    @SubscribeMessage('connect-game-session-visio')
+    async handleJoinVisio(client: Socket, content: any) {
+        await this.liveChatService.joinVisio(client, content);
+    }
+
+    @UseGuards(WebSocketAuthGuard)
+    @SubscribeMessage('disconnect-game-session')
+    async disconnect(client: Socket, gameSessionId: string) {
+        this.liveChatService.disconnectFromGameSession(client, client.data.user, gameSessionId);
+    }
+
+    @UseGuards(WebSocketAuthGuard)
+    @SubscribeMessage('chat')
+    async gameSessionChat(client: Socket, content: MessageForChat) {
+        await this.liveChatService.sendChat(
+            client,
+            this.server,
+            client.data.user,
+            content,
+        );
+    }
+
+    @UseGuards(WebSocketAuthGuard)
+    @SubscribeMessage('connect-conversation')
     handleJoinConversation(client: Socket) {
         this.liveChatService.connect(client, client.data.user);
+    }
 
-        client.on('disconnect', () => {
-            this.liveChatService.disconnect(client, client.data.user);
-        });
-        client.on('chat', async (content) => {
-            await this.liveChatService.sendChat(
-                this.server,
-                client.data.user,
-                content,
-            );
-        });
+    @UseGuards(WebSocketAuthGuard)
+    @SubscribeMessage('disconnect-conversation')
+    handleDisconnectConversation(client: any) {
+        client.leave(client.data.user);
     }
 }

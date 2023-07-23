@@ -1,12 +1,13 @@
 import { SubscribeMessage, WebSocketGateway } from '@nestjs/websockets';
 import { UseGuards } from '@nestjs/common';
+import { WebSocketAuthGuard } from "../guards/WebSocketAuthGuard";
 
 @WebSocketGateway({
     cors: { origin: '*', methods: ['GET', 'POST'] },
     path: '/sockets',
 })
 export class SocketGateway {
-    @UseGuards(WebSocketGateway)
+    @UseGuards(WebSocketAuthGuard)
     @SubscribeMessage('action-runner')
     handleActionRunner(client: any, payload: any) {
         client
@@ -14,13 +15,13 @@ export class SocketGateway {
             .emit('action-runner', payload.action);
     }
 
-    @UseGuards(WebSocketGateway)
+    @UseGuards(WebSocketAuthGuard)
     @SubscribeMessage('connect-runner')
     handleConnectRunner(client: any, gameSessionId: string) {
         client.join(`runner${gameSessionId}`);
     }
 
-    @UseGuards(WebSocketGateway)
+    @UseGuards(WebSocketAuthGuard)
     @SubscribeMessage('disconnect-runner')
     handleDisconnectRunner(client: any, gameSessionId: string) {
         client.leave(`runner${gameSessionId}`);
