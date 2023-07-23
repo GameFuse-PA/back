@@ -14,7 +14,7 @@ env:
   PATH_TO_CODE: /var/www/gamefuseApi
   JWT_SECRET: ${{secrets.JWT_SECRET}}
   JWT_EXPIRATION: ${{secrets.JWT_EXPIRATION}}
-  MONGO_URI: ${{secrets.MONGO_URI}}
+  MONGO_URI: "${{secrets.MONGO_URI}}"
   MAILJET_API_SECRET: ${{secrets.MAILJET_API_SECRET}}
   MAILJET_EMAIL_FROM: ${{secrets.MAILJET_EMAIL_FROM}}
   AWS_ACCESS_KEY_ID: ${{secrets.AWS_ACCESS_KEY_ID}}
