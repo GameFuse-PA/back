@@ -7,7 +7,12 @@ async function bootstrap() {
     app.useGlobalPipes(new ValidationPipe());
 
     app.enableCors({
-        origin: 'http://localhost:4200',
+        origin: [
+            'http://localhost:4200',
+            'https://gamefuse.fr',
+            'https://www.gamefuse.fr',
+            'https://develop.dy4skeilg164o.amplifyapp.com',
+        ],
     });
     await app.listen(3000);
 }
