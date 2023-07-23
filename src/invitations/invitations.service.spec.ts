@@ -12,7 +12,7 @@ describe('InvitationsService', () => {
             imports: [InvitationsModule, CommonModule],
         }).compile();
 
-        service = module.getgit<InvitationsService>(InvitationsService);
+        service = module.get<InvitationsService>(InvitationsService);
     });
 
     it('should be defined', () => {
