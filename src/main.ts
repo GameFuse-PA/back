@@ -9,8 +9,8 @@ async function bootstrap() {
     app.enableCors({
         origin: [
             'http://localhost:4200',
-            'https://api.gamefuse.fr',
-            'https://api-test.gamefuse.fr',
+            'https://gamefuse.fr',
+            'https://www.gamefuse.fr',
         ],
     });
     await app.listen(3000);
