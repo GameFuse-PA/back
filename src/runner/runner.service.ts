@@ -5,7 +5,7 @@ import {
 } from '@nestjs/common';
 import { GameSessionService } from '../game-session/game-session.service';
 import { FileService } from '../amazon/file.service';
-import { spawn } from 'child_process';
+import { spawn, exec } from 'child_process';
 import { GameActionDto } from './dto/gameAction.dto';
 import * as fs from 'fs';
 import { Action, ActionDocument } from '../schemas/action.schema';
@@ -92,17 +92,21 @@ export class RunnerService {
     }
 
     private async run(process: any, input: string) {
-        process.stdin.write(input + '\n');
+        console.log(input)
+        process.stdin.write(input + "\n" );
 
         return new Promise((resolve, reject) => {
             process.stdout.on('data', (data: any) => {
                 process.stdout.removeAllListeners('data');
+                console.log('stdout', data.toString())
                 resolve(JSON.parse(data) as any);
             });
             process.stderr.on('data', (data: any) => {
                 process.stderr.removeAllListeners('data');
+                console.log('stderr', data.toString())
                 reject(data);
             });
+
         });
     }
 
@@ -121,7 +125,7 @@ export class RunnerService {
             case LanguageEnum.Java:
                 return this.appConfigService.getJavaRunCommand();
             case LanguageEnum.C:
-                return this.appConfigService.getCRunCommand();
+                return `cmd.exe`;
             default:
                 throw new BadRequestException('Langage non supporté');
         }
@@ -172,21 +176,30 @@ export class RunnerService {
         await this.downloadGameFiles(game, outputDir);
 
         let processArgs = [];
+        let argumentsGcc = [];
+
+        console.log('language', game.language);
 
         if (game.language === LanguageEnum.Java) {
             processArgs = ['-jar', `${outputDir}/${game.program.name}`];
+        } else if (game.language === LanguageEnum.C) {
+            console.log(`-o main ${outputDir}/${game.program.name} -I ${this.appConfigService.getIncludePath()} -L ${this.appConfigService.getLibPath()} -ljson-c`)
+            /*argumentsGcc = [
+                '-o',
+                `${outputDir}/main`,
+                `${outputDir}/${game.program.name}`,
+                '-I',
+                `${this.appConfigService.getIncludePath()}`,
+                '-L',
+                `${this.appConfigService.getLibPath()}`,
+                '-ljson-c'
+            ];
+
+            const pr = spawn('gcc', argumentsGcc);
+            console.log("gcc")*/
+            //exec(`sudo chmod -X ${outputDir}/main`);
         } else {
             processArgs = [`${outputDir}/${game.program.name}`];
-        }
-
-        if (game.language === LanguageEnum.C) {
-            processArgs = [
-                '-o',
-                'main',
-                `${outputDir}/${game.program.name}`,
-                '-ljson-c',
-            ];
-            spawn('gcc', processArgs);
         }
 
         const process = spawn(this.getRunCommand(game.language), processArgs);
