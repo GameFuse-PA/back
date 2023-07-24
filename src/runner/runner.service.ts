@@ -120,6 +120,8 @@ export class RunnerService {
                 return this.appConfigService.getPythonRunCommand();
             case LanguageEnum.Java:
                 return this.appConfigService.getJavaRunCommand();
+            case LanguageEnum.C:
+                return this.appConfigService.getCRunCommand();
             default:
                 throw new BadRequestException('Langage non supporté');
         }
@@ -175,6 +177,16 @@ export class RunnerService {
             processArgs = ['-jar', `${outputDir}/${game.program.name}`];
         } else {
             processArgs = [`${outputDir}/${game.program.name}`];
+        }
+
+        if (game.language === LanguageEnum.C) {
+            processArgs = [
+                '-o',
+                'main',
+                `${outputDir}/${game.program.name}`,
+                '-ljson-c',
+            ];
+            spawn('gcc', processArgs);
         }
 
         const process = spawn(this.getRunCommand(game.language), processArgs);

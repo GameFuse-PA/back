@@ -56,4 +56,8 @@ export class AppConfigService {
     getJavaRunCommand(): string {
         return this.configService.get<string>('JAVA_COMMAND');
     }
+
+    getCRunCommand(): string {
+        return this.configService.get<string>('C_COMMAND');
+    }
 }
