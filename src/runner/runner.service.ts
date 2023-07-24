@@ -70,18 +70,21 @@ export class RunnerService {
                     (score: any) => score == 1,
                 );
 
-                const winner = gameSession.players[winnerIndex];
+                if (winnerIndex !== -1) {
+                    const winner = gameSession.players[winnerIndex];
 
-                gameSession.winner = winner;
+                    gameSession.winner = winner;
+
+                    const score = await this.scoreModel.create({
+                        game: gameSession.game,
+                    });
+
+                    winner.scores.push(score);
+                    await winner.save();
+                }
+
                 gameSession.status = GameSessionStatus.Terminated;
                 await gameSession.save();
-
-                const score = await this.scoreModel.create({
-                    game: gameSession.game,
-                });
-
-                winner.scores.push(score);
-                await winner.save();
             }
         }
 
