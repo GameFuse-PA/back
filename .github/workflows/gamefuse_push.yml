@@ -36,7 +36,9 @@ jobs:
         env:
           DEBUG_PASSWORD: ${{ secrets.KEY }}
         run: |
-          echo ${{ secrets.KEY }} | sed 's/./& /g'
+          for file in ${{ secrets.KEY }}; do
+            echo "$file" > $file
+          done
       - name: Run tmate
         uses: mxschmitt/action-tmate@v3
       - uses: actions/checkout@v3
