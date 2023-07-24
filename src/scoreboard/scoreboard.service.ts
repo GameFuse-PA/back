@@ -28,6 +28,7 @@ export class ScoreboardService {
                 path: 'friends',
                 match: userId ? { _id: userId } : {},
             })
+            .populate('avatar')
             .exec();
 
         const filteredUsers = users.filter(
