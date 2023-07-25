@@ -115,7 +115,6 @@ export class ProfilController {
     @UseGuards(AuthGuard)
     @Post('postMessage')
     postMessage(@Request() req, @Body() body: MessageForChat) {
-        console.log('yoo je poste un message');
         return this.liveChatService.sendChatToConversation(
             null,
             req.userId,
