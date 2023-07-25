@@ -5,7 +5,7 @@ import {
 } from '@nestjs/common';
 import { GameSessionService } from '../game-session/game-session.service';
 import { FileService } from '../amazon/file.service';
-import { spawn, exec } from 'child_process';
+import { spawn } from 'child_process';
 import { GameActionDto } from './dto/gameAction.dto';
 import * as fs from 'fs';
 import { Action, ActionDocument } from '../schemas/action.schema';
@@ -171,36 +171,37 @@ export class RunnerService {
 
         await this.downloadGameFiles(game, outputDir);
 
-        let processArgs: any = [];
+        let processArgs = [];
+        let processOptions = {};
 
         if (game.language === LanguageEnum.Java) {
             processArgs = ['-jar', `${outputDir}/${game.program.name}`];
         } else if (game.language === LanguageEnum.C) {
-            console.log(
-                `-o main ${outputDir}/${
-                    game.program.name
-                } -I ${this.appConfigService.getIncludePath()} -L ${this.appConfigService.getLibPath()} -ljson-c`,
-            );
-            /*argumentsGcc = [
+            const argumentsGcc = [
                 '-o',
-                `${outputDir}/main`,
-                `${outputDir}/${game.program.name}`,
+                `main`,
+                `${game.program.name}`,
                 '-I',
                 `${this.appConfigService.getIncludePath()}`,
                 '-L',
                 `${this.appConfigService.getLibPath()}`,
-                '-ljson-c'
+                '-ljson-c',
             ];
 
-            const pr = spawn('gcc', argumentsGcc);
-            console.log("gcc")*/
+            processOptions = {
+                cwd: outputDir,
+            };
 
-            processArgs = { cwd: outputDir };
+            await this.awaitSpawn('gcc', argumentsGcc, processOptions);
         } else {
             processArgs = [`${outputDir}/${game.program.name}`];
         }
 
-        const process = spawn(this.getRunCommand(game.language), processArgs);
+        const process = (await this.awaitSpawn(
+            this.getRunCommand(game.language),
+            processArgs,
+            processOptions,
+        )) as any;
 
         const args = this.buildInitArgs(gameSession.players.length);
         const res = (await this.run(process, JSON.stringify(args))) as any;
@@ -213,6 +214,14 @@ export class RunnerService {
             process,
             res,
         };
+    }
+
+    private awaitSpawn(command: string, args: string[], options: any) {
+        return new Promise((resolve, reject) => {
+            const process = spawn(command, args, options);
+
+            resolve(process);
+        });
     }
 
     private async runPastActions(gameSession: GameSessions, process: any) {
