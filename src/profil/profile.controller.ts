@@ -19,6 +19,8 @@ import { FriendsService } from '../friends/friends.service';
 import { GamesService } from '../games/games.service';
 import { GameSessionService } from '../game-session/game-session.service';
 import { ConversationsService } from '../conversations/conversations.service';
+import { MessageForChat } from '../liveChat/Models/MessageForChat';
+import { LiveChatService } from '../liveChat/liveChat.service';
 
 @Controller('me')
 export class ProfilController {
@@ -28,6 +30,7 @@ export class ProfilController {
         private gamesService: GamesService,
         private gameSessionService: GameSessionService,
         private conversationsService: ConversationsService,
+        private liveChatService: LiveChatService,
     ) {}
 
     @UseGuards(AuthGuard)
@@ -107,5 +110,16 @@ export class ProfilController {
         @UploadedFile() file: Express.Multer.File,
     ) {
         return this.profileService.uploadPhoto(req.userId, file);
+    }
+
+    @UseGuards(AuthGuard)
+    @Post('postMessage')
+    postMessage(@Request() req, @Body() body: MessageForChat) {
+        console.log('yoo je poste un message');
+        return this.liveChatService.sendChatToConversation(
+            null,
+            req.userId,
+            body,
+        );
     }
 }

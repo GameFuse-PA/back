@@ -50,7 +50,11 @@ export class LiveChatService {
     ) {
         client.broadcast
             .to(`game-session${joinGameSessionVisioDTO.conversationId}`)
-            .emit('user-connected', joinGameSessionVisioDTO.peerId, client.data.user);
+            .emit(
+                'user-connected',
+                joinGameSessionVisioDTO.peerId,
+                client.data.user,
+            );
     }
 
     public disconnectFromGameSession(
@@ -105,7 +109,9 @@ export class LiveChatService {
             date: new Date(),
             conversationId: conversation._id,
         };
-        server.to(message.to).emit('new-message', messageToReturn);
+        if (server != null) {
+            server.to(message.to).emit('new-message', messageToReturn);
+        }
     }
 
     public async sendChat(

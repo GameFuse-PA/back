@@ -17,5 +17,6 @@ import { GameSessionService } from '../game-session/game-session.service';
         ConversationsService,
         GameSessionService,
     ],
+    exports: [LiveChatService],
 })
 export class LiveChatModule {}
