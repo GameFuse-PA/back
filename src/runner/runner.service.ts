@@ -200,11 +200,11 @@ export class RunnerService {
             processArgs = [`${outputDir}/${game.program.name}`];
         }
 
-        const process = (await this.awaitSpawn(
+        const process = spawn(
             this.getRunCommand(game.language),
             processArgs,
             processOptions,
-        )) as any;
+        );
 
         const args = this.buildInitArgs(gameSession.players.length);
         const res = (await this.run(process, JSON.stringify(args))) as any;
@@ -223,7 +223,9 @@ export class RunnerService {
         return new Promise((resolve, reject) => {
             const process = spawn(command, args, options);
 
-            resolve(process);
+            process.on('close', (code) => {
+                resolve(code);
+            });
         });
     }
 
