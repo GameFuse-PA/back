@@ -54,7 +54,11 @@ export class LiveChatGateWay
     @UseGuards(WebSocketAuthGuard)
     @SubscribeMessage('disconnect-game-session')
     async disconnect(client: Socket, gameSessionId: string) {
-        this.liveChatService.disconnectFromGameSession(client, client.data.user, gameSessionId);
+        this.liveChatService.disconnectFromGameSession(
+            client,
+            client.data.user,
+            gameSessionId,
+        );
     }
 
     @UseGuards(WebSocketAuthGuard)
