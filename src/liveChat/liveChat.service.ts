@@ -109,9 +109,7 @@ export class LiveChatService {
             date: new Date(),
             conversationId: conversation._id,
         };
-        if (server != null) {
-            server.to(message.to).emit('new-message', messageToReturn);
-        }
+        server.to(message.to).emit('new-message', messageToReturn);
     }
 
     public async sendChat(
