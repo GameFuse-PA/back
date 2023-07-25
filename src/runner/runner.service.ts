@@ -70,18 +70,21 @@ export class RunnerService {
                     (score: any) => score == 1,
                 );
 
-                const winner = gameSession.players[winnerIndex];
+                if (winnerIndex !== -1) {
+                    const winner = gameSession.players[winnerIndex];
 
-                gameSession.winner = winner;
+                    gameSession.winner = winner;
+
+                    const score = await this.scoreModel.create({
+                        game: gameSession.game,
+                    });
+
+                    winner.scores.push(score);
+                    await winner.save();
+                }
+
                 gameSession.status = GameSessionStatus.Terminated;
                 await gameSession.save();
-
-                const score = await this.scoreModel.create({
-                    game: gameSession.game,
-                });
-
-                winner.scores.push(score);
-                await winner.save();
             }
         }
 
@@ -120,6 +123,8 @@ export class RunnerService {
                 return this.appConfigService.getPythonRunCommand();
             case LanguageEnum.Java:
                 return this.appConfigService.getJavaRunCommand();
+            case LanguageEnum.C:
+                return this.appConfigService.getCRunCommand();
             default:
                 throw new BadRequestException('Langage non supporté');
         }
@@ -170,14 +175,36 @@ export class RunnerService {
         await this.downloadGameFiles(game, outputDir);
 
         let processArgs = [];
+        let processOptions = {};
 
         if (game.language === LanguageEnum.Java) {
             processArgs = ['-jar', `${outputDir}/${game.program.name}`];
+        } else if (game.language === LanguageEnum.C) {
+            const argumentsGcc = [
+                '-o',
+                `main`,
+                `${game.program.name}`,
+                '-I',
+                `${this.appConfigService.getIncludePath()}`,
+                '-L',
+                `${this.appConfigService.getLibPath()}`,
+                '-ljson-c',
+            ];
+
+            processOptions = {
+                cwd: outputDir,
+            };
+
+            await this.awaitSpawn('gcc', argumentsGcc, processOptions);
         } else {
             processArgs = [`${outputDir}/${game.program.name}`];
         }
 
-        const process = spawn(this.getRunCommand(game.language), processArgs);
+        const process = spawn(
+            this.getRunCommand(game.language),
+            processArgs,
+            processOptions,
+        );
 
         const args = this.buildInitArgs(gameSession.players.length);
         const res = (await this.run(process, JSON.stringify(args))) as any;
@@ -190,6 +217,16 @@ export class RunnerService {
             process,
             res,
         };
+    }
+
+    private awaitSpawn(command: string, args: string[], options: any) {
+        return new Promise((resolve, reject) => {
+            const process = spawn(command, args, options);
+
+            process.on('close', (code) => {
+                resolve(code);
+            });
+        });
     }
 
     private async runPastActions(gameSession: GameSessions, process: any) {
