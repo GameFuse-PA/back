@@ -9,6 +9,7 @@ import { GamesModule } from '../games/games.module';
 import { GameSessionModule } from '../game-session/game-session.module';
 import { InvitationsModule } from '../invitations/invitations.module';
 import { ConversationsModule } from '../conversations/conversations.module';
+import { LiveChatModule } from '../liveChat/liveChat.module';
 
 @Module({
     imports: [
@@ -20,6 +21,7 @@ import { ConversationsModule } from '../conversations/conversations.module';
         GameSessionModule,
         InvitationsModule,
         ConversationsModule,
+        LiveChatModule,
     ],
     controllers: [ProfilController],
     providers: [ProfilService],
