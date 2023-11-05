@@ -35,5 +35,5 @@ resource "scaleway_k8s_pool" "gamefuse-pool" {
 
 resource "local_file" "kubeconfig" {
   content  = scaleway_k8s_cluster.gamefuse-cluster.kubeconfig[0].config_file
-  filename = "kubeconfig"
+  filename = "kubeconfig.yaml"
 }
