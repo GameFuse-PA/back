@@ -9,6 +9,11 @@ terraform {
       source = "hashicorp/local"
       version = "2.4.0"
     }
+
+    kubernetes = {
+      source = "hashicorp/kubernetes"
+      version = "2.23.0"
+    }
   }
 }
 
@@ -36,4 +41,44 @@ resource "scaleway_k8s_pool" "gamefuse-pool" {
 resource "local_file" "kubeconfig" {
   content  = scaleway_k8s_cluster.gamefuse-cluster.kubeconfig[0].config_file
   filename = "kubeconfig.yaml"
+}
+
+provider "kubernetes" {
+  config_path = local_file.kubeconfig.filename
+}
+
+resource "kubernetes_pod" "gamefuse-pod" {
+  metadata {
+    name = "gamefuse-pod"
+  }
+
+  spec {
+    container {
+      image = "pbonnamy/gamefuse_api:release"
+      name  = "gamefuse-container"
+
+      port {
+        container_port = 3000
+      }
+    }
+  }
+}
+
+resource "kubernetes_service" "gamefuse-service" {
+  metadata {
+    name = "gamefuse-service"
+  }
+
+  spec {
+    selector = {
+      app = "gamefuse-pod"
+    }
+
+    port {
+      port        = 3000
+      target_port = 3000
+    }
+
+    type = "LoadBalancer"
+  }
 }

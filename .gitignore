@@ -50,4 +50,4 @@ sessions/*
 *.tfstate.*
 
 #Kubernetes
-kubeconfig
+kubeconfig.yaml
