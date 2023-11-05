@@ -1,3 +1,17 @@
 Dockerfile
 node_modules
 dist
+
+.terraform
+.terraform.*
+*.tfstate
+*.tfstate.*
+
+kubeconfig.yaml
+
+.env.example
+.export.env.example
+
+sessions/*
+
+.idea/*
