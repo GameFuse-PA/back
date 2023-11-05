@@ -39,5 +39,15 @@ lerna-debug.log*
 
 # Env files
 .env
+.export.env
 
 sessions/*
+
+#Terraform
+.terraform
+.terraform.*
+*.tfstate
+*.tfstate.*
+
+#Kubernetes
+kubeconfig
