@@ -50,6 +50,9 @@ provider "kubernetes" {
 resource "kubernetes_pod" "gamefuse-pod" {
   metadata {
     name = "gamefuse-pod"
+    labels = {
+      app = "gamefuse-pod"
+    }
   }
 
   spec {
