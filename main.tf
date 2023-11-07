@@ -2,7 +2,7 @@ terraform {
   required_providers {
     scaleway = {
       source = "scaleway/scaleway"
-      version = "2.29.0"
+      version = "2.31.0"
     }
 
     local = {
@@ -38,13 +38,26 @@ resource "scaleway_k8s_pool" "gamefuse-pool" {
   size       = 1
 }
 
+resource "null_resource" "kubeconfig" {
+  depends_on = [scaleway_k8s_pool.gamefuse-pool]
+  triggers = {
+    host                   = scaleway_k8s_cluster.gamefuse-cluster.kubeconfig[0].host
+    token                  = scaleway_k8s_cluster.gamefuse-cluster.kubeconfig[0].token
+    cluster_ca_certificate = scaleway_k8s_cluster.gamefuse-cluster.kubeconfig[0].cluster_ca_certificate
+  }
+}
+
 resource "local_file" "kubeconfig" {
   content  = scaleway_k8s_cluster.gamefuse-cluster.kubeconfig[0].config_file
   filename = "kubeconfig.yaml"
 }
 
 provider "kubernetes" {
-  config_path = local_file.kubeconfig.filename
+  host  = null_resource.kubeconfig.triggers.host
+  token = null_resource.kubeconfig.triggers.token
+  cluster_ca_certificate = base64decode(
+    null_resource.kubeconfig.triggers.cluster_ca_certificate
+  )
 }
 
 resource "kubernetes_pod" "gamefuse-pod" {
@@ -67,7 +80,7 @@ resource "kubernetes_pod" "gamefuse-pod" {
   }
 }
 
-resource "kubernetes_service" "gamefuse-service" {
+resource "kubernetes_service" "gamefuse-loadbalancer" {
   metadata {
     name = "gamefuse-service"
   }
