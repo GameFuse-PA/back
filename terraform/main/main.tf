@@ -15,6 +15,16 @@ terraform {
       version = "2.23.0"
     }
   }
+
+  backend "s3" {
+    bucket = "gamefuse-terraform-state"
+    key    = "gamefuse-terraform.tfstate"
+    endpoint = "https://s3.fr-par.scw.cloud"
+    region = "fr-par"
+    skip_credentials_validation = true
+    skip_region_validation = true
+    skip_requesting_account_id = true
+  }
 }
 
 provider "scaleway" {}
