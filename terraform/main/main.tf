@@ -70,21 +70,39 @@ provider "kubernetes" {
   )
 }
 
-resource "kubernetes_pod" "gamefuse-pod" {
+resource "kubernetes_deployment" "gamefuse-deployment" {
   metadata {
-    name = "gamefuse-pod"
+    name = "gamefuse-deployment"
     labels = {
-      app = "gamefuse-pod"
+      app = "gamefuse-deployment"
     }
   }
 
   spec {
-    container {
-      image = "pbonnamy/gamefuse_api:release"
-      name  = "gamefuse-container"
+    replicas = 1
 
-      port {
-        container_port = 3000
+    selector {
+      match_labels = {
+        app = "gamefuse-deployment"
+      }
+    }
+
+    template {
+      metadata {
+        labels = {
+          app = "gamefuse-deployment"
+        }
+      }
+
+      spec {
+        container {
+          image = "pbonnamy/gamefuse_api:release"
+          name  = "gamefuse-container"
+
+          port {
+            container_port = 3000
+          }
+        }
       }
     }
   }
@@ -97,7 +115,7 @@ resource "kubernetes_service" "gamefuse-loadbalancer" {
 
   spec {
     selector = {
-      app = "gamefuse-pod"
+      app = "gamefuse-deployment"
     }
 
     port {
