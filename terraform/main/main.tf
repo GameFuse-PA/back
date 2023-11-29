@@ -29,6 +29,20 @@ terraform {
 
 provider "scaleway" {}
 
+resource "scaleway_object_bucket" "gamefuse-bucket" {
+  name = "gamefuse-bucket"
+  force_destroy = true
+  region = "fr-par"
+}
+
+variable "SCW_ACCESS_KEY" {
+  type = string
+}
+
+variable "SCW_SECRET_KEY" {
+  type = string
+}
+
 resource "scaleway_vpc_private_network" "gamefuse-network" {
   name = "gamefuse-network"
 }
@@ -96,11 +110,37 @@ resource "kubernetes_deployment" "gamefuse-deployment" {
 
       spec {
         container {
-          image = "pbonnamy/gamefuse_api:release"
+          image = "pbonnamy/gamefuse_api:latest"
           name  = "gamefuse-container"
+          image_pull_policy = "Always"
 
           port {
             container_port = 3000
+          }
+
+          env {
+            name = "AWS_ACCESS_KEY_ID"
+            value = var.SCW_ACCESS_KEY
+          }
+
+          env {
+            name = "AWS_SECRET_ACCESS_KEY"
+            value = var.SCW_SECRET_KEY
+          }
+
+          env {
+              name = "AWS_REGION"
+              value = scaleway_object_bucket.gamefuse-bucket.region
+          }
+
+          env {
+              name = "AWS_BUCKET_NAME"
+              value = scaleway_object_bucket.gamefuse-bucket.name
+          }
+
+          env {
+              name = "BUCKET_DOMAIN"
+              value = "scw.cloud"
           }
         }
       }

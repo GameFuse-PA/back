@@ -19,9 +19,9 @@
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --config ./test/jest-e2e.json",
-    "docker:build": "docker build -t pbonnamy/gamefuse_api:release .",
-    "docker:run": "docker run -p 3000:3000 pbonnamy/gamefuse_api:release",
-    "docker:push": "docker push pbonnamy/gamefuse_api:release"
+    "docker:build": "docker build -t pbonnamy/gamefuse_api:latest .",
+    "docker:run": "docker run -p 3000:3000 pbonnamy/gamefuse_api:latest",
+    "docker:push": "docker push pbonnamy/gamefuse_api:latest"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.327.0",

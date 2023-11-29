@@ -33,6 +33,10 @@ export class AppConfigService {
         return this.configService.get<string>('AWS_BUCKET_NAME');
     }
 
+    get bucketDomain(): string {
+        return this.configService.get<string>('BUCKET_DOMAIN');
+    }
+
     get mailjetApiKey(): string {
         return this.configService.get<string>('MAILJET_API_KEY');
     }
