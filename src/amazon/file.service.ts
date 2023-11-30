@@ -26,6 +26,7 @@ export class FileService {
                 accessKeyId: this.appConfigService.awsAccessKeyId,
                 secretAccessKey: this.appConfigService.awsSecretAccessKey,
             },
+            endpoint: `https://s3.${this.appConfigService.awsRegion}.${this.appConfigService.bucketDomain}`,
         });
     }
 
@@ -41,11 +42,12 @@ export class FileService {
                 Key: `${path}/${fileName}`,
                 Body: dataBuffer,
                 ContentType: contentType,
+                ACL: 'public-read',
             };
             const command = new PutObjectCommand(params);
             const upload = await this.s3.send(command);
 
-            const url = `https://${this.appConfigService.awsBucketName}.s3.${this.appConfigService.awsRegion}.amazonaws.com/${path}/${fileName}`;
+            const url = `https://${this.appConfigService.awsBucketName}.s3.${this.appConfigService.awsRegion}.${this.appConfigService.bucketDomain}/${path}/${fileName}`;
 
             const file = new this.fileModel({
                 location: url,
