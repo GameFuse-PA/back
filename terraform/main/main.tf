@@ -84,6 +84,64 @@ provider "kubernetes" {
   )
 }
 
+resource "kubernetes_deployment" "gamefuse-database" {
+  metadata {
+    name = "gamefuse-database"
+    labels = {
+      app = "gamefuse-database"
+    }
+  }
+
+  spec {
+    replicas = 1
+
+    selector {
+      match_labels = {
+        app = "gamefuse-database"
+      }
+    }
+
+    template {
+      metadata {
+        labels = {
+          app = "gamefuse-database"
+        }
+      }
+
+      spec {
+        container {
+          image = "mongo:latest"
+          name  = "mongodb-container"
+          image_pull_policy = "Always"
+
+          port {
+            container_port = 27017
+          }
+        }
+      }
+    }
+  }
+}
+
+resource "kubernetes_service" "gamefuse-database-service" {
+  metadata {
+    name = "gamefuse-database-service"
+  }
+
+  spec {
+    selector = {
+      app = "gamefuse-database"
+    }
+
+    port {
+      port        = 27017
+      target_port = 27017
+    }
+
+    type = "ClusterIP"
+  }
+}
+
 resource "kubernetes_deployment" "gamefuse-deployment" {
   metadata {
     name = "gamefuse-deployment"
@@ -129,18 +187,23 @@ resource "kubernetes_deployment" "gamefuse-deployment" {
           }
 
           env {
-              name = "AWS_REGION"
-              value = scaleway_object_bucket.gamefuse-bucket.region
+            name = "AWS_REGION"
+            value = scaleway_object_bucket.gamefuse-bucket.region
           }
 
           env {
-              name = "AWS_BUCKET_NAME"
-              value = scaleway_object_bucket.gamefuse-bucket.name
+            name = "AWS_BUCKET_NAME"
+            value = scaleway_object_bucket.gamefuse-bucket.name
           }
 
           env {
-              name = "BUCKET_DOMAIN"
-              value = "scw.cloud"
+            name = "BUCKET_DOMAIN"
+            value = "scw.cloud"
+          }
+
+          env {
+            name = "MONGO_URI"
+            value = "mongodb://gamefuse-database:27017/gamefuse"
           }
         }
       }
