@@ -68,7 +68,7 @@ resource "kubernetes_deployment" "gamefuse-api" {
 
           env {
             name = "MONGO_URI"
-            value = "mongodb://gamefuse-database:27017/gamefuse"
+            value = "mongodb://gamefuse-database-service:27017/gamefuse"
           }
         }
       }
