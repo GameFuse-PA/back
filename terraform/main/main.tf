@@ -29,10 +29,24 @@ terraform {
 
 provider "scaleway" {}
 
-resource "scaleway_object_bucket" "gamefuse-bucket" {
-  name = "gamefuse-bucket"
-  force_destroy = true
-  region = "fr-par"
+module "object_storage" {
+  source = "./object_storage"
+}
+
+module "kubernetes_cluster" {
+  source = "./kubernetes_cluster"
+}
+
+provider "kubernetes" {
+  host  = module.kubernetes_cluster.kubeconfig_host
+  token = module.kubernetes_cluster.kubeconfig_token
+  cluster_ca_certificate = base64decode(
+    module.kubernetes_cluster.kubeconfig_cluster_ca_certificate,
+  )
+}
+
+module "database_deployment" {
+  source = "./database_deployment"
 }
 
 variable "SCW_ACCESS_KEY" {
@@ -43,189 +57,10 @@ variable "SCW_SECRET_KEY" {
   type = string
 }
 
-resource "scaleway_vpc_private_network" "gamefuse-network" {
-  name = "gamefuse-network"
-}
-
-resource "scaleway_k8s_cluster" "gamefuse-cluster" {
-  private_network_id = scaleway_vpc_private_network.gamefuse-network.id
-  name    = "gamefuse-cluster"
-  version = "1.24.3"
-  cni     = "cilium"
-  delete_additional_resources = false
-}
-
-resource "scaleway_k8s_pool" "gamefuse-pool" {
-  cluster_id = scaleway_k8s_cluster.gamefuse-cluster.id
-  name       = "gamefuse-pool"
-  node_type  = "DEV1-M"
-  size       = 1
-}
-
-resource "null_resource" "kubeconfig" {
-  depends_on = [scaleway_k8s_pool.gamefuse-pool]
-  triggers = {
-    host                   = scaleway_k8s_cluster.gamefuse-cluster.kubeconfig[0].host
-    token                  = scaleway_k8s_cluster.gamefuse-cluster.kubeconfig[0].token
-    cluster_ca_certificate = scaleway_k8s_cluster.gamefuse-cluster.kubeconfig[0].cluster_ca_certificate
-  }
-}
-
-resource "local_file" "kubeconfig" {
-  content  = scaleway_k8s_cluster.gamefuse-cluster.kubeconfig[0].config_file
-  filename = "kubeconfig.yaml"
-}
-
-provider "kubernetes" {
-  host  = null_resource.kubeconfig.triggers.host
-  token = null_resource.kubeconfig.triggers.token
-  cluster_ca_certificate = base64decode(
-    null_resource.kubeconfig.triggers.cluster_ca_certificate
-  )
-}
-
-resource "kubernetes_deployment" "gamefuse-database" {
-  metadata {
-    name = "gamefuse-database"
-    labels = {
-      app = "gamefuse-database"
-    }
-  }
-
-  spec {
-    replicas = 1
-
-    selector {
-      match_labels = {
-        app = "gamefuse-database"
-      }
-    }
-
-    template {
-      metadata {
-        labels = {
-          app = "gamefuse-database"
-        }
-      }
-
-      spec {
-        container {
-          image = "mongo:latest"
-          name  = "mongodb-container"
-          image_pull_policy = "Always"
-
-          port {
-            container_port = 27017
-          }
-        }
-      }
-    }
-  }
-}
-
-resource "kubernetes_service" "gamefuse-database-service" {
-  metadata {
-    name = "gamefuse-database-service"
-  }
-
-  spec {
-    selector = {
-      app = "gamefuse-database"
-    }
-
-    port {
-      port        = 27017
-      target_port = 27017
-    }
-
-    type = "ClusterIP"
-  }
-}
-
-resource "kubernetes_deployment" "gamefuse-deployment" {
-  metadata {
-    name = "gamefuse-deployment"
-    labels = {
-      app = "gamefuse-deployment"
-    }
-  }
-
-  spec {
-    replicas = 1
-
-    selector {
-      match_labels = {
-        app = "gamefuse-deployment"
-      }
-    }
-
-    template {
-      metadata {
-        labels = {
-          app = "gamefuse-deployment"
-        }
-      }
-
-      spec {
-        container {
-          image = "pbonnamy/gamefuse_api:latest"
-          name  = "gamefuse-container"
-          image_pull_policy = "Always"
-
-          port {
-            container_port = 3000
-          }
-
-          env {
-            name = "AWS_ACCESS_KEY_ID"
-            value = var.SCW_ACCESS_KEY
-          }
-
-          env {
-            name = "AWS_SECRET_ACCESS_KEY"
-            value = var.SCW_SECRET_KEY
-          }
-
-          env {
-            name = "AWS_REGION"
-            value = scaleway_object_bucket.gamefuse-bucket.region
-          }
-
-          env {
-            name = "AWS_BUCKET_NAME"
-            value = scaleway_object_bucket.gamefuse-bucket.name
-          }
-
-          env {
-            name = "BUCKET_DOMAIN"
-            value = "scw.cloud"
-          }
-
-          env {
-            name = "MONGO_URI"
-            value = "mongodb://gamefuse-database:27017/gamefuse"
-          }
-        }
-      }
-    }
-  }
-}
-
-resource "kubernetes_service" "gamefuse-loadbalancer" {
-  metadata {
-    name = "gamefuse-service"
-  }
-
-  spec {
-    selector = {
-      app = "gamefuse-deployment"
-    }
-
-    port {
-      port        = 3000
-      target_port = 3000
-    }
-
-    type = "LoadBalancer"
-  }
+module "api_deployment" {
+  source = "./api_deployment"
+  SCW_ACCESS_KEY = var.SCW_ACCESS_KEY
+  SCW_SECRET_KEY = var.SCW_SECRET_KEY
+  BUCKET_NAME = module.object_storage.bucket_name
+  BUCKET_REGION = module.object_storage.bucket_region
 }
