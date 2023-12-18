@@ -2,7 +2,7 @@ terraform {
   required_providers {
     kubernetes = {
       source = "hashicorp/kubernetes"
-      version = "2.23.0"
+      version = "2.24.0"
     }
   }
 }
@@ -36,6 +36,17 @@ resource "kubernetes_deployment" "gamefuse-api" {
           image = "pbonnamy/gamefuse_api:latest"
           name  = "gamefuse-container"
           image_pull_policy = "Always"
+
+          resources {
+            limits = {
+              cpu    = "0.5"
+              memory = "512Mi"
+            }
+            requests = {
+              cpu    = "250m"
+              memory = "50Mi"
+            }
+          }
 
           port {
             container_port = 3000
@@ -92,5 +103,24 @@ resource "kubernetes_service" "gamefuse-api-service" {
     }
 
     type = "LoadBalancer"
+  }
+}
+
+resource "kubernetes_horizontal_pod_autoscaler" "gamefuse-api-hpa" {
+  metadata {
+    name = "gamefuse-api-hpa"
+  }
+
+  spec {
+    max_replicas = 5
+    min_replicas = 1
+
+    target_cpu_utilization_percentage = 50
+
+    scale_target_ref {
+      api_version = "apps/v1"
+      kind = "Deployment"
+      name = "gamefuse-api"
+    }
   }
 }
