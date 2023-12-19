@@ -2,17 +2,17 @@ terraform {
   required_providers {
     scaleway = {
       source = "scaleway/scaleway"
-      version = "2.31.0"
+      version = "2.34.0"
     }
 
     local = {
       source = "hashicorp/local"
-      version = "2.4.0"
+      version = "2.4.1"
     }
 
     kubernetes = {
       source = "hashicorp/kubernetes"
-      version = "2.23.0"
+      version = "2.24.0"
     }
   }
 
