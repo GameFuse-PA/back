@@ -7,6 +7,27 @@ terraform {
   }
 }
 
+resource "kubernetes_secret" "dockerhub" {
+  metadata {
+    name = "docker-cfg"
+  }
+
+  type = "kubernetes.io/dockerconfigjson"
+
+  data = {
+    ".dockerconfigjson" = jsonencode({
+      auths = {
+        "docker.io" = {
+          "username" = var.DOCKERHUB_USERNAME
+          "password" = var.DOCKERHUB_PASSWORD
+          "email"    = var.DOCKERHUB_EMAIL
+          "auth"     = base64encode("${var.DOCKERHUB_USERNAME}:${var.DOCKERHUB_PASSWORD}")
+        }
+      }
+    })
+  }
+}
+
 resource "kubernetes_deployment" "gamefuse-api" {
   metadata {
     name = "gamefuse-api"
@@ -81,6 +102,10 @@ resource "kubernetes_deployment" "gamefuse-api" {
             name = "MONGO_URI"
             value = "mongodb://gamefuse-database-service:27017/gamefuse"
           }
+        }
+
+        image_pull_secrets {
+          name = "docker-cfg"
         }
       }
     }
