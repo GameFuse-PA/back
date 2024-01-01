@@ -57,10 +57,25 @@ variable "SCW_SECRET_KEY" {
   type = string
 }
 
+variable "DOCKERHUB_USERNAME" {
+  type = string
+}
+
+variable "DOCKERHUB_PASSWORD" {
+  type = string
+}
+
+variable "DOCKERHUB_EMAIL" {
+  type = string
+}
+
 module "api_deployment" {
   source = "./api_deployment"
   SCW_ACCESS_KEY = var.SCW_ACCESS_KEY
   SCW_SECRET_KEY = var.SCW_SECRET_KEY
   BUCKET_NAME = module.object_storage.bucket_name
   BUCKET_REGION = module.object_storage.bucket_region
+  DOCKERHUB_PASSWORD = var.DOCKERHUB_PASSWORD
+  DOCKERHUB_USERNAME = var.DOCKERHUB_USERNAME
+  DOCKERHUB_EMAIL = var.DOCKERHUB_EMAIL
 }

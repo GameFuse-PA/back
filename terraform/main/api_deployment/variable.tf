@@ -13,3 +13,15 @@ variable "BUCKET_NAME" {
 variable "BUCKET_REGION" {
   type = string
 }
+
+variable "DOCKERHUB_USERNAME" {
+  type = string
+}
+
+variable "DOCKERHUB_PASSWORD" {
+  type = string
+}
+
+variable "DOCKERHUB_EMAIL" {
+  type = string
+}
