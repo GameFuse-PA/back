@@ -69,6 +69,26 @@ variable "DOCKERHUB_EMAIL" {
   type = string
 }
 
+variable "MAILJET_API_KEY" {
+  type = string
+}
+
+variable "MAILJET_API_SECRET" {
+  type = string
+}
+
+variable "MAILJET_EMAIL_FROM" {
+  type = string
+}
+
+variable "JWT_SECRET" {
+  type = string
+}
+
+variable "JWT_EXPIRATION" {
+  type = string
+}
+
 module "api_deployment" {
   source = "./api_deployment"
   SCW_ACCESS_KEY = var.SCW_ACCESS_KEY
@@ -78,4 +98,9 @@ module "api_deployment" {
   DOCKERHUB_PASSWORD = var.DOCKERHUB_PASSWORD
   DOCKERHUB_USERNAME = var.DOCKERHUB_USERNAME
   DOCKERHUB_EMAIL = var.DOCKERHUB_EMAIL
+  MAILJET_API_KEY = var.MAILJET_API_KEY
+  MAILJET_API_SECRET = var.MAILJET_API_SECRET
+  MAILJET_EMAIL_FROM = var.MAILJET_EMAIL_FROM
+  JWT_SECRET = var.JWT_SECRET
+  JWT_EXPIRATION = var.JWT_EXPIRATION
 }

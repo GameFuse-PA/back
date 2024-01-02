@@ -9,6 +9,7 @@ dist
 
 kubeconfig.yaml
 
+.env
 .env.example
 .export.env.example
 

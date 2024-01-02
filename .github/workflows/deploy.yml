@@ -20,6 +20,11 @@ jobs:
       TF_VAR_DOCKERHUB_USERNAME: ${{ secrets.DOCKER_USERNAME }}
       TF_VAR_DOCKERHUB_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
       TF_VAR_DOCKERHUB_EMAIL: ${{ secrets.DOCKER_EMAIL }}
+      TF_VAR_MAILJET_API_KEY: ${{ secrets.MAILJET_API_KEY }}
+      TF_VAR_MAILJET_API_SECRET: ${{ secrets.MAILJET_API_SECRET }}
+      TF_VAR_MAILJET_EMAIL_FROM: ${{ secrets.MAILJET_EMAIL_FROM }}
+      TF_VAR_JWT_SECRET: ${{ secrets.JWT_SECRET }}
+      TF_VAR_JWT_EXPIRATION: ${{ secrets.JWT_EXPIRATION }}
 
     steps:
       - name: Checkout

@@ -1,7 +1,7 @@
 terraform {
   required_providers {
     kubernetes = {
-      source = "hashicorp/kubernetes"
+      source  = "hashicorp/kubernetes"
       version = "2.24.0"
     }
   }
@@ -30,7 +30,7 @@ resource "kubernetes_secret" "dockerhub" {
 
 resource "kubernetes_deployment" "gamefuse-api" {
   metadata {
-    name = "gamefuse-api"
+    name   = "gamefuse-api"
     labels = {
       app = "gamefuse-api"
     }
@@ -54,8 +54,8 @@ resource "kubernetes_deployment" "gamefuse-api" {
 
       spec {
         container {
-          image = "pbonnamy/gamefuse_api:latest"
-          name  = "gamefuse-container"
+          image             = "pbonnamy/gamefuse_api:latest"
+          name              = "gamefuse-container"
           image_pull_policy = "Always"
 
           resources {
@@ -74,33 +74,58 @@ resource "kubernetes_deployment" "gamefuse-api" {
           }
 
           env {
-            name = "AWS_ACCESS_KEY_ID"
+            name  = "AWS_ACCESS_KEY_ID"
             value = var.SCW_ACCESS_KEY
           }
 
           env {
-            name = "AWS_SECRET_ACCESS_KEY"
+            name  = "AWS_SECRET_ACCESS_KEY"
             value = var.SCW_SECRET_KEY
           }
 
           env {
-            name = "AWS_REGION"
+            name  = "AWS_REGION"
             value = var.BUCKET_REGION
           }
 
           env {
-            name = "AWS_BUCKET_NAME"
+            name  = "AWS_BUCKET_NAME"
             value = var.BUCKET_NAME
           }
 
           env {
-            name = "BUCKET_DOMAIN"
+            name  = "BUCKET_DOMAIN"
             value = "scw.cloud"
           }
 
           env {
-            name = "MONGO_URI"
+            name  = "MONGO_URI"
             value = "mongodb://gamefuse-database-service:27017/gamefuse"
+          }
+
+          env {
+            name  = "MAILJET_API_KEY"
+            value = var.MAILJET_API_KEY
+          }
+
+          env {
+            name  = "MAILJET_API_SECRET"
+            value = var.MAILJET_API_SECRET
+          }
+
+          env {
+            name  = "MAILJET_EMAIL_FROM"
+            value = var.MAILJET_EMAIL_FROM
+          }
+
+          env {
+            name  = "JWT_SECRET"
+            value = var.JWT_SECRET
+          }
+
+          env {
+            name  = "JWT_EXPIRATION"
+            value = var.JWT_EXPIRATION
           }
         }
 
@@ -144,8 +169,8 @@ resource "kubernetes_horizontal_pod_autoscaler" "gamefuse-api-hpa" {
 
     scale_target_ref {
       api_version = "apps/v1"
-      kind = "Deployment"
-      name = "gamefuse-api"
+      kind        = "Deployment"
+      name        = "gamefuse-api"
     }
   }
 }
