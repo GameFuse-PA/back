@@ -1,0 +1,65 @@
+name: Build and Deploy docker image using Terraform
+
+on:
+  push:
+    branches: [ test_deployment ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    env:
+      SCW_ACCESS_KEY: ${{ secrets.SCW_ACCESS_KEY }}
+      SCW_SECRET_KEY: ${{ secrets.SCW_SECRET_KEY }}
+      SCW_DEFAULT_ORGANIZATION_ID: ${{ secrets.SCW_DEFAULT_ORGANIZATION_ID }}
+      SCW_DEFAULT_PROJECT_ID: ${{ secrets.SCW_DEFAULT_PROJECT_ID }}
+      AWS_ACCESS_KEY_ID: ${{ secrets.SCW_ACCESS_KEY }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.SCW_SECRET_KEY }}
+      TF_VAR_SCW_ACCESS_KEY: ${{ secrets.SCW_ACCESS_KEY }}
+      TF_VAR_SCW_SECRET_KEY: ${{ secrets.SCW_SECRET_KEY }}
+      TF_VAR_DOCKERHUB_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+      TF_VAR_DOCKERHUB_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+      TF_VAR_DOCKERHUB_EMAIL: ${{ secrets.DOCKER_EMAIL }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Build the Docker image
+        run: npm run docker:build
+
+      - name: Push the Docker image to the repository
+        run: npm run docker:push
+
+      - name: Set up Terraform
+        uses: hashicorp/setup-terraform@v1
+
+      - name: Init backend
+        working-directory: ./terraform/backend
+        run: terraform init
+
+      - name: Plan backend
+        working-directory: ./terraform/backend
+        run: terraform plan
+
+      - name: Apply backend
+        working-directory: ./terraform/backend
+        run: terraform apply -auto-approve
+
+#      - name: Init main
+#        working-directory: ./terraform/main
+#        run: terraform init
+
+#      - name: Plan main
+#        working-directory: ./terraform/main
+#        run: terraform plan
+
+#      - name: Apply main
+#        working-directory: ./terraform/main
+#        run: terraform apply -auto-approve
