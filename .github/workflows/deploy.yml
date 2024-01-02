@@ -52,14 +52,18 @@ jobs:
         working-directory: ./terraform/backend
         run: terraform apply -auto-approve
 
-#      - name: Init main
-#        working-directory: ./terraform/main
-#        run: terraform init
+      - name: Init main
+        working-directory: ./terraform/main
+        run: terraform init
 
-#      - name: Plan main
-#        working-directory: ./terraform/main
-#        run: terraform plan
+      - name: Plan main
+        working-directory: ./terraform/main
+        run: terraform plan
 
-#      - name: Apply main
-#        working-directory: ./terraform/main
-#        run: terraform apply -auto-approve
+      - name: Apply main
+        working-directory: ./terraform/main
+        run: terraform apply -auto-approve
+
+      - name: Display kubeconfig.yaml
+        working-directory: ./terraform/main
+        run: cat kubeconfig.yaml
