@@ -45,17 +45,17 @@ jobs:
       - name: Set up Terraform
         uses: hashicorp/setup-terraform@v1
 
-      - name: Init backend
-        working-directory: ./terraform/backend
-        run: terraform init
+#      - name: Init backend
+#        working-directory: ./terraform/backend
+#        run: terraform init
 
-      - name: Plan backend
-        working-directory: ./terraform/backend
-        run: terraform plan
+#      - name: Plan backend
+#        working-directory: ./terraform/backend
+#        run: terraform plan
 
-      - name: Apply backend
-        working-directory: ./terraform/backend
-        run: terraform apply -auto-approve
+#      - name: Apply backend
+#        working-directory: ./terraform/backend
+#        run: terraform apply -auto-approve
 
       - name: Init main
         working-directory: ./terraform/main
