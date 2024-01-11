@@ -3,6 +3,7 @@ name: Build and Deploy docker image using Terraform
 on:
   push:
     branches: [ test_deployment ]
+#   branches: [ develop, master ]
 
 jobs:
   build:
@@ -43,15 +44,15 @@ jobs:
       - name: Set up Terraform
         uses: hashicorp/setup-terraform@v1
         
-      - name: Init main
+      - name: Init terraform deployments
         working-directory: ./terraform/main
         run: terraform init
 
-      - name: Plan main
+      - name: Plan terraform deployments
         working-directory: ./terraform/main
         run: terraform plan
 
-      - name: Apply main
+      - name: Apply terraform deployments
         working-directory: ./terraform/main
         run: terraform apply -auto-approve
 
