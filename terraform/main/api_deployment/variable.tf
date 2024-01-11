@@ -14,18 +14,6 @@ variable "BUCKET_REGION" {
   type = string
 }
 
-variable "DOCKERHUB_USERNAME" {
-  type = string
-}
-
-variable "DOCKERHUB_PASSWORD" {
-  type = string
-}
-
-variable "DOCKERHUB_EMAIL" {
-  type = string
-}
-
 variable "MAILJET_API_KEY" {
   type = string
 }

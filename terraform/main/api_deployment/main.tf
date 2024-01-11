@@ -7,9 +7,9 @@ terraform {
   }
 }
 
-resource "kubernetes_secret" "dockerhub" {
+resource "kubernetes_secret" "registry" {
   metadata {
-    name = "docker-cfg"
+    name = "registry-cfg"
   }
 
   type = "kubernetes.io/dockerconfigjson"
@@ -17,11 +17,10 @@ resource "kubernetes_secret" "dockerhub" {
   data = {
     ".dockerconfigjson" = jsonencode({
       auths = {
-        "docker.io" = {
-          "username" = var.DOCKERHUB_USERNAME
-          "password" = var.DOCKERHUB_PASSWORD
-          "email"    = var.DOCKERHUB_EMAIL
-          "auth"     = base64encode("${var.DOCKERHUB_USERNAME}:${var.DOCKERHUB_PASSWORD}")
+        "rg.fr-par.scw.cloud" = {
+          "username" = "nologin"
+          "password" = var.SCW_SECRET_KEY
+          "auth"     = base64encode("nologin:${var.SCW_SECRET_KEY}")
         }
       }
     })
@@ -54,7 +53,7 @@ resource "kubernetes_deployment" "gamefuse-api" {
 
       spec {
         container {
-          image             = "pbonnamy/gamefuse_api:latest"
+          image             = "rg.fr-par.scw.cloud/gamefuse/gamefuse_api:latest"
           name              = "gamefuse-container"
           image_pull_policy = "Always"
 
@@ -130,7 +129,7 @@ resource "kubernetes_deployment" "gamefuse-api" {
         }
 
         image_pull_secrets {
-          name = "docker-cfg"
+          name = "registry-cfg"
         }
       }
     }
