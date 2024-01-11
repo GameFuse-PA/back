@@ -30,9 +30,9 @@ jobs:
       - name: Login to Docker registry
         uses: docker/login-action@v3
         with:
-          registry: "rg.fr-par.scw.cloud"
-          username: "nologin"
-          password: ${{ secrets.DOCKER_PASSWORD }}
+          registry: rg.fr-par.scw.cloud
+          username: ${{ secrets.SCW_ACCESS_KEY }}
+          password: ${{ secrets.SCW_SECRET_KEY }}
 
       - name: Build the Docker image
         run: npm run docker:build
