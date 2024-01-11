@@ -3,6 +3,7 @@ name: Build and Deploy docker image using Terraform
 on:
   push:
     branches: [ test_deployment ]
+#   branches: [ develop, master ]
 
 jobs:
   build:
@@ -17,24 +18,23 @@ jobs:
       AWS_SECRET_ACCESS_KEY: ${{ secrets.SCW_SECRET_KEY }}
       TF_VAR_SCW_ACCESS_KEY: ${{ secrets.SCW_ACCESS_KEY }}
       TF_VAR_SCW_SECRET_KEY: ${{ secrets.SCW_SECRET_KEY }}
-      TF_VAR_DOCKERHUB_USERNAME: ${{ secrets.DOCKER_USERNAME }}
-      TF_VAR_DOCKERHUB_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
-      TF_VAR_DOCKERHUB_EMAIL: ${{ secrets.DOCKER_EMAIL }}
       TF_VAR_MAILJET_API_KEY: ${{ secrets.MAILJET_API_KEY }}
       TF_VAR_MAILJET_API_SECRET: ${{ secrets.MAILJET_API_SECRET }}
       TF_VAR_MAILJET_EMAIL_FROM: ${{ secrets.MAILJET_EMAIL_FROM }}
       TF_VAR_JWT_SECRET: ${{ secrets.JWT_SECRET }}
       TF_VAR_JWT_EXPIRATION: ${{ secrets.JWT_EXPIRATION }}
+      TF_VAR_REGISTRY_USERNAME: ${{ secrets.REGISTRY_USERNAME }}
 
     steps:
       - name: Checkout
         uses: actions/checkout@v2
 
-      - name: Login to Docker Hub
-        uses: docker/login-action@v1
+      - name: Login to Docker registry
+        uses: docker/login-action@v3
         with:
-          username: ${{ secrets.DOCKER_USERNAME }}
-          password: ${{ secrets.DOCKER_PASSWORD }}
+          registry: rg.fr-par.scw.cloud
+          username: ${{ secrets.REGISTRY_USERNAME }}
+          password: ${{ secrets.SCW_SECRET_KEY }}
 
       - name: Build the Docker image
         run: npm run docker:build
@@ -45,15 +45,15 @@ jobs:
       - name: Set up Terraform
         uses: hashicorp/setup-terraform@v1
         
-      - name: Init main
+      - name: Init Terraform deployments
         working-directory: ./terraform/main
         run: terraform init
 
-      - name: Plan main
+      - name: Plan Terraform deployments
         working-directory: ./terraform/main
         run: terraform plan
 
-      - name: Apply main
+      - name: Apply Terraform deployments
         working-directory: ./terraform/main
         run: terraform apply -auto-approve
 

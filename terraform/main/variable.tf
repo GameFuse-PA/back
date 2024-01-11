@@ -6,14 +6,6 @@ variable "SCW_SECRET_KEY" {
   type = string
 }
 
-variable "BUCKET_NAME" {
-  type = string
-}
-
-variable "BUCKET_REGION" {
-  type = string
-}
-
 variable "MAILJET_API_KEY" {
   type = string
 }

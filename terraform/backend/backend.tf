@@ -14,3 +14,8 @@ resource "scaleway_object_bucket" "gamefuse-terraform-state" {
   force_destroy = true
   region = "fr-par"
 }
+
+resource "scaleway_registry_namespace" "gamefuse-registry" {
+  name = "gamefuse"
+  is_public = false
+}

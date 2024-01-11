@@ -49,55 +49,13 @@ module "database_deployment" {
   source = "./database_deployment"
 }
 
-variable "SCW_ACCESS_KEY" {
-  type = string
-}
-
-variable "SCW_SECRET_KEY" {
-  type = string
-}
-
-variable "DOCKERHUB_USERNAME" {
-  type = string
-}
-
-variable "DOCKERHUB_PASSWORD" {
-  type = string
-}
-
-variable "DOCKERHUB_EMAIL" {
-  type = string
-}
-
-variable "MAILJET_API_KEY" {
-  type = string
-}
-
-variable "MAILJET_API_SECRET" {
-  type = string
-}
-
-variable "MAILJET_EMAIL_FROM" {
-  type = string
-}
-
-variable "JWT_SECRET" {
-  type = string
-}
-
-variable "JWT_EXPIRATION" {
-  type = string
-}
-
 module "api_deployment" {
   source = "./api_deployment"
   SCW_ACCESS_KEY = var.SCW_ACCESS_KEY
   SCW_SECRET_KEY = var.SCW_SECRET_KEY
   BUCKET_NAME = module.object_storage.bucket_name
   BUCKET_REGION = module.object_storage.bucket_region
-  DOCKERHUB_PASSWORD = var.DOCKERHUB_PASSWORD
-  DOCKERHUB_USERNAME = var.DOCKERHUB_USERNAME
-  DOCKERHUB_EMAIL = var.DOCKERHUB_EMAIL
+  REGISTRY_USERNAME = var.REGISTRY_USERNAME
   MAILJET_API_KEY = var.MAILJET_API_KEY
   MAILJET_API_SECRET = var.MAILJET_API_SECRET
   MAILJET_EMAIL_FROM = var.MAILJET_EMAIL_FROM
