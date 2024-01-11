@@ -37,3 +37,7 @@ variable "JWT_EXPIRATION" {
 variable "REGISTRY_USERNAME" {
   type = string
 }
+
+variable "REGISTRY_URL" {
+  type = string
+}

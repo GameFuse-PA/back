@@ -56,6 +56,7 @@ module "api_deployment" {
   BUCKET_NAME        = module.object_storage.bucket_name
   BUCKET_REGION      = module.object_storage.bucket_region
   REGISTRY_USERNAME  = var.REGISTRY_USERNAME
+  REGISTRY_URL       = var.REGISTRY_URL
   MAILJET_API_KEY    = var.MAILJET_API_KEY
   MAILJET_API_SECRET = var.MAILJET_API_SECRET
   MAILJET_EMAIL_FROM = var.MAILJET_EMAIL_FROM
