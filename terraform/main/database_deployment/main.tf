@@ -1,7 +1,7 @@
 terraform {
   required_providers {
     kubernetes = {
-      source = "hashicorp/kubernetes"
+      source  = "hashicorp/kubernetes"
       version = "2.24.0"
     }
   }
@@ -9,7 +9,7 @@ terraform {
 
 resource "kubernetes_deployment" "gamefuse-database" {
   metadata {
-    name = "gamefuse-database"
+    name   = "gamefuse-database"
     labels = {
       app = "gamefuse-database"
     }
@@ -33,8 +33,8 @@ resource "kubernetes_deployment" "gamefuse-database" {
 
       spec {
         container {
-          image = "mongo:latest"
-          name  = "mongodb-container"
+          image             = "mongo:latest"
+          name              = "mongodb-container"
           image_pull_policy = "Always"
 
           port {
