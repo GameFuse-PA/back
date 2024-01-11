@@ -23,6 +23,7 @@ jobs:
       TF_VAR_MAILJET_EMAIL_FROM: ${{ secrets.MAILJET_EMAIL_FROM }}
       TF_VAR_JWT_SECRET: ${{ secrets.JWT_SECRET }}
       TF_VAR_JWT_EXPIRATION: ${{ secrets.JWT_EXPIRATION }}
+      TF_VAR_REGISTRY_USERNAME: ${{ secrets.REGISTRY_USERNAME }}
 
     steps:
       - name: Checkout
@@ -44,15 +45,15 @@ jobs:
       - name: Set up Terraform
         uses: hashicorp/setup-terraform@v1
         
-      - name: Init terraform deployments
+      - name: Init Terraform deployments
         working-directory: ./terraform/main
         run: terraform init
 
-      - name: Plan terraform deployments
+      - name: Plan Terraform deployments
         working-directory: ./terraform/main
         run: terraform plan
 
-      - name: Apply terraform deployments
+      - name: Apply Terraform deployments
         working-directory: ./terraform/main
         run: terraform apply -auto-approve
 
