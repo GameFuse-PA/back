@@ -31,7 +31,7 @@ jobs:
         uses: docker/login-action@v3
         with:
           registry: rg.fr-par.scw.cloud
-          username: ${{ secrets.SCW_ACCESS_KEY }}
+          username: ${{ secrets.REGISTRY_USERNAME }}
           password: ${{ secrets.SCW_SECRET_KEY }}
 
       - name: Build the Docker image

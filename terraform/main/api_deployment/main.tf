@@ -18,9 +18,9 @@ resource "kubernetes_secret" "registry" {
     ".dockerconfigjson" = jsonencode({
       auths = {
         "rg.fr-par.scw.cloud" = {
-          "username" = "nologin"
+          "username" = var.REGISTRY_USERNAME
           "password" = var.SCW_SECRET_KEY
-          "auth"     = base64encode("nologin:${var.SCW_SECRET_KEY}")
+          "auth"     = base64encode("${var.REGISTRY_USERNAME}:${var.SCW_SECRET_KEY}")
         }
       }
     })

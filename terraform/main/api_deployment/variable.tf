@@ -33,3 +33,7 @@ variable "JWT_SECRET" {
 variable "JWT_EXPIRATION" {
   type = string
 }
+
+variable "REGISTRY_USERNAME" {
+  type = string
+}

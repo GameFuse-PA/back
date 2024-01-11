@@ -55,6 +55,7 @@ module "api_deployment" {
   SCW_SECRET_KEY = var.SCW_SECRET_KEY
   BUCKET_NAME = module.object_storage.bucket_name
   BUCKET_REGION = module.object_storage.bucket_region
+  REGISTRY_USERNAME = var.REGISTRY_USERNAME
   MAILJET_API_KEY = var.MAILJET_API_KEY
   MAILJET_API_SECRET = var.MAILJET_API_SECRET
   MAILJET_EMAIL_FROM = var.MAILJET_EMAIL_FROM
