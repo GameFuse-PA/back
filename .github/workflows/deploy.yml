@@ -3,7 +3,7 @@ name: Build and Deploy docker image using Terraform
 on:
   push:
     branches: [ test_deployment ]
-#   branches: [ develop, master ]
+#   branches: [ master ]
 
 jobs:
   build:
